@@ -49,11 +49,11 @@ users are in `plugins/ui-engineering/docs/`.
 Claude Code, directly from GitHub (the repository is a plugin marketplace named `ui-engineering`):
 
 ```bash
-claude plugin marketplace add doantuan22/Skill-AI-Coding_Frontend-
+claude plugin marketplace add doantuan22/Onni_UIUX_Design
 claude plugin install ui-ux-design@ui-engineering
 ```
 
-Codex (from a clone): `codex plugin marketplace add ./Skill-AI-Coding_Frontend-` (reads `.agents/plugins/marketplace.json`).
+Codex (from a clone): `codex plugin marketplace add ./Onni_UIUX_Design` (reads `.agents/plugins/marketplace.json`).
 Other options — a single session with `claude --plugin-dir plugins/ui-engineering`, release archives and a standalone
 MCP server — are described in [plugins/ui-engineering/docs/INSTALLATION.md](plugins/ui-engineering/docs/INSTALLATION.md).
 

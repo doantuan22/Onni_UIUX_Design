@@ -26,7 +26,7 @@ This will produce the `dist/dev/adapters/ui-ux-design-0.1.0-dev-claude-marketpla
 The repository itself is a Claude Code marketplace (`ui-engineering`):
 
 ```bash
-claude plugin marketplace add doantuan22/Skill-AI-Coding_Frontend-
+claude plugin marketplace add doantuan22/Onni_UIUX_Design
 claude plugin install ui-ux-design@ui-engineering
 ```
 

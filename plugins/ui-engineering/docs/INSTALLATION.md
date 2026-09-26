@@ -14,7 +14,7 @@ This guide details how to acquire, install, verify, and upgrade the **UI Enginee
 
 ## 2. Installation Methods
 
-Repository: <https://github.com/doantuan22/Skill-AI-Coding_Frontend->. The plugin root is
+Repository: <https://github.com/doantuan22/Onni_UIUX_Design>. The plugin root is
 `plugins/ui-engineering/` (plugin id `ui-ux-design`).
 
 ### Method A: Install directly from GitHub (Claude Code marketplace)
@@ -22,19 +22,19 @@ Repository: <https://github.com/doantuan22/Skill-AI-Coding_Frontend->. The plugi
 The repository root is a Claude Code marketplace named `ui-engineering`:
 
 ```bash
-claude plugin marketplace add doantuan22/Skill-AI-Coding_Frontend-
+claude plugin marketplace add doantuan22/Onni_UIUX_Design
 claude plugin install ui-ux-design@ui-engineering
 ```
 
-(Inside a Claude Code session: `/plugin marketplace add doantuan22/Skill-AI-Coding_Frontend-`, then
+(Inside a Claude Code session: `/plugin marketplace add doantuan22/Onni_UIUX_Design`, then
 `/plugin install ui-ux-design@ui-engineering`.) This registers the `ui-ux-workflow` skill and the
 `ui-ux-design-mcp` MCP server.
 
 ### Method B: Install from a clone
 
 ```bash
-git clone https://github.com/doantuan22/Skill-AI-Coding_Frontend-.git
-cd Skill-AI-Coding_Frontend-
+git clone https://github.com/doantuan22/Onni_UIUX_Design.git
+cd Onni_UIUX_Design
 ```
 
 - Claude Code: `claude plugin marketplace add .` then `claude plugin install ui-ux-design@ui-engineering`,
@@ -83,7 +83,7 @@ Add the stdio server to any MCP client configuration (e.g. `claude_desktop_confi
   "mcpServers": {
     "ui-ux-design-mcp": {
       "command": "python3",
-      "args": ["/path/to/Skill-AI-Coding_Frontend-/plugins/ui-engineering/adapters/mcp/server.py"]
+      "args": ["/path/to/Onni_UIUX_Design/plugins/ui-engineering/adapters/mcp/server.py"]
     }
   }
 }

@@ -45,8 +45,8 @@ UI Engineering Plugin v0.1.0 provides an AI coding agent pair-programming system
 
 ### Install via GitHub Source
 ```bash
-git clone https://github.com/doantuan22/Skill-AI-Coding_Frontend-.git
-cd Skill-AI-Coding_Frontend-
+git clone https://github.com/doantuan22/Onni_UIUX_Design.git
+cd Onni_UIUX_Design
 python plugins/ui-engineering/scripts/uiux_cli.py call self_test
 ```
 

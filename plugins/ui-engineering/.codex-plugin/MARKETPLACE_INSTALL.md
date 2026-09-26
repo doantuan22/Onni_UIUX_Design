@@ -18,8 +18,8 @@ plugin source is `./plugins/ui-engineering`; that directory contains `.codex-plu
 `.codex-plugin/mcp.json` and `skills/ui-ux-workflow/SKILL.md`. Clone the repository and add it:
 
 ```bash
-git clone https://github.com/doantuan22/Skill-AI-Coding_Frontend-.git
-codex plugin marketplace add ./Skill-AI-Coding_Frontend-
+git clone https://github.com/doantuan22/Onni_UIUX_Design.git
+codex plugin marketplace add ./Onni_UIUX_Design
 ```
 
 The plugin identifier is `ui-ux-design@ui-engineering`. This layout is structurally tested

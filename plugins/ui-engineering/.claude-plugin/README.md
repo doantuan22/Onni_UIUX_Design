@@ -48,12 +48,12 @@ See [VSCODE_INSTALL.md](VSCODE_INSTALL.md) for full installation and VS Code set
 The repository root carries `.claude-plugin/marketplace.json` (marketplace `ui-engineering`, source `./plugins/ui-engineering`):
 
 ```bash
-claude plugin marketplace add doantuan22/Skill-AI-Coding_Frontend-
+claude plugin marketplace add doantuan22/Onni_UIUX_Design
 claude plugin install ui-ux-design@ui-engineering
 ```
 
-Inside Claude Code the same is `/plugin marketplace add doantuan22/Skill-AI-Coding_Frontend-` then `/plugin install ui-ux-design@ui-engineering`.
-A local clone works the same way: `claude plugin marketplace add /path/to/Skill-AI-Coding_Frontend-`.
+Inside Claude Code the same is `/plugin marketplace add doantuan22/Onni_UIUX_Design` then `/plugin install ui-ux-design@ui-engineering`.
+A local clone works the same way: `claude plugin marketplace add /path/to/Onni_UIUX_Design`.
 
 ### Development (recommended for testing)
 
