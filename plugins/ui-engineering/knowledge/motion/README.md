@@ -24,7 +24,7 @@ Runs after Visual Grammar and before Web Pattern selection is finalized (pattern
 | [performance-safety.md](performance-safety.md) | Any scroll-linked, continuous, or large-area motion |
 | [motion-review.md](motion-review.md) | Review of rendered motion |
 
-Progressive disclosure: dashboards/forms load principles + M1 (+ M2 for overlays, M3 for list/detail) + reduced-motion only. M4 is for marketing/content pages; M5 only when the Capability Resolver allows it. Every entry is a structured catalog item of the [Design Knowledge System](../knowledge/README.md).
+Progressive disclosure: dashboards/forms load principles + M1 (+ M2 for overlays, M3 for list/detail) + reduced-motion only. M4 is for marketing/content pages; M5 only when the Capability Resolver allows it. Every entry is a structured catalog item of the [Design Knowledge System](../domains/README.md).
 
 ## Dependencies
 

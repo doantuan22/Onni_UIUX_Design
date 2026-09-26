@@ -22,6 +22,9 @@ evals/results/
 uiux.config.json
 dist/
 build/
+# Local build outputs and throwaway scripts (never committed; releases are built by .github/workflows/package.yml)
+/out/
+/scratch/
 .staging/
 *.staging/
 *.egg-info/

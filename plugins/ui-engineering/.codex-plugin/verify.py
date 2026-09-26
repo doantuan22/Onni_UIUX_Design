@@ -1,7 +1,7 @@
 """Codex plugin bundle verification (checks X1-X16).
 
-    python plugin/adapters/codex/verify.py <extracted-bundle-root>
-    python plugin/adapters/codex/verify.py --bundle <bundle.zip>
+    python plugins/ui-engineering/.codex-plugin/verify.py <extracted-bundle-root>
+    python plugins/ui-engineering/.codex-plugin/verify.py --bundle <bundle.zip>
 
 Checks are structural and subprocess-based. A live Codex session is NOT required for X1-X16.
 Exit codes: 0 all PASS, 2 at least one FAIL, 1 unusable input.
@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shutil
 import sys
 import tempfile
@@ -36,7 +37,7 @@ CHECKS = {
     "X2": "manifest schema hợp lệ",
     "X3": "version khớp VERSION",
     "X4": "skill directory hợp lệ",
-    "X5": "generated skill khớp canonical SKILL.md",
+    "X5": "skill entry delegates to canonical SKILL.md (same frontmatter, links resolve)",
     "X6": "MCP config hợp lệ (mcp.json)",
     "X7": "MCP config dùng shared MCP",
     "X8": "không absolute path",
@@ -92,12 +93,12 @@ def verify_bundle(root: Path, python: str = sys.executable) -> dict:
     skill_path = root / "skills" / "ui-ux-workflow" / "SKILL.md"
     ok("X4", [] if skill_path.is_file() else [f"{skill_path} not found"])
 
-    # X5: generated skill matches canonical SKILL.md
+    # X5: the skill entry delegates to the canonical SKILL.md: same frontmatter, a link to it, and every
+    # relative link resolving inside the bundle (a verbatim copy one level down breaks the canonical links).
     x5_problems: list[str] = []
     canonical_skill = root / "SKILL.md"
     if skill_path.is_file() and canonical_skill.is_file():
-        if skill_path.read_bytes() != canonical_skill.read_bytes():
-            x5_problems.append("generated skill content differs from canonical SKILL.md")
+        x5_problems.extend(check_skill_entry(skill_path, canonical_skill, root))
     else:
         x5_problems.append("cannot compare; files missing")
     ok("X5", x5_problems)
@@ -188,6 +189,33 @@ def verify_bundle(root: Path, python: str = sys.executable) -> dict:
         "not_run": [c["id"] for c in checks if c["status"] == "NOT_RUN"],
         "checks": checks,
     }
+
+
+_FRONTMATTER = re.compile(r"\A---\r?\n(.*?)\r?\n---\r?\n", re.DOTALL)
+_LINK = re.compile(r"\]\(([^)\s#]+)(?:#[^)]*)?\)")
+
+
+def check_skill_entry(skill_path: Path, canonical_skill: Path, root: Path) -> list[str]:
+    """Problems with a skill entry that must delegate to the canonical SKILL.md."""
+    problems: list[str] = []
+    text = skill_path.read_text(encoding="utf-8", errors="replace")
+    entry = _FRONTMATTER.match(text)
+    canonical = _FRONTMATTER.match(canonical_skill.read_text(encoding="utf-8", errors="replace"))
+    if not entry:
+        problems.append("skill entry has no frontmatter")
+    elif not canonical or entry.group(1).strip() != canonical.group(1).strip():
+        problems.append("skill entry frontmatter differs from canonical SKILL.md")
+    targets = [t for t in _LINK.findall(text) if "://" not in t and not t.startswith("mailto:")]
+    resolved = [(t, (skill_path.parent / t).resolve()) for t in targets]
+    if not any(path == canonical_skill.resolve() for _, path in resolved):
+        problems.append("skill entry does not link to the canonical SKILL.md")
+    root_resolved = root.resolve()
+    for target, path in resolved:
+        if not path.exists():
+            problems.append(f"broken relative link: {target}")
+        elif root_resolved not in (path, *path.parents):
+            problems.append(f"link escapes the bundle: {target}")
+    return problems
 
 
 def verify_marketplace(root: Path, python: str = sys.executable) -> dict:

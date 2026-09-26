@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Adapter metadata (plugin/adapters/<id>/adapter.json)",
+  "title": "Adapter metadata (plugins/ui-engineering/adapters/<id>/adapter.json)",
   "description": "Declarative adapter metadata (spec section 7.2). Data only: every reference points to a uiux.api function, never to internal modules. Platform adapters add host metadata only through the optional 'host', 'rendered_files' and 'bundle_layout' fields.",
   "type": "object",
   "required": ["schema_version", "id", "status", "adapter_contract_version", "core_api", "manifest_version", "transports",

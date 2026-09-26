@@ -2,8 +2,8 @@
 
 Run from any directory with either::
 
-    python -m plugin.adapters.mcp.server
-    python plugin/adapters/mcp/server.py
+    python -m adapters.mcp.server  # from plugins/ui-engineering
+    python plugins/ui-engineering/adapters/mcp/server.py
 
 Messages are newline-delimited JSON-RPC 2.0. Stdout is protocol-only; diagnostics, including debug tracebacks, use
 stderr. The server has no network listener and never installs dependencies or invokes arbitrary code.

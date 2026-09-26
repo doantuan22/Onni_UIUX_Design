@@ -1,10 +1,12 @@
 """Build a self-contained Codex plugin bundle from a verified generic artifact.
 
-    python plugin/adapters/codex/export.py --source <extracted-artifact-root> --out dist/<version>/adapters/
-    python plugin/adapters/codex/export.py --dev --out dist/dev/adapters/
+    python plugins/ui-engineering/.codex-plugin/export.py --source <extracted-artifact-root> --out dist/<version>/adapters/
+    python plugins/ui-engineering/.codex-plugin/export.py --dev --source plugins/ui-engineering --out dist/dev/adapters/
 
 The bundle is a ZIP containing the full generic payload plus Codex-specific overlay files
-(plugin.json, mcp.json, skills/ui-ux-workflow/SKILL.md). It delegates to the common adapter framework
+(plugin.json, mcp.json). The skill entry skills/ui-ux-workflow/SKILL.md comes from the payload: it is the
+committed pointer to the canonical SKILL.md, so every relative link keeps resolving (a byte copy of SKILL.md
+one directory level down would break them). It delegates to the common adapter framework
 for safe overlay assembly and deterministic ZIP creation.
 """
 from __future__ import annotations
@@ -41,16 +43,14 @@ def export(source: Path, out_dir: Path, dev: bool = False) -> dict:
     
     mcp_config = (_HERE / "templates" / "mcp.json").read_text(encoding="utf-8")
     
-    # Read the canonical SKILL.md from the root to copy it to the skills/ directory
-    skill_md_path = source / "SKILL.md"
-    if not skill_md_path.is_file():
-        raise RuntimeError(f"SKILL.md not found in {source}")
-    skill_content = skill_md_path.read_bytes()
+    # The skill entry is part of the generic payload (never re-rendered): it delegates to the canonical SKILL.md.
+    for required in ("SKILL.md", "skills/ui-ux-workflow/SKILL.md"):
+        if not (source / required).is_file():
+            raise RuntimeError(f"{required} not found in {source}")
 
     overlay = [
         ("plugin.json", codex_manifest.encode("utf-8")),
         ("mcp.json", mcp_config.encode("utf-8")),
-        ("skills/ui-ux-workflow/SKILL.md", skill_content),
     ]
 
     # Collect generic payload using common utility (excluding files rendered by overlay)
@@ -103,7 +103,7 @@ def main(argv: list[str] | None = None) -> int:
 
     source = args.source
     if source is None:
-        source = _HERE.parents[2]
+        source = _HERE.parent  # the plugin root (plugins/ui-engineering)
 
     try:
         result = export(source, args.out, args.dev)

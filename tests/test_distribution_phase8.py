@@ -47,11 +47,41 @@ if str(PACKAGING_DIR) not in sys.path:
     sys.path.insert(0, str(PACKAGING_DIR))
 
 import artifact
+import build
 import package_files
+import verify
+
+ARTIFACT_BASE = "ui-ux-design-0.1.0-dev"
 
 
 class Phase8DistributionTests(unittest.TestCase):
     """Automated tests for Phase 8 Distribution and Compatibility gates."""
+
+    _artifact_dir: Path | None = None
+    _artifact_tmp: str | None = None
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        if cls._artifact_tmp:
+            shutil.rmtree(cls._artifact_tmp, ignore_errors=True)
+            cls._artifact_tmp = cls._artifact_dir = None
+
+    @classmethod
+    def _dev_artifact_dir(cls) -> Path:
+        """Build (once per class) a developer artifact of the working tree into a temporary directory and verify it.
+
+        ``dist/`` is git-ignored, so the tests never rely on a pre-built artifact or write into the repository.
+        V13 is skipped here to avoid re-running the whole suite recursively.
+        """
+        if cls._artifact_dir is None:
+            if os.environ.get("UIUX_TEST_ROOT"):
+                raise unittest.SkipTest("artifact build tests run against the source repository, not an extracted artifact")
+            cls._artifact_tmp = tempfile.mkdtemp(prefix="phase8-dist-")
+            out = Path(cls._artifact_tmp)
+            result = build.build(REPO_ROOT, dev=True, out=out, formats=["zip"])
+            verify.verify(Path(result["artifacts"][0]), tests_dir=None)
+            cls._artifact_dir = out
+        return cls._artifact_dir
 
     def setUp(self) -> None:
         self.temp_dirs: list[str] = []
@@ -280,9 +310,9 @@ class Phase8DistributionTests(unittest.TestCase):
     # -------------------------------------------------------------------------
     def test_11_package_build_and_artifact_integrity(self) -> None:
         """Package manifest, zip file, and sha256 checksums exist and match."""
-        dist_dev_dir = REPO_ROOT / "dist" / "dev" / "0.1.0"
-        zip_path = dist_dev_dir / "ui-ux-design-0.1.0-dev.zip"
-        manifest_path = dist_dev_dir / "ui-ux-design-0.1.0-dev.package-manifest.json"
+        dist_dev_dir = self._dev_artifact_dir()
+        zip_path = dist_dev_dir / f"{ARTIFACT_BASE}.zip"
+        manifest_path = dist_dev_dir / f"{ARTIFACT_BASE}.package-manifest.json"
         sums_path = dist_dev_dir / "SHA256SUMS"
 
         self.assertTrue(zip_path.is_file(), f"Zip artifact must exist at {zip_path}")
@@ -300,7 +330,7 @@ class Phase8DistributionTests(unittest.TestCase):
     # -------------------------------------------------------------------------
     def test_12_artifact_verify_passes(self) -> None:
         """Verification report on the packaged artifact must be PASS."""
-        report_path = REPO_ROOT / "dist" / "dev" / "0.1.0" / "ui-ux-design-0.1.0-dev.verify-report.json"
+        report_path = self._dev_artifact_dir() / f"{ARTIFACT_BASE}.verify-report.json"
         self.assertTrue(report_path.is_file(), "Verification report must exist")
 
         report = json.loads(report_path.read_text(encoding="utf-8"))
@@ -312,8 +342,7 @@ class Phase8DistributionTests(unittest.TestCase):
     # -------------------------------------------------------------------------
     def test_13_clean_install_isolated_consumer(self) -> None:
         """Extracted artifact in clean consumer workspace executes without source repo."""
-        dist_dev_dir = REPO_ROOT / "dist" / "dev" / "0.1.0"
-        zip_path = dist_dev_dir / "ui-ux-design-0.1.0-dev.zip"
+        zip_path = self._dev_artifact_dir() / f"{ARTIFACT_BASE}.zip"
 
         install_root = self._mkdtemp("consumer-install-")
         with zipfile.ZipFile(zip_path) as zf:
@@ -376,8 +405,7 @@ class Phase8DistributionTests(unittest.TestCase):
     # -------------------------------------------------------------------------
     def test_14_clean_install_smoke_workflow(self) -> None:
         """Isolated consumer executes analyze_repository via CLI on target fixture."""
-        dist_dev_dir = REPO_ROOT / "dist" / "dev" / "0.1.0"
-        zip_path = dist_dev_dir / "ui-ux-design-0.1.0-dev.zip"
+        zip_path = self._dev_artifact_dir() / f"{ARTIFACT_BASE}.zip"
 
         install_root = self._mkdtemp("consumer-install-smoke-")
         with zipfile.ZipFile(zip_path) as zf:

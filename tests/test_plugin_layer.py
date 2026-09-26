@@ -120,7 +120,7 @@ class CoreWithoutPluginTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.temporary = tempfile.TemporaryDirectory()
-        cls.root = Path(cls.temporary.name) / "skill"
+        cls.root = Path(cls.temporary.name).resolve() / "skill"  # Windows 8.3 short names, macOS /private/var
         for rel in PackagingTests.result["included"]:
             if rel.startswith("plugin/"):
                 continue

@@ -39,4 +39,4 @@ Each dimension is necessary. A single failing dimension caps the whole: a beauti
 ## Using the model
 
 - **Before implementation:** state which dimensions the design direction invests in and which restraint decisions were made (what was *not* added).
-- **During review:** the [craft review](../../visual-language/craft-review.md) and E65–E80 evaluate the dimensions. A failure in performance, accessibility or consistency blocks a "premium" claim regardless of visual polish (`PREMIUM_BY_EFFECTS` when polish was pursued through effects instead).
+- **During review:** the [craft review](../../../skills/visual-language/craft-review.md) and E65–E80 evaluate the dimensions. A failure in performance, accessibility or consistency blocks a "premium" claim regardless of visual polish (`PREMIUM_BY_EFFECTS` when polish was pursued through effects instead).

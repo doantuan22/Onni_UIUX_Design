@@ -5,9 +5,9 @@ This is the experimental, host-neutral MCP transport for the UI/UX Skill. It is 
 Run it from any working directory:
 
 ```bash
-python -m plugin.adapters.mcp.server
+python -m adapters.mcp.server  # from plugins/ui-engineering
 # or
-python plugin/adapters/mcp/server.py
+python plugins/ui-engineering/adapters/mcp/server.py
 ```
 
 The transport uses newline-delimited JSON on standard input/output. Standard output is protocol data only. Diagnostics and `--debug` tracebacks go to standard error. EOF cleanly stops the process; there is no network listener, daemon, dependency installation, browser download, resource API, prompt API, sampling API, or host-specific configuration.

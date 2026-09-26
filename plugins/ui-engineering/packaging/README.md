@@ -1,6 +1,6 @@
 # Packaging: build and verification
 
-Implements spec phases P0–P2 plus the experimental shared MCP transport smoke checks ([docs/plugin-packaging-spec.md](../../docs/plugin-packaging-spec.md)). Release archives are the primary distribution format. Nothing is published, tagged or installed by these tools.
+Implements spec phases P0–P2 plus the experimental shared MCP transport smoke checks ([docs/plugin-packaging-spec.md](../../../development/docs/plugin-packaging-spec.md)). Release archives are the primary distribution format. Nothing is published, tagged or installed by these tools.
 
 | File | Role |
 |---|---|
@@ -14,11 +14,11 @@ Implements spec phases P0–P2 plus the experimental shared MCP transport smoke 
 ## How to build
 
 ```bash
-python plugin/packaging/build.py                    # release build of HEAD -> dist/<version>/
-python plugin/packaging/build.py --commit v0.2.0    # release build of another commit/tag
-python plugin/packaging/build.py --dev              # developer build of the working tree -> dist/dev/<version>/
-python plugin/packaging/build.py --verify           # build, then run verify.py on the zip
-python plugin/packaging/build.py --out <dir> --formats zip,tar.gz --repo <repo-root>
+python plugins/ui-engineering/packaging/build.py                    # release build of HEAD -> dist/<version>/
+python plugins/ui-engineering/packaging/build.py --commit v0.2.0    # release build of another commit/tag
+python plugins/ui-engineering/packaging/build.py --dev              # developer build of the working tree -> dist/dev/<version>/
+python plugins/ui-engineering/packaging/build.py --verify           # build, then run verify.py on the zip
+python plugins/ui-engineering/packaging/build.py --out <dir> --formats zip,tar.gz --repo <repo-root>
 ```
 
 All commands work from any working directory. Exit codes: `0` built, `1` refused or failed (JSON error with a stable `code`), `2` verification failed.
@@ -60,7 +60,7 @@ ui-ux-design-<version>/            single top-level directory inside each archiv
 
 Excluded: `tests/`, `.git/`, `.github/`, `.gitignore`, `.gitattributes`, caches (`__pycache__`, `*.pyc`), runtime evidence (`.evidence/`) and helper temporaries, benchmark/eval outputs, logs, temporary files, local config, virtualenvs, IDE folders, `dist/`, `build/` and staging directories. Evals fixtures are packaged on purpose: they are inputs to `run_evals` and `validate_skill`.
 
-**Name ownership:** the package id `ui-ux-design` comes from `plugin/manifest/plugin.json`; the skill name `ui-ux-workflow` comes from the `SKILL.md` frontmatter; the Python package is `uiux`. All three are recorded in `PACKAGE-MANIFEST.json`. None is renamed by packaging.
+**Name ownership:** the package id `ui-ux-design` comes from `plugins/ui-engineering/plugin.json`; the skill name `ui-ux-workflow` comes from the `SKILL.md` frontmatter; the Python package is `uiux`. All three are recorded in `PACKAGE-MANIFEST.json`. None is renamed by packaging.
 
 **Version source:** `VERSION` only. The build copies it into every name and metadata file and refuses mismatches.
 
@@ -75,9 +75,9 @@ Verify manually: `sha256sum -c SHA256SUMS` (Linux/macOS) or `Get-FileHash -Algor
 ## How to verify an artifact
 
 ```bash
-python plugin/packaging/verify.py dist/<version>/ui-ux-design-<version>.zip --require-release --tests tests
-python plugin/packaging/verify.py --installed <extracted-root>        # an existing install (bytecode caches ignored)
-python plugin/packaging/verify.py <archive> --quick                  # structural checks V1-V5 only
+python plugins/ui-engineering/packaging/verify.py dist/<version>/ui-ux-design-<version>.zip --require-release --tests tests
+python plugins/ui-engineering/packaging/verify.py --installed <extracted-root>        # an existing install (bytecode caches ignored)
+python plugins/ui-engineering/packaging/verify.py <archive> --quick                  # structural checks V1-V5 only
 ```
 
 The verifier extracts the archive into a fresh temp directory (rejecting absolute, `..`, backslash and symlink members). It then runs every check with the **artifact's own** scripts, from an unrelated working directory, with `PYTHONPATH`/`UIUX_ROOT`/`UIUX_CONFIG` removed, bytecode writes disabled and an empty `PLAYWRIGHT_BROWSERS_PATH`. After a structural failure (V1–V5) the behavioral checks are reported `NOT_RUN`.

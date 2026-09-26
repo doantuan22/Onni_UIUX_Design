@@ -27,7 +27,7 @@ RUNTIME / VISUAL / INTERACTION EVALUATION   Browser runtime evidence · Accessib
 | Advanced graphics | [graphics/techniques.md](graphics/techniques.md) + technology entries | 4 techniques + 12 technologies |
 | Composition | [composition/](composition/README.md) | 16 recipes, anti-homogenization, premium quality model |
 | Accessibility contract | [advanced-accessibility.md](advanced-accessibility.md) | Required for every advanced item |
-| Implementation | [technology-resolver.md](../05-frontend-implementation/technology-resolver.md), [performance-budget.md](../05-frontend-implementation/performance-budget.md) | Technology decisions and budgets |
+| Implementation | [technology-resolver.md](../../skills/frontend-implementation/technology-resolver.md), [performance-budget.md](../../skills/frontend-implementation/performance-budget.md) | Technology decisions and budgets |
 
 `Effect ≠ Motion ≠ Interaction`: an effect is how something looks, motion is how it changes over time, and an interaction is how input produces a result. They are decided, budgeted and reviewed separately.
 
@@ -37,7 +37,7 @@ RUNTIME / VISUAL / INTERACTION EVALUATION   Browser runtime evidence · Accessib
 - [retrieval.md](retrieval.md): how to load only what a task needs.
 - [INDEX.md](INDEX.md): the generated id index (never edited by hand).
 
-Tools (standard library only): `scripts/knowledge_lib.py` (validate, index), `scripts/resolve_capabilities.py` (resolver), `tests/test_knowledge.py` (schema, retrieval, resolver, diversity tests). Extension guide: [docs/design-knowledge-system.md](../../docs/design-knowledge-system.md).
+Tools (standard library only): `scripts/knowledge_lib.py` (validate, index), `scripts/resolve_capabilities.py` (resolver), `tests/test_knowledge.py` (schema, retrieval, resolver, diversity tests). Extension guide: [docs/design-knowledge-system.md](../../../../development/docs/design-knowledge-system.md).
 
 ## Principles
 

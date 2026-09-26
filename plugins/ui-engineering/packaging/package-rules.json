@@ -46,6 +46,8 @@
     "SKILL.md",
     "VERSION",
     "CHANGELOG.md",
+    "LICENSE",
+    "NOTICE",
     "uiux/__init__.py",
     "uiux/api.py",
     "uiux/cli.py",

@@ -3,7 +3,7 @@
 **Release Date:** 2026-09-26  
 **Status:** RELEASE-READY (Local & Package Verified)  
 **Release Tag:** `v0.1.0`  
-**Distribution Archive:** `ui-engineering-0.1.0.zip`
+**Distribution Archive:** `ui-ux-design-0.1.0.zip`
 
 ---
 
@@ -45,16 +45,16 @@ UI Engineering Plugin v0.1.0 provides an AI coding agent pair-programming system
 
 ### Install via GitHub Source
 ```bash
-git clone https://github.com/organization/ui-engineering-plugin.git
-cd ui-engineering-plugin
-python -m uiux.cli self_test
+git clone https://github.com/doantuan22/Onni_UIUX_Design.git
+cd Onni_UIUX_Design
+python plugins/ui-engineering/scripts/uiux_cli.py call self_test
 ```
 
 ### Install from Packaged Release Archive
-1. Download `ui-engineering-0.1.0.zip` and its SHA-256 checksum from the GitHub Releases page.
+1. Download `ui-ux-design-0.1.0.zip` and its SHA-256 checksum from the GitHub Releases page.
 2. Unzip into your project's plugin directory or a global plugin root:
    ```bash
-   unzip ui-engineering-0.1.0.zip -d ~/.plugins/ui-engineering
+   unzip ui-ux-design-0.1.0.zip -d ~/.plugins/ui-engineering
    ```
 3. Verify integrity:
    ```bash

@@ -1,7 +1,7 @@
 """Compute the package file list from the packaging contract (package-rules.json + uiux/core/layers.json).
 
-    python plugin/packaging/package_files.py            # summary JSON
-    python plugin/packaging/package_files.py --list     # plus "included" paths and per-file "entries" (path, layer)
+    python plugins/ui-engineering/packaging/package_files.py            # summary JSON
+    python plugins/ui-engineering/packaging/package_files.py --list     # plus "included" paths and per-file "entries" (path, layer)
 
 Uses only the public Core API (architecture layers) and package-rules.json. build.py and verify.py run *this file
 from the tree being packaged or verified*, so an artifact is always selected by its own contract.

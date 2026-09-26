@@ -1,7 +1,7 @@
 """Verify a built artifact after extracting it into a clean directory (docs/plugin-packaging-spec.md §11, V1-V14).
 
-    python plugin/packaging/verify.py dist/<version>/ui-ux-design-<version>.zip [--require-release]
-    python plugin/packaging/verify.py --installed <extracted-root>
+    python plugins/ui-engineering/packaging/verify.py dist/<version>/ui-ux-design-<version>.zip [--require-release]
+    python plugins/ui-engineering/packaging/verify.py --installed <extracted-root>
     options: --quick (V1-V5 only) --tests <dir> | --no-tests  --report <file>  --keep  --python <exe>
 
 Every check runs the *artifact's own* scripts in subprocesses from an unrelated working directory with a clean

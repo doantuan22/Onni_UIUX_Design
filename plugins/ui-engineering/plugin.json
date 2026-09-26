@@ -4,7 +4,7 @@
   "display_name": "UI/UX Design Skill",
   "version": "0.1.0",
   "description": "Two-phase web UI/UX workflow (structure lock, then design and frontend delivery) with a Design Knowledge System, capability and technology resolvers, a Playwright runtime runner and design quality evals.",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "entrypoints": {
     "skill": {"path": "SKILL.md", "type": "instructions", "description": "Workflow controller; agents start here."},
     "knowledge": {"path": "knowledge/domains/README.md", "type": "instructions", "registry": "knowledge/domains/registry.json"},

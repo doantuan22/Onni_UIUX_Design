@@ -36,7 +36,9 @@ def git(repo: Path, *args: str) -> subprocess.CompletedProcess:
     env = {**os.environ, "GIT_AUTHOR_DATE": COMMIT_DATE, "GIT_COMMITTER_DATE": COMMIT_DATE,
            "GIT_AUTHOR_NAME": "packaging-test", "GIT_AUTHOR_EMAIL": "packaging@test.invalid",
            "GIT_COMMITTER_NAME": "packaging-test", "GIT_COMMITTER_EMAIL": "packaging@test.invalid"}
-    result = subprocess.run(["git", "-C", str(repo), "-c", "core.autocrlf=false", "-c", "commit.gpgsign=false", *args],
+    # gc.auto/maintenance.auto off: a background gc must not rewrite .git/objects while a test copies or clones it
+    result = subprocess.run(["git", "-C", str(repo), "-c", "core.autocrlf=false", "-c", "commit.gpgsign=false",
+                             "-c", "gc.auto=0", "-c", "maintenance.auto=false", *args],
                             capture_output=True, text=True, env=env)
     if result.returncode != 0:
         raise AssertionError(f"git {' '.join(args)} failed: {result.stderr}")
@@ -45,15 +47,16 @@ def git(repo: Path, *args: str) -> subprocess.CompletedProcess:
 
 def make_repo(parent: Path, name: str = "repo") -> Path:
     """A committed repository containing exactly the package file list (+ .gitattributes)."""
-    repo = parent / name
+    repo = (parent / name).resolve()
     repo.mkdir(parents=True)
     for rel in package_files.compute(ROOT)["included"]:
         target = repo / rel
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(ROOT / rel, target)
     source = ROOT / ".gitattributes"
-    (repo / ".gitattributes").write_text(source.read_text(encoding="utf-8") if source.is_file() else DEFAULT_GITATTRIBUTES,
-                                         encoding="utf-8", newline="\n")
+    # write_bytes keeps LF on every OS (Path.write_text(newline=) needs Python 3.10+)
+    text = source.read_text(encoding="utf-8") if source.is_file() else DEFAULT_GITATTRIBUTES
+    (repo / ".gitattributes").write_bytes(text.replace("\r\n", "\n").encode("utf-8"))
     git(repo, "init", "-q")
     git(repo, "add", "-A")
     git(repo, "commit", "-q", "-m", "fixture")
@@ -61,8 +64,9 @@ def make_repo(parent: Path, name: str = "repo") -> Path:
 
 
 def clone(repo: Path, parent: Path, name: str) -> Path:
-    target = parent / name
-    shutil.copytree(repo, target)
+    """An independent clone with the same commit (no raw copy of .git/objects, which races with git on macOS)."""
+    target = (parent / name).resolve()
+    git(parent, "clone", "-q", "--no-hardlinks", str(repo), str(target))
     return target
 
 

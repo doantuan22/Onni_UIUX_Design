@@ -2,7 +2,7 @@
   "schema_version": 1,
   "description": "Architecture layers. 'paths' classify repository files (first match wins, POSIX globs relative to the package root); 'imports' are the allowed dependencies between Python modules (enforced by tests/test_architecture.py). Nothing in a lower layer may import a higher one, and no core module may import the plugin layer.",
   "layers": [
-    {"id": "plugin", "title": "Plugin Layer", "package": true, "paths": ["plugin.json", "adapters/**", "packaging/**", "schemas/**", ".codex-plugin/**", ".claude-plugin/**"]},
+    {"id": "plugin", "title": "Plugin Layer", "package": true, "paths": ["plugin.json", ".mcp.json", "adapters/**", "packaging/**", "schemas/**", ".codex-plugin/**", ".claude-plugin/**"]},
     {"id": "core-api", "title": "Core API", "package": true, "paths": ["uiux/api.py", "uiux/cli.py", "uiux/__main__.py", "uiux/__init__.py"]},
     {"id": "core-foundation", "title": "Core foundation (resources, config, registries)", "package": true, "paths": ["uiux/core/**", "VERSION"]},
     {"id": "knowledge", "title": "Knowledge Layer", "package": true,
@@ -14,7 +14,7 @@
     {"id": "tooling", "title": "Tooling", "package": true, "paths": ["uiux/tooling/**", "scripts/**"]},
     {"id": "core-skill", "title": "Core Skill (workflow, reasoning, contracts, templates)", "package": true,
      "paths": ["SKILL.md", "workflows/**", "skills/**", "review/**", "templates/**"]},
-    {"id": "docs", "title": "Documentation", "package": true, "paths": ["docs/**", "../development/docs/**", "CHANGELOG.md", "README.md"]},
+    {"id": "docs", "title": "Documentation", "package": true, "paths": ["docs/**", "../development/docs/**", "CHANGELOG.md", "README.md", "LICENSE", "NOTICE"]},
     {"id": "tests", "title": "Tests", "package": false, "paths": ["../tests/**"]},
     {"id": "development", "title": "Development-only research, CI and repository metadata", "package": false,
      "paths": [".gitattributes", ".gitignore", "development/**", "../external-references/**", "../.github/**", "../.gitignore", "../.gitattributes", "uiux.config.json", "../development/**", "../.agents/**"]},

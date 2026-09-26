@@ -1,7 +1,7 @@
 """Claude Code plugin bundle verification (checks C1-C16).
 
-    python plugin/adapters/claude-code/verify.py <extracted-bundle-root>
-    python plugin/adapters/claude-code/verify.py --bundle <bundle.zip>
+    python plugins/ui-engineering/.claude-plugin/verify.py <extracted-bundle-root>
+    python plugins/ui-engineering/.claude-plugin/verify.py --bundle <bundle.zip>
 
 Checks are structural and subprocess-based.  A live Claude Code session is NOT required.
 Exit codes: 0 all PASS, 2 at least one FAIL, 1 unusable input.
@@ -96,10 +96,14 @@ def verify_bundle(root: Path, python: str = sys.executable) -> dict:
     else:
         c4_problems.append(".mcp.json not found")
     ok("C4", c4_problems)
+    # Claude Code's documented form wraps servers in "mcpServers"; the legacy flat map is still accepted.
+    servers = mcp_config.get("mcpServers", mcp_config) if isinstance(mcp_config, dict) else {}
+    if not isinstance(servers, dict):
+        servers = {}
 
     # C5: MCP config references shared MCP server only
     c5_problems: list[str] = []
-    for server_name, config in mcp_config.items():
+    for server_name, config in servers.items():
         args = config.get("args", [])
         for arg in args:
             if isinstance(arg, str) and "server.py" in arg:
@@ -113,7 +117,7 @@ def verify_bundle(root: Path, python: str = sys.executable) -> dict:
     # C7: ${CLAUDE_PLUGIN_ROOT} used correctly
     c7_problems: list[str] = []
     if mcp_path.is_file():
-        for server_name, config in mcp_config.items():
+        for server_name, config in servers.items():
             args = config.get("args", [])
             for arg in args:
                 if isinstance(arg, str) and "server.py" in arg:

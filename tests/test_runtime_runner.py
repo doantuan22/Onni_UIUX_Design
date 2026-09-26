@@ -25,7 +25,7 @@ def request(**overrides: object) -> dict[str, object]:
 class RunnerInputTests(unittest.TestCase):
     def test_valid_request_uses_project_evidence_root(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
+            root = Path(temporary).resolve()  # Windows 8.3 short names, macOS /var -> /private/var
             _, session = runner.validate(request(), root)
             self.assertEqual(session, root / ".evidence" / "safe-session")
 

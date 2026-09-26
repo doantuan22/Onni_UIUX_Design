@@ -1,6 +1,6 @@
 # Motion review
 
-Run during [craft review](../visual-language/craft-review.md) on rendered output (or source when rendering is unavailable, stated as a limitation). Record in `VISUAL-REVIEW.md`.
+Run during [craft review](../../skills/visual-language/craft-review.md) on rendered output (or source when rendering is unavailable, stated as a limitation). Record in `VISUAL-REVIEW.md`.
 
 | Code | Detect | Severity guide | Fix |
 |---|---|---|---|

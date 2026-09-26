@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "ui-ux-design-mcp": {
+      "command": "python3",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/adapters/mcp/server.py"],
+      "env": {}
+    }
+  }
+}

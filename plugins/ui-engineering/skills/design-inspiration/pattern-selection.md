@@ -1,6 +1,6 @@
 # Pattern Selection Engine
 
-Selects hero, section, storytelling, navigation, interaction, composition and motion-composition patterns from the [Web Pattern Library](../web-patterns/README.md). Patterns are never chosen at random, by popularity, or because a category "usually has" them.
+Selects hero, section, storytelling, navigation, interaction, composition and motion-composition patterns from the [Web Pattern Library](../../knowledge/web-patterns/README.md). Patterns are never chosen at random, by popularity, or because a category "usually has" them.
 
 ## Boundary with Phase 1
 
@@ -24,7 +24,7 @@ motion character    from motion system (if decided) or direction
 2. **List candidates** per block from the library whose *content requirement* is met. A pattern whose required content does not exist is ineligible (e.g., `cinematic-product` without high-quality product media).
 3. **Score** each candidate quickly: fit to job (0–2), fit to archetype (0–2), content availability (0–2), responsive risk (0 to −2), motion budget cost (0 to −2). Pick the highest; ties go to the simpler pattern.
 4. **Check rhythm across the page**: adjacent blocks should not repeat the same pattern and density unless repetition is the point (e.g., a spec list). Aim for a deliberate cadence (e.g., open → dense → open → proof → close).
-5. **Check the motion budget** with [motion-intensity-budget](../motion/motion-principles.md#intensity-budget): at most one high-intensity block per page (two on long storytelling pages with separation).
+5. **Check the motion budget** with [motion-intensity-budget](../../knowledge/motion/motion-principles.md#intensity-budget): at most one high-intensity block per page (two on long storytelling pages with separation).
 6. **Record** selected, candidates, and rejected patterns with a one-line reason in `DESIGN-INSPIRATION.md`.
 
 ## Archetype → typical candidates

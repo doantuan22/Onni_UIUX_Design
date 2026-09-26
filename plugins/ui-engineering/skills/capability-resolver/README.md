@@ -1,6 +1,6 @@
 # Design Capability Resolver
 
-Turns a requirement into **ranked design capabilities** (style, layout, screen, motion, interaction, effect, technology, composition anchor) with explicit **WHY** and **WHY NOT** for each choice. It is the reasoning bridge between intent and the [Design Knowledge System](../knowledge/README.md), and it is what keeps agents from defaulting to one look.
+Turns a requirement into **ranked design capabilities** (style, layout, screen, motion, interaction, effect, technology, composition anchor) with explicit **WHY** and **WHY NOT** for each choice. It is the reasoning bridge between intent and the [Design Knowledge System](../../knowledge/domains/README.md), and it is what keeps agents from defaulting to one look.
 
 It runs inside Design Intelligence (Phase 2 step 3), after Design Direction and before Design Inspiration's pattern selection. It never changes the Structure Lock: screens and content come *from* the locked artifacts.
 
@@ -12,14 +12,14 @@ User intent → product/domain → brand attributes (+ avoided attributes) → v
 
 ## How to run it
 
-1. Write the **profile** from the pre-design declaration ([anti-homogenization](../knowledge/composition/anti-homogenization.md)), locked page types, and content inventory. The profile fields and vocabularies are in [resolver.md](resolver.md#profile).
+1. Write the **profile** from the pre-design declaration ([anti-homogenization](../../knowledge/domains/composition/anti-homogenization.md)), locked page types, and content inventory. The profile fields and vocabularies are in [resolver.md](resolver.md#profile).
 2. Run the deterministic resolver when Python is available:
    ```bash
    python scripts/resolve_capabilities.py --profile profile.json --format md
    ```
    Without Python, apply the same rules by hand from [resolver.md](resolver.md). The script is the reference implementation of those rules, not a replacement for judgment.
 3. Record the result in [CAPABILITY-PLAN.md](../../templates/CAPABILITY-PLAN.md) and review it. Override any choice with a written reason. Overrides are expected when the resolver lacks context (brand guidelines, existing system).
-4. Load **only** the files listed under *Retrieval* in the plan ([retrieval.md](../knowledge/retrieval.md)).
+4. Load **only** the files listed under *Retrieval* in the plan ([retrieval.md](../../knowledge/domains/retrieval.md)).
 
 ## What it guarantees
 

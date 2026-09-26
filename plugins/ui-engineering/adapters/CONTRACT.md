@@ -5,7 +5,7 @@ An adapter connects one host platform (an agent runtime or IDE assistant) to the
 ## Allowed dependencies
 
 - `uiux.api` (public Core API) and `uiux.__version__`: nothing else from `uiux`.
-- The manifest (`plugin/manifest/plugin.json`) and the host platform's own SDK.
+- The manifest (`plugins/ui-engineering/plugin.json`) and the host platform's own SDK.
 - Enforced by `tests/test_architecture.py` (imports inside `plugin/` are scanned).
 
 ## Required operations
@@ -29,8 +29,8 @@ An adapter connects one host platform (an agent runtime or IDE assistant) to the
 
 ## Adding an adapter
 
-1. Create `plugin/adapters/<platform>/` with a README (host version, install and registration steps, mapping table) and the adapter code.
+1. Create `plugins/ui-engineering/adapters/<platform>/` with a README (host version, install and registration steps, mapping table) and the adapter code.
 2. Implement the four operations above using only `uiux.api` and the manifest.
-3. Add the adapter's status in `plugin/manifest/plugin.json` → `compatibility.adapters` (`skeleton`, `experimental`, `supported`).
+3. Add the adapter's status in `plugins/ui-engineering/plugin.json` → `compatibility.adapters` (`skeleton`, `experimental`, `supported`).
 4. Add a test that loads the adapter and calls `describe()` and at least one read-only tool (`retrieve_knowledge`), and include it in the import-boundary scan.
 5. Do not mark an adapter `supported` until it has been exercised on the real host platform.

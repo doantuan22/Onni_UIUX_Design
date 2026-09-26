@@ -19,7 +19,7 @@ Pick one type voice. Each archetype gives reasoning plus default *ranges* that [
 - **Archetype follows the design archetype and task, not taste.** A developer tool with luxury type misleads; a data-heavy product with editorial serif body reduces scan speed.
 - **Two voices at most:** a page may use a scoped secondary voice (e.g., `expressive-marketing` only in the hero of a `premium-modern` system) when recorded.
 - **Dense surfaces override:** inside tables, forms and app shells, fall back to `dense-transactional` or `neutral-product` behavior even in expressive products.
-- **Language first:** if the product serves Vietnamese (or other diacritic-heavy languages), eliminate archetype candidates whose natural families lack coverage before judging style. See [font-selection.md](font-selection.md#vietnamese-and-diacritics).
+- **Language first:** if the product serves Vietnamese (or other diacritic-heavy languages), eliminate archetype candidates whose natural families lack coverage before judging style. See [font-selection.md](../../skills/typography/font-selection.md#vietnamese-and-diacritics).
 - **Existing brand type wins** when it is licensed, readable and coherent.
 
 ## Record

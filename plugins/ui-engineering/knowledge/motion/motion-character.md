@@ -28,5 +28,5 @@ motion_character:
 ## Rules
 
 - One base character per product; a region may be more expressive only within the [intensity budget](motion-principles.md#intensity-budget).
-- The character must match the [design archetype](../design-inspiration/archetypes.md); `cinematic` in a developer tool or `playful` in a banking dashboard is `MOTION_STYLE_DRIFT`.
+- The character must match the [design archetype](../../skills/design-inspiration/archetypes.md); `cinematic` in a developer tool or `playful` in a banking dashboard is `MOTION_STYLE_DRIFT`.
 - Existing coherent motion (durations, easing, library) is kept unless it violates purpose, performance or reduced-motion rules.

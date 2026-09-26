@@ -1,4 +1,4 @@
-# Release artifact build + verification on two operating systems, then a cross-OS reproducibility check (V14).
+# Release artifact build + verification on Linux, Windows and macOS, then a cross-OS reproducibility check (V14).
 # Builds never publish; a human creates the release from the uploaded artifacts.
 name: package
 
@@ -16,40 +16,54 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     env:
       PYTHONDONTWRITEBYTECODE: "1"
       PYTHONIOENCODING: utf-8
+    defaults:
+      run:
+        shell: bash
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
+      - name: Resolve version (and reject a tag that differs from VERSION)
+        run: |
+          set -euo pipefail
+          version=$(tr -d '[:space:]' < plugins/ui-engineering/VERSION)
+          if [ "${GITHUB_REF_TYPE}" = "tag" ] && [ "${GITHUB_REF_NAME}" != "v${version}" ]; then
+            echo "::error::tag ${GITHUB_REF_NAME} does not match VERSION ${version} (expected v${version})"; exit 1
+          fi
+          echo "VERSION=${version}" >> "$GITHUB_ENV"
       - name: Build release artifact (clean checkout of the pushed commit)
-        run: python plugins/ui-engineering/packaging/build.py --out out
+        run: python plugins/ui-engineering/packaging/build.py --out dist/release
       - name: Verify extracted artifact (V1-V13, tests from the checkout)
-        run: python plugins/ui-engineering/packaging/verify.py out/ui-ux-design-*.zip --require-release --tests tests
-        shell: bash
-      - uses: actions/upload-artifact@v4
+        run: python plugins/ui-engineering/packaging/verify.py "dist/release/ui-ux-design-${VERSION}.zip" --require-release --tests tests
+      - uses: actions/upload-artifact@v7
         with:
           name: package-${{ matrix.os }}
-          path: out/
+          path: dist/release/
+          if-no-files-found: error
 
   reproducibility:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
       - name: Compare content digests and checksums across operating systems (V14)
         shell: bash
         run: |
           set -euo pipefail
-          lin=package-ubuntu-latest; win=package-windows-latest
-          # Content equality is required: identical PACKAGE-MANIFEST (every file hash) on both OSes.
-          diff $lin/*.package-manifest.json $win/*.package-manifest.json
-          # Archive bytes are identical when both runners use the same zlib implementation; report either way.
-          if diff $lin/SHA256SUMS $win/SHA256SUMS; then echo "archives byte-identical across OSes"; \
-          else echo "::warning::archive bytes differ (compression library differs); content digest is identical"; fi
+          ref=package-ubuntu-latest
+          for other in package-windows-latest package-macos-latest; do
+            # Content equality is required: identical PACKAGE-MANIFEST (every file hash) on every OS.
+            diff $ref/*.package-manifest.json $other/*.package-manifest.json
+            echo "content digest identical: $ref vs $other"
+            # Archive bytes are identical when runners use the same zlib implementation; report either way.
+            if diff $ref/SHA256SUMS $other/SHA256SUMS; then echo "archives byte-identical: $ref vs $other"; \
+            else echo "::warning::archive bytes differ between $ref and $other (compression library differs); content digest is identical"; fi
+          done

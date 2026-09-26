@@ -2,7 +2,7 @@
 
 This module turns an approved Design Direction into a **selected design DNA**: a small, compatible set of archetype and reference traits that the rest of Phase 2 realizes. It answers "which good visual language fits this product, and why?" after the anti-generic layer has answered "what should we avoid?".
 
-It sits between [Design Direction](../01-design-direction/workflow.md) and [Typography Intelligence](../typography/README.md). It never changes the Structure Lock, page responsibilities, required content, or flows.
+It sits between [Design Direction](../design-direction/workflow.md) and [Typography Intelligence](../typography/README.md). It never changes the Structure Lock, page responsibilities, required content, or flows.
 
 ## Files
 

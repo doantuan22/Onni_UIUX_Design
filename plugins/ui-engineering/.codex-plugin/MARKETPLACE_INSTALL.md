@@ -11,14 +11,28 @@ Codex Marketplace Live Host Test: NOT_RUN
 CODEX_VSCODE_MARKETPLACE_SUPPORT = NOT_CLAIMED
 ```
 
+## Repository marketplace (from GitHub)
+
+The repository root carries `.agents/plugins/marketplace.json` (marketplace `ui-engineering`) whose
+plugin source is `./plugins/ui-engineering`; that directory contains `.codex-plugin/plugin.json`,
+`.codex-plugin/mcp.json` and `skills/ui-ux-workflow/SKILL.md`. Clone the repository and add it:
+
+```bash
+git clone https://github.com/doantuan22/Onni_UIUX_Design.git
+codex plugin marketplace add ./Onni_UIUX_Design
+```
+
+The plugin identifier is `ui-ux-design@ui-engineering`. This layout is structurally tested
+(`tests/test_github_install.py`); a live Codex host install has not been run.
+
 ## Build and verify
 
 From the repository root:
 
 ```bash
-python plugin/adapters/codex/export.py --dev --out dist/dev/adapters
-python plugin/adapters/codex/verify.py --bundle dist/dev/adapters/ui-ux-design-0.1.0-dev-codex.zip
-python plugin/adapters/codex/verify.py --marketplace --bundle dist/dev/adapters/ui-ux-design-0.1.0-dev-codex-marketplace.zip
+python plugins/ui-engineering/.codex-plugin/export.py --dev --source plugins/ui-engineering --out dist/dev/adapters
+python plugins/ui-engineering/.codex-plugin/verify.py --bundle dist/dev/adapters/ui-ux-design-0.1.0-dev-codex.zip
+python plugins/ui-engineering/.codex-plugin/verify.py --marketplace --bundle dist/dev/adapters/ui-ux-design-0.1.0-dev-codex-marketplace.zip
 ```
 
 Extract `ui-ux-design-0.1.0-dev-codex-marketplace.zip`. Its root contains:
@@ -32,7 +46,7 @@ Extract `ui-ux-design-0.1.0-dev-codex-marketplace.zip`. Its root contains:
     ├── VERSION
     ├── skills/ui-ux-workflow/SKILL.md
     ├── uiux/
-    └── plugin/
+    └── adapters/, packaging/, schemas/, …
 ```
 
 The marketplace artifact is assembled from the same generic payload and Codex overlay as the separately verified Codex bundle; it does not rebuild the core payload. ZIP timestamps, ordering, permissions, and JSON serialization are deterministic.

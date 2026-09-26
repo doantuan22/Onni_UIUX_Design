@@ -121,7 +121,7 @@ motion_budget:
   decorative_loop: none
 ```
 
-The page-level point budget across motion, effects and interactions is in [performance-budget.md](../05-frontend-implementation/performance-budget.md).
+The page-level point budget across motion, effects and interactions is in [performance-budget.md](../../skills/frontend-implementation/performance-budget.md).
 
 ## Direction and consistency
 
@@ -152,4 +152,4 @@ The page-level point budget across motion, effects and interactions is in [perfo
 5. **View Transitions API** for spatial/page continuity as progressive enhancement.
 6. **`requestAnimationFrame`** only for continuous, measured, scroll/pointer-linked effects that CSS cannot express; throttle and stop when off-screen.
 7. **Existing project animation library** when present — use it consistently for the effects it already handles.
-8. **New library** only with need + authorization + recorded justification. The full decision matrix is the [technology resolver](../05-frontend-implementation/technology-resolver.md).
+8. **New library** only with need + authorization + recorded justification. The full decision matrix is the [technology resolver](../../skills/frontend-implementation/technology-resolver.md).

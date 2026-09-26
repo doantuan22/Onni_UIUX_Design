@@ -1,1 +1,20 @@
-{ "id": "ui-engineering", "name": "UI Engineering Plugin" }
+{
+  "name": "ui-engineering",
+  "interface": {
+    "displayName": "UI Engineering Plugin"
+  },
+  "plugins": [
+    {
+      "name": "ui-ux-design",
+      "source": {
+        "source": "local",
+        "path": "./plugins/ui-engineering"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

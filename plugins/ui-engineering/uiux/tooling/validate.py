@@ -340,7 +340,7 @@ def inspiration_checks(root: Path) -> list[str]:
         if lens not in craft:
             errors.append(f"craft review missing inspiration lens: {lens}")
     # Single source of truth: Visual Language delegates; typography lives in DESIGN-SYSTEM.md.
-    for path, owner in (("knowledge/visual-language/typography-character.md", "../typography/README.md"),
+    for path, owner in (("knowledge/visual-language/typography-character.md", "../../skills/typography/README.md"),
                         ("knowledge/visual-language/motion-character.md", "../motion/README.md")):
         if owner not in text(root / path):
             errors.append(f"{path} must delegate to {owner}")
@@ -375,7 +375,7 @@ def knowledge_checks(root: Path) -> list[str]:
     except Exception as exc:  # report, never crash the validator
         errors.append(f"knowledge base could not be validated: {exc}")
     router = text(root / "skills/ui-orchestrator/router.md")
-    for phrase in ("capability-resolver/README.md", "knowledge/retrieval.md", "technology-resolver.md", "performance-budget.md",
+    for phrase in ("capability-resolver/README.md", "knowledge/domains/retrieval.md", "technology-resolver.md", "performance-budget.md",
                    "cinematic-motion.md", "layout-motion.md", "evals/quality/README.md"):
         if phrase not in router:
             errors.append(f"Phase 2 router does not route to: {phrase}")

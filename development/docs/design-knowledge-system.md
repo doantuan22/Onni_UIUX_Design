@@ -38,7 +38,7 @@ USER REQUIREMENT
 
 ## Schemas and validation
 
-Entries are fenced `yaml` blocks whose first key is `id`. Schemas, vocabularies and format rules: [phase-2/knowledge/schema.md](../phase-2/knowledge/schema.md). Tools:
+Entries are fenced `yaml` blocks whose first key is `id`. Schemas, vocabularies and format rules: [phase-2/knowledge/schema.md](../../plugins/ui-engineering/knowledge/domains/schema.md). Tools:
 
 ```bash
 python scripts/knowledge_lib.py check     # parse, schema, vocabularies, references, index freshness
@@ -51,11 +51,11 @@ python -m unittest discover -s tests       # full test suite (any working direct
 
 ## Retrieval
 
-Agents never scan catalogs. The resolver's plan lists the only files to load; [INDEX.md](../phase-2/knowledge/INDEX.md) maps ids to files; entries are read by id. Category gating by task is in [retrieval.md](../phase-2/knowledge/retrieval.md).
+Agents never scan catalogs. The resolver's plan lists the only files to load; [INDEX.md](../../plugins/ui-engineering/knowledge/domains/INDEX.md) maps ids to files; entries are read by id. Category gating by task is in [retrieval.md](../../plugins/ui-engineering/knowledge/domains/retrieval.md).
 
 ## Capability resolver
 
-Profile → style ranking (domain, conveyed attributes, avoided and conflicting attributes, intensity, default-tell penalty) → layouts (content, density, motion cost, compatibility) → motion (tier gating, one HIGH) → interactions → effects (budget, one signature) → technology (installed → native → authorized library → native fallback → degrade) → recipe anchor → retrieval list. Rules: [resolver.md](../phase-2/capability-resolver/resolver.md).
+Profile → style ranking (domain, conveyed attributes, avoided and conflicting attributes, intensity, default-tell penalty) → layouts (content, density, motion cost, compatibility) → motion (tier gating, one HIGH) → interactions → effects (budget, one signature) → technology (installed → native → authorized library → native fallback → degrade) → recipe anchor → retrieval list. Rules: [resolver.md](../../plugins/ui-engineering/skills/capability-resolver/resolver.md).
 
 ## Extending the system
 
@@ -94,11 +94,11 @@ Add a `technology` entry with `packages` (used by `detect_capabilities.py` to de
 
 ### Add a vocabulary term
 
-Edit the sets in `scripts/knowledge_lib.py` (`DOMAINS`, `ATTRIBUTES`, `CONTENT`, …) only when an entry or profile genuinely needs it. Update [schema.md](../phase-2/knowledge/schema.md) and, for attributes, consider `CONFLICTS` in the resolver.
+Edit the sets in `scripts/knowledge_lib.py` (`DOMAINS`, `ATTRIBUTES`, `CONTENT`, …) only when an entry or profile genuinely needs it. Update [schema.md](../../plugins/ui-engineering/knowledge/domains/schema.md) and, for attributes, consider `CONFLICTS` in the resolver.
 
 ### Add an eval
 
-Behavioral evals: copy an existing scenario's frontmatter (see [evals/README.md](../evals/README.md)). Design-quality evals: add a scenario with Purpose, Input, Evidence, Heuristics, Pass/fail, Limitations and False positives sections; if it has a deterministic signal, extend `analyze_design_quality.py` and add a fixture assertion in `test_quality_analyzer.py`. Update the ID range in `scripts/validate_skill.py` and the suites in `evals/framework.md`.
+Behavioral evals: copy an existing scenario's frontmatter (see [evals/README.md](../../plugins/ui-engineering/evals/README.md)). Design-quality evals: add a scenario with Purpose, Input, Evidence, Heuristics, Pass/fail, Limitations and False positives sections; if it has a deterministic signal, extend `analyze_design_quality.py` and add a fixture assertion in `test_quality_analyzer.py`. Update the ID range in `scripts/validate_skill.py` and the suites in `evals/framework.md`.
 
 ## Guarantees and non-goals
 

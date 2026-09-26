@@ -1,14 +1,14 @@
 """Generic, host-agnostic adapter: JSON in, JSON out, over the public Core API only.
 
-    python plugin/adapters/generic/adapter.py describe
-    python plugin/adapters/generic/adapter.py instructions
-    python plugin/adapters/generic/adapter.py self-test
-    python plugin/adapters/generic/adapter.py call <tool-id> [--params '<json>' | --params @file.json]
-    python plugin/adapters/generic/adapter.py --config host-config.json call ...   # configure(overrides)
+    python plugins/ui-engineering/adapters/generic/adapter.py describe
+    python plugins/ui-engineering/adapters/generic/adapter.py instructions
+    python plugins/ui-engineering/adapters/generic/adapter.py self-test
+    python plugins/ui-engineering/adapters/generic/adapter.py call <tool-id> [--params '<json>' | --params @file.json]
+    python plugins/ui-engineering/adapters/generic/adapter.py --config host-config.json call ...   # configure(overrides)
 
 Importable as a module too: ``GenericAdapter().call("retrieve_knowledge", {"collection": "styles"})``.
 Integration only: no design, knowledge, eval or runtime logic lives here (see ../CONTRACT.md). Declarative metadata
-is in adapter.json (schema plugin/schemas/adapter.schema.json). Errors are the core's error envelope; exit codes:
+is in adapter.json (schema plugins/ui-engineering/schemas/adapter.schema.json). Errors are the core's error envelope; exit codes:
 0 success, 1 self-test FAIL or internal error, 3 invalid call or incompatible package.
 """
 from __future__ import annotations

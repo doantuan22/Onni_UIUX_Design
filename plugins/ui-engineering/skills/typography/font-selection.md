@@ -17,7 +17,7 @@ Select families by evidence, not by a "beautiful fonts" list. The skill stores k
 | 2 | Language coverage | All required scripts/diacritics render in the chosen weights; see below. |
 | 3 | Readability | Clear at body sizes: open apertures, distinct `Il1`, `O0`, `rn/m`; adequate x-height. |
 | 4 | Screen rendering | Hinting/rendering acceptable on Windows at 14–16px; test thin weights. |
-| 5 | Brand character | Matches the [typography archetype](typography-archetypes.md). |
+| 5 | Brand character | Matches the [typography archetype](../../knowledge/typography/typography-archetypes.md). |
 | 6 | Performance | Prefer one variable file per family; ≤ 2 families and ≤ ~4 font files on first load; subset to needed scripts; `font-display: swap` (or `optional` for non-critical); preload only the above-the-fold face. |
 | 7 | Availability | Accessible to the project's hosting policy (self-host vs CDN); works offline builds when required. |
 | 8 | Fallback quality | A metric-close fallback stack; use `size-adjust`/`ascent-override` when the project supports it to limit layout shift. |

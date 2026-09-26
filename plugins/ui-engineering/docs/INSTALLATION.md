@@ -14,67 +14,86 @@ This guide details how to acquire, install, verify, and upgrade the **UI Enginee
 
 ## 2. Installation Methods
 
-### Method A: Install from GitHub Source
+Repository: <https://github.com/doantuan22/Onni_UIUX_Design>. The plugin root is
+`plugins/ui-engineering/` (plugin id `ui-ux-design`).
 
-Clone the repository and point your host AI coding environment at the canonical plugin root:
+### Method A: Install directly from GitHub (Claude Code marketplace)
+
+The repository root is a Claude Code marketplace named `ui-engineering`:
 
 ```bash
-git clone https://github.com/org/Skill-AI-Coding_Frontend.git
-cd Skill-AI-Coding_Frontend
+claude plugin marketplace add doantuan22/Onni_UIUX_Design
+claude plugin install ui-ux-design@ui-engineering
 ```
 
-The canonical plugin directory is located at `plugins/ui-engineering/`.
+(Inside a Claude Code session: `/plugin marketplace add doantuan22/Onni_UIUX_Design`, then
+`/plugin install ui-ux-design@ui-engineering`.) This registers the `ui-ux-workflow` skill and the
+`ui-ux-design-mcp` MCP server.
 
-### Method B: Install from Release Artifact
-
-Download the official release archive `ui-ux-design-<version>.zip` from GitHub Releases and extract it to your preferred tools or plugins directory:
+### Method B: Install from a clone
 
 ```bash
-# Example extraction
-unzip ui-ux-design-0.1.0.zip -d ~/.plugins/ui-engineering
+git clone https://github.com/doantuan22/Onni_UIUX_Design.git
+cd Onni_UIUX_Design
+```
+
+- Claude Code: `claude plugin marketplace add .` then `claude plugin install ui-ux-design@ui-engineering`,
+  or for a single session `claude --plugin-dir plugins/ui-engineering`.
+- Codex: `codex plugin marketplace add .` (reads `.agents/plugins/marketplace.json`; plugin
+  `ui-ux-design@ui-engineering`, manifest `plugins/ui-engineering/.codex-plugin/plugin.json`).
+
+### Method C: Install from a release artifact
+
+Download `ui-ux-design-<version>.zip` and `SHA256SUMS` from GitHub Releases, check the checksum and extract:
+
+```bash
+unzip ui-ux-design-0.1.0.zip -d ~/.plugins
+claude --plugin-dir ~/.plugins/ui-ux-design-0.1.0
+```
+
+Host-specific bundles can also be exported from a clone:
+
+```bash
+python plugins/ui-engineering/.claude-plugin/export.py --source plugins/ui-engineering --out dist/adapters
+python plugins/ui-engineering/.codex-plugin/export.py --source plugins/ui-engineering --out dist/adapters
 ```
 
 ---
 
 ## 3. Platform Setup
 
-### A. Claude Code Setup
+### A. Claude Code
 
-Claude Code integrates via the `.claude-plugin/` adapter configuration:
+- Manifest: `plugins/ui-engineering/.claude-plugin/plugin.json`; MCP: `plugins/ui-engineering/.mcp.json`;
+  skill: `plugins/ui-engineering/skills/ui-ux-workflow/SKILL.md` (delegates to the canonical `SKILL.md`).
+- Check with `claude plugin validate .` (marketplace) and `claude plugin validate plugins/ui-engineering`.
+- Details: [../.claude-plugin/README.md](../.claude-plugin/README.md).
 
-1. Register the plugin path in your Claude Code settings or CLI invocation:
-   ```bash
-   claude --plugin-dir /path/to/plugins/ui-engineering
-   ```
-2. Verify that Claude Code detects the plugin manifest at `.claude-plugin/adapter.json` or `plugin.json`.
+### B. OpenAI Codex
 
-### B. OpenAI Codex Setup
+- Manifest: `plugins/ui-engineering/.codex-plugin/plugin.json`; MCP: `plugins/ui-engineering/.codex-plugin/mcp.json`.
+- Details: [../.codex-plugin/MARKETPLACE_INSTALL.md](../.codex-plugin/MARKETPLACE_INSTALL.md). A live Codex host install has not been run yet.
 
-Codex integrates via `.codex-plugin/` metadata:
+### C. Standalone MCP server
 
-1. Point your Codex environment configuration to the plugin directory.
-2. The launcher uses `python scripts/uiux_cli.py call <tool_id>` with `--params "@path/to/params.json"` on Windows.
-
-### C. Standalone MCP Server Setup
-
-The plugin provides a native Model Context Protocol (MCP) stdio server:
-
-Add the server to your host MCP client configuration (e.g., `claude_desktop_config.json`):
+Add the stdio server to any MCP client configuration (e.g. `claude_desktop_config.json`):
 
 ```json
 {
   "mcpServers": {
-    "ui-engineering": {
-      "command": "python",
-      "args": [
-        "-m",
-        "adapters.mcp.server"
-      ],
-      "cwd": "/path/to/plugins/ui-engineering"
+    "ui-ux-design-mcp": {
+      "command": "python3",
+      "args": ["/path/to/Onni_UIUX_Design/plugins/ui-engineering/adapters/mcp/server.py"]
     }
   }
 }
 ```
+
+### Python launcher
+
+The MCP configs call `python3`, which exists on Linux, macOS and Windows installs from the Microsoft Store.
+With the python.org Windows installer, replace `python3` by `python` or `py` (with args `["-3", ...]`) in
+the host's MCP configuration.
 
 ---
 
@@ -84,7 +103,7 @@ After installation, verify the installation immediately using the public CLI:
 
 ```bash
 # Run self-test health check
-python scripts/uiux_cli.py call self_test
+python plugins/ui-engineering/scripts/uiux_cli.py call self_test
 
 # Expected output:
 # {"status": "PASS", "version": "0.1.0", "checks": [...]}
@@ -98,10 +117,10 @@ python scripts/uiux_cli.py call self_test
 To upgrade to a new version:
 1. Obtain the new release archive or pull the latest Git tag.
 2. Replace the plugin directory with the new version.
-3. Run `python scripts/uiux_cli.py call self_test` to confirm registry and contract integrity.
+3. Run `python plugins/ui-engineering/scripts/uiux_cli.py call self_test` to confirm registry and contract integrity.
 4. *Note*: Plugin upgrades never modify your target repository files.
 
 ### Rollback
 If you need to roll back to a previous version:
 1. Re-extract or check out the previous release tag (e.g., `v0.1.0`).
-2. Run `python scripts/uiux_cli.py call self_test` to verify rollback validity.
+2. Run `python plugins/ui-engineering/scripts/uiux_cli.py call self_test` to verify rollback validity.

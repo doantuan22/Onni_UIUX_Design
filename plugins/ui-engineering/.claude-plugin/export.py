@@ -1,10 +1,11 @@
 """Build a self-contained Claude Code plugin bundle from a verified generic artifact.
 
-    python plugin/adapters/claude-code/export.py --source <extracted-artifact-root> --out dist/<version>/adapters/
-    python plugin/adapters/claude-code/export.py --dev --out dist/dev/adapters/
+    python plugins/ui-engineering/.claude-plugin/export.py --source <extracted-artifact-root> --out dist/<version>/adapters/
+    python plugins/ui-engineering/.claude-plugin/export.py --dev --source plugins/ui-engineering --out dist/dev/adapters/
 
 The bundle is a ZIP containing the full generic payload plus Claude-specific overlay files
-(.claude-plugin/plugin.json, .mcp.json). It delegates to the common adapter framework
+(.claude-plugin/plugin.json, .mcp.json); the same files are committed in the source tree so the plugin
+installs directly from GitHub, and the rendered overlay replaces them in the bundle. It delegates to the common adapter framework
 for safe overlay assembly and deterministic ZIP creation.
 """
 from __future__ import annotations
@@ -23,12 +24,14 @@ from common import bundle, descriptor
 
 
 def _mcp_json_content() -> str:
-    """Render the .mcp.json with portable ${CLAUDE_PLUGIN_ROOT} paths."""
+    """Render the .mcp.json (``mcpServers`` wrapper) with portable ${CLAUDE_PLUGIN_ROOT} paths."""
     return json.dumps({
-        "ui-ux-design-mcp": {
-            "command": "python3",
-            "args": ["${CLAUDE_PLUGIN_ROOT}/adapters/mcp/server.py"],
-            "env": {}
+        "mcpServers": {
+            "ui-ux-design-mcp": {
+                "command": "python3",
+                "args": ["${CLAUDE_PLUGIN_ROOT}/adapters/mcp/server.py"],
+                "env": {}
+            }
         }
     }, indent=2, ensure_ascii=False) + "\n"
 
@@ -60,8 +63,9 @@ def export(source: Path, out_dir: Path, dev: bool = False) -> dict:
         (".mcp.json", mcp_config.encode("utf-8")),
     ]
 
-    # Collect generic payload using common utility
-    payload = bundle.collect_generic_payload(source)
+    # Collect generic payload using common utility (excluding files rendered by overlay)
+    overlay_targets = {rel for rel, _ in overlay}
+    payload = [p for p in bundle.collect_generic_payload(source) if p[0] not in overlay_targets]
 
     # Delegate safe assembly to common framework for standard plugin bundle
     plugin_result = bundle.assemble_bundle(
@@ -108,12 +112,12 @@ def main(argv: list[str] | None = None) -> int:
 
     source = args.source
     if source is None:
-        source = _HERE.parents[2]
+        source = _HERE.parent  # the plugin root (plugins/ui-engineering)
 
     try:
         result = export(source, args.out, args.dev)
     except RuntimeError as exc:
-        print(json.dumps({"status": "ERROR", "error": {"message": str(exc)}}), indent=2)
+        print(json.dumps({"status": "ERROR", "error": {"message": str(exc)}}, indent=2))
         return 1
     print(json.dumps(result, indent=2))
     return 0

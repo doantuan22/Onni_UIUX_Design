@@ -6,4 +6,4 @@ This module chooses a rationale, not a preset. Prefer patterns that support the 
 
 Design Intelligence sets task, density and product constraints. [Design Inspiration](../design-inspiration/README.md) then selects a visual archetype/DNA *within* those constraints; it may not override a density or readability decision made here.
 
-For new builds, redesigns and product/marketing sites, run the [Capability Resolver](../capability-resolver/README.md) here: record the pre-design declaration, resolve capabilities, review overrides, and write `CAPABILITY-PLAN.md`. Its retrieval list bounds what later steps load from the [Design Knowledge System](../knowledge/README.md).
+For new builds, redesigns and product/marketing sites, run the [Capability Resolver](../capability-resolver/README.md) here: record the pre-design declaration, resolve capabilities, review overrides, and write `CAPABILITY-PLAN.md`. Its retrieval list bounds what later steps load from the [Design Knowledge System](../../knowledge/domains/README.md).

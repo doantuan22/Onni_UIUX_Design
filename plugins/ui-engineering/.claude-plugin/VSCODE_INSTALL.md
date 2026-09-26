@@ -14,14 +14,23 @@ This document describes how to install and use the UI/UX Design plugin in the Cl
 To build the local marketplace bundle from the source code, run the export script from the repository root:
 
 ```powershell
-python plugin/adapters/claude-code/export.py --dev --out dist/dev/adapters
+python plugins/ui-engineering/.claude-plugin/export.py --dev --source plugins/ui-engineering --out dist/dev/adapters
 ```
 
 This will produce the `dist/dev/adapters/ui-ux-design-0.1.0-dev-claude-marketplace.zip` archive. You must extract this ZIP archive to a permanent directory on your machine before installing it. The marketplace identity is `uiux-local`, so the plugin installation identifier is `ui-ux-design@uiux-local`.
 
 ## Install
 
-### Mode A: Local Installation (Recommended)
+### From GitHub (no build needed)
+
+The repository itself is a Claude Code marketplace (`ui-engineering`):
+
+```bash
+claude plugin marketplace add doantuan22/Onni_UIUX_Design
+claude plugin install ui-ux-design@ui-engineering
+```
+
+### Mode A: Local Installation from an exported bundle
 
 1. Unzip the marketplace artifact to a known location, e.g., `~/claude-marketplaces/ui-ux-design`.
 2. Open your terminal and add the marketplace to Claude Code:

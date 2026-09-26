@@ -5,10 +5,10 @@ Scenes, 3D, shaders and physics. M5 is allowed only when all of these hold:
 1. The chosen style's `motion_ceiling` is `M5` and visual intensity is 4 or higher.
 2. The content (3D assets, video, product renders) exists and explains the product better than a static alternative.
 3. A static or reduced version with the same information exists, and it is what mobile, low-power, `save-data` and reduced-motion users receive.
-4. The page budget allows it: one M5 region per page. See [performance-budget.md](../05-frontend-implementation/performance-budget.md).
+4. The page budget allows it: one M5 region per page. See [performance-budget.md](../../skills/frontend-implementation/performance-budget.md).
 5. The technology is authorized (most M5 entries need a dependency). Otherwise degrade to M4.
 
-Graphics engineering details (lifecycles, context loss, fallbacks) are in [advanced graphics](../knowledge/graphics/techniques.md).
+Graphics engineering details (lifecycles, context loss, fallbacks) are in [advanced graphics](../domains/graphics/techniques.md).
 
 ```yaml
 id: motion.m5-cinematic-hero

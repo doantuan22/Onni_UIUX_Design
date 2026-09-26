@@ -10,7 +10,7 @@ def load_and_validate(adapter_dir: Path, schema_dir: Path) -> dict:
     
     Args:
         adapter_dir: Directory containing adapter.json
-        schema_dir: Directory containing adapter.schema.json (usually plugin/schemas)
+        schema_dir: Directory containing adapter.schema.json (usually plugins/ui-engineering/schemas)
         
     Returns:
         The validated metadata dict.
@@ -37,7 +37,7 @@ def load_and_validate(adapter_dir: Path, schema_dir: Path) -> dict:
         raise RuntimeError(f"Cannot parse adapter.schema.json: {exc}")
 
     # Use packaging artifact to validate schema
-    # We find packaging directory relative to schema_dir (which is plugin/schemas)
+    # We find packaging directory relative to schema_dir (which is plugins/ui-engineering/schemas)
     packaging_dir = schema_dir.parent / "packaging"
     
     import sys

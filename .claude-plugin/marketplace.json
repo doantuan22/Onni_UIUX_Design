@@ -1,1 +1,18 @@
-{ "id": "ui-engineering", "name": "UI Engineering Plugin" }
+{
+  "name": "ui-engineering",
+  "owner": {
+    "name": "doantuan22"
+  },
+  "metadata": {
+    "description": "UI Engineering Plugin marketplace (GitHub: doantuan22/Onni_UIUX_Design)"
+  },
+  "plugins": [
+    {
+      "name": "ui-ux-design",
+      "source": "./plugins/ui-engineering",
+      "description": "Two-phase web UI/UX workflow with a Design Knowledge System, capability resolvers, runtime runner and design quality evals.",
+      "version": "0.1.0",
+      "category": "development"
+    }
+  ]
+}

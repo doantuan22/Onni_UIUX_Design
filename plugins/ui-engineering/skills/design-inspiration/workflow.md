@@ -10,7 +10,7 @@ Active `DESIGN-DIRECTION.md`, locked `DESIGN-BRIEF.md` and relevant `PAGE-SPEC.m
 2. **Check the existing language.** If the current system is coherent (`KEEP`/`REFINE` in Visual Language terms), inspiration only fills gaps; it does not re-theme the product.
 3. **Select a primary archetype** from [archetypes.md](archetypes.md) using the selection matrix below. Record at least one rejected archetype and why.
 4. **Optionally select a secondary DNA source**: another archetype, a [reference profile](reference-profiles.md), or an extracted user reference ([reference-extraction.md](reference-extraction.md)). Run the compatibility check.
-5. **Derive direction lines** for composition, typography, surface/color, imagery, and motion. These are *intent statements* consumed by [Typography](../typography/README.md), [Design System](../03-design-system/workflow.md), [Visual Grammar](../visual-language/visual-grammar.md), and [Motion](../motion/README.md).
+5. **Derive direction lines** for composition, typography, surface/color, imagery, and motion. These are *intent statements* consumed by [Typography](../typography/README.md), [Design System](../design-system/workflow.md), [Visual Grammar](../../knowledge/visual-language/visual-grammar.md), and [Motion](../../knowledge/motion/README.md).
 6. **Shortlist patterns** with [pattern-selection.md](pattern-selection.md): candidates, selected, rejected, each with a content reason.
 7. **Apply [anti-copying.md](anti-copying.md)** and record transformation constraints.
 8. Write [DESIGN-INSPIRATION.md](../../templates/DESIGN-INSPIRATION.md).

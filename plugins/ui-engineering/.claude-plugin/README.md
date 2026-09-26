@@ -1,40 +1,40 @@
 # Claude Code adapter
 
-Status: **experimental** (structurally verified; live Claude Code host test not yet run)
+Status: **experimental** (structurally verified; local-marketplace install verified with the Claude Code CLI; interactive session test not yet run)
 
-This adapter bundles the platform-neutral UI/UX Design Skill as a Claude Code plugin with MCP tool exposure through the shared stdio transport. It contains no design, knowledge, eval or runtime logic (see [CONTRACT.md](../CONTRACT.md)).
+This adapter bundles the platform-neutral UI/UX Design Skill as a Claude Code plugin with MCP tool exposure through the shared stdio transport. It contains no design, knowledge, eval or runtime logic (see [CONTRACT.md](../adapters/CONTRACT.md)).
 
 ## Plugin structure
 
 ```text
 <plugin-root>/
 ├── .claude-plugin/
-│   └── plugin.json          # Claude plugin manifest (name, version, description)
+│   ├── plugin.json          # Claude plugin manifest (committed; also rendered into bundles)
+│   └── export.py, verify.py, templates/   # adapter tooling
 ├── .mcp.json                 # MCP server declaration for the shared transport
-├── SKILL.md                  # Skill entry point (reused unchanged)
-├── VERSION
+├── SKILL.md                  # Canonical workflow controller
+├── skills/
+│   └── ui-ux-workflow/SKILL.md   # Discoverable skill entry; delegates to ../../SKILL.md
+├── plugin.json, VERSION, CHANGELOG.md
 ├── uiux/                     # Core package
-├── plugin/                   # Plugin layer (manifest, adapters, packaging, schemas)
-├── workflow/                 # Workflow definitions
-├── phase-1/                  # Phase 1 knowledge
-├── phase-2/                  # Phase 2 knowledge (incl. Design Knowledge System)
-├── review/                   # Review gates
-├── templates/                # Artifact templates
+├── adapters/                 # Generic adapter, shared MCP transport, adapter contract
+├── packaging/, schemas/      # Artifact build/verification and JSON schemas
+├── workflows/, review/, templates/   # Workflow definitions, review gates, artifact templates
+├── knowledge/                # Design Knowledge System
 ├── execution/                # Execution contracts
 ├── evals/                    # Eval scenarios and fixtures
 ├── docs/                     # Documentation
-├── scripts/                  # CLI tools
-└── CHANGELOG.md
+└── scripts/                  # CLI tools
 ```
 
-The plugin root IS the package root. `SKILL.md` and all its relative links work without rewriting.
+The plugin root IS the package root (`plugins/ui-engineering/` in the repository). `SKILL.md` and all its relative links work without rewriting.
 
 ## Name mapping
 
 | Context | Name | Source |
 |---|---|---|
 | Skill name (frontmatter) | `ui-ux-workflow` | `SKILL.md` |
-| Package / plugin id | `ui-ux-design` | `plugin/manifest/plugin.json` |
+| Package / plugin id | `ui-ux-design` | `plugins/ui-engineering/plugin.json` |
 | Claude plugin name | `ui-ux-design` | `.claude-plugin/plugin.json` |
 | MCP server name | `ui-ux-design-mcp` | `.mcp.json` key |
 | Python package | `uiux` | `uiux/` |
@@ -43,17 +43,30 @@ The plugin root IS the package root. `SKILL.md` and all its relative links work 
 
 See [VSCODE_INSTALL.md](VSCODE_INSTALL.md) for full installation and VS Code setup instructions.
 
+### From GitHub (repository marketplace)
+
+The repository root carries `.claude-plugin/marketplace.json` (marketplace `ui-engineering`, source `./plugins/ui-engineering`):
+
+```bash
+claude plugin marketplace add doantuan22/Onni_UIUX_Design
+claude plugin install ui-ux-design@ui-engineering
+```
+
+Inside Claude Code the same is `/plugin marketplace add doantuan22/Onni_UIUX_Design` then `/plugin install ui-ux-design@ui-engineering`.
+A local clone works the same way: `claude plugin marketplace add /path/to/Onni_UIUX_Design`.
+
 ### Development (recommended for testing)
 
 ```bash
-claude --plugin-dir <path-to-extracted-bundle>
+claude --plugin-dir plugins/ui-engineering        # from a clone
+claude --plugin-dir <path-to-extracted-bundle>     # from an exported bundle
 ```
 
 The agent will discover `SKILL.md`, connect to the MCP server, and expose all public tools.
 
 ### Local Marketplace Installation
 
-1. Build the marketplace bundle: `python plugin/adapters/claude-code/export.py --source . --out dist/dev/adapters/ --dev`
+1. Build the marketplace bundle: `python plugins/ui-engineering/.claude-plugin/export.py --dev --source plugins/ui-engineering --out dist/dev/adapters/`
 2. Extract `dist/dev/adapters/ui-ux-design-<version>-dev-claude-marketplace.zip`
 3. Add marketplace: `claude plugin marketplace add <extracted-directory>`
 4. Install plugin: `claude plugin install ui-ux-design@uiux-local`
@@ -69,10 +82,12 @@ The `.mcp.json` at the plugin root declares one MCP server:
 
 ```json
 {
-  "ui-ux-design-mcp": {
-    "command": "python3",
-    "args": ["${CLAUDE_PLUGIN_ROOT}/plugin/adapters/mcp/server.py"],
-    "env": {}
+  "mcpServers": {
+    "ui-ux-design-mcp": {
+      "command": "python3",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/adapters/mcp/server.py"],
+      "env": {}
+    }
   }
 }
 ```
@@ -97,10 +112,12 @@ If Python is not found, the MCP server will fail to start and Claude Code will r
 
 ```json
 {
-  "ui-ux-design-mcp": {
-    "command": "/path/to/python3",
-    "args": ["${CLAUDE_PLUGIN_ROOT}/plugin/adapters/mcp/server.py"],
-    "env": {}
+  "mcpServers": {
+    "ui-ux-design-mcp": {
+      "command": "/path/to/python3",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/adapters/mcp/server.py"],
+      "env": {}
+    }
   }
 }
 ```
@@ -127,14 +144,14 @@ Tool permissions are driven by MCP annotations (`readOnlyHint`, `destructiveHint
 
 ## Skill integration
 
-Claude Code reads `SKILL.md` at the plugin root. The skill instructs the agent to:
+Claude Code discovers `skills/ui-ux-workflow/SKILL.md`, which delegates to the canonical `SKILL.md` at the plugin root. The skill instructs the agent to:
 1. Follow the workflow state machine
 2. Load knowledge progressively through `retrieve_knowledge`
 3. Use capability and technology resolvers before design decisions
 4. Gate phase transitions on review criteria
 5. Use runtime tools only when the target project has Playwright
 
-No duplicate skill content exists in the adapter. The canonical `SKILL.md` is reused directly.
+No duplicate skill content exists in the adapter: `skills/ui-ux-workflow/SKILL.md` carries only the frontmatter and a pointer to the canonical `SKILL.md`.
 
 ## Verification
 
@@ -142,8 +159,8 @@ No duplicate skill content exists in the adapter. The canonical `SKILL.md` is re
 
 ```bash
 # Structural + subprocess verification (C1-C16)
-python plugin/adapters/claude-code/verify.py <extracted-bundle>
-python plugin/adapters/claude-code/verify.py --bundle <bundle.zip>
+python plugins/ui-engineering/.claude-plugin/verify.py <extracted-bundle>
+python plugins/ui-engineering/.claude-plugin/verify.py --bundle <bundle.zip>
 ```
 
 ### Live host test (requires Claude Code)
@@ -158,12 +175,12 @@ If Claude Code is not available: `CLAUDE_CODE_LIVE_TEST = NOT_RUN`
 Marketplace verification is structural and does not claim a live install:
 
 ```bash
-python plugin/adapters/claude-code/verify.py --marketplace --bundle dist/dev/adapters/ui-ux-design-0.1.0-dev-claude-marketplace.zip
+python plugins/ui-engineering/.claude-plugin/verify.py --marketplace --bundle dist/dev/adapters/ui-ux-design-0.1.0-dev-claude-marketplace.zip
 ```
 
 ## Limitations
 
-- Claude Code live host test has not been executed; structural and subprocess verification only
+- Verified with the Claude Code CLI (2.1.x): `claude plugin validate`, local marketplace add/install, component inventory (1 skill, 1 MCP server) and MCP health (`Connected`); an interactive session and a GitHub-hosted install have not been run yet
 - No `min_version` for Claude Code is declared (docs verified 2026-09-25, no pinned host release)
 - Python 3 must be available on PATH
 - On Windows, `.mcp.json` uses `python3`; users may need to adjust to `python` or `py -3`
@@ -189,5 +206,6 @@ Claude Code plugin documentation verified: **2026-09-25**
 Claude Marketplace: IMPLEMENTED / SCHEMA VERIFIED / INSTALL IDENTIFIER CONSISTENT
 Claude VS Code Installation: READY
 Claude Live VS Code: NOT_RUN
-CLAUDE_MARKETPLACE_LIVE_VALIDATE = NOT_RUN
+CLAUDE_MARKETPLACE_LIVE_VALIDATE = PASS (claude plugin validate, local marketplace install)
+CLAUDE_GITHUB_INSTALL = NOT_RUN (requires the manifests on the default branch)
 ```

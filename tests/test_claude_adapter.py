@@ -206,8 +206,9 @@ class BundleStructureTests(unittest.TestCase):
 
     def test_mcp_json_valid_and_uses_plugin_root(self) -> None:
         mcp = json.loads((self._root / ".mcp.json").read_text(encoding="utf-8"))
-        self.assertIn("ui-ux-design-mcp", mcp)
-        server_config = mcp["ui-ux-design-mcp"]
+        self.assertIn("mcpServers", mcp, "Claude Code .mcp.json wraps servers in 'mcpServers'")
+        self.assertIn("ui-ux-design-mcp", mcp["mcpServers"])
+        server_config = mcp["mcpServers"]["ui-ux-design-mcp"]
         args = server_config.get("args", [])
         # At least one arg should reference the shared MCP server
         server_refs = [a for a in args if "adapters/mcp/server.py" in str(a)]

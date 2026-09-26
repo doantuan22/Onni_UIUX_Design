@@ -114,7 +114,7 @@
       "scope": [
         "envelope"
       ],
-      "remediation": "Reinstall the package; the plugin manifest does not match plugin/manifest/plugin.schema.json."
+      "remediation": "Reinstall the package; the plugin manifest does not match schemas/plugin.schema.json."
     },
     "VERSION_MISMATCH": {
       "category": "package",

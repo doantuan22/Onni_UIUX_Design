@@ -9,7 +9,7 @@ Requirement → Capability Resolver → selected categories → candidate entrie
 ## Procedure
 
 1. **Declare** the profile (pre-design declaration) from the Design Direction and locked artifacts.
-2. **Resolve**: run `scripts/resolve_capabilities.py` (or apply [resolver rules](../capability-resolver/resolver.md) by hand). The plan's *Retrieval* list names the only catalog files to load.
+2. **Resolve**: run `scripts/resolve_capabilities.py` (or apply [resolver rules](../../skills/capability-resolver/resolver.md) by hand). The plan's *Retrieval* list names the only catalog files to load.
 3. **Load entries, not files, when possible**: find `id: <id>` in the listed file and read that block. [INDEX.md](INDEX.md) maps ids to files; read only the index section for the kind you need.
 4. **Load guidance modules by trigger** (Phase 2 router): motion grammar when motion is in scope, performance budget before implementation, accessibility contract for any advanced item.
 5. **Expand only on evidence**: if review finds a gap (e.g., a missing interaction), retrieve that one entry. Do not reload categories.

@@ -120,6 +120,29 @@ class CodexAdapterTests(unittest.TestCase):
         self.assertEqual(report["status"], "FAIL")
         self.assertIn("X5", report["failed"])
 
+    def test_verify_x5_rejects_verbatim_copy_of_canonical_skill(self) -> None:
+        """A byte copy of SKILL.md one level down breaks its relative links, so X5 must fail."""
+        import importlib.util
+        spec1 = importlib.util.spec_from_file_location("export", str(ROOT / ".codex-plugin" / "export.py"))
+        export = importlib.util.module_from_spec(spec1)
+        spec1.loader.exec_module(export)
+        spec2 = importlib.util.spec_from_file_location("verify", str(ROOT / ".codex-plugin" / "verify.py"))
+        verify = importlib.util.module_from_spec(spec2)
+        spec2.loader.exec_module(verify)
+        import sys
+
+        result = export.export(ROOT, self.workspace, dev=True)
+        from _packaging_support import artifact
+        extract_dir = self.workspace / "extract-copy"
+        artifact.safe_extract(Path(result["bundle"]), extract_dir)
+        root = extract_dir / f"{result['name']}-{result['version']}-dev-codex"
+
+        skill = root / "skills" / "ui-ux-workflow" / "SKILL.md"
+        self.assertNotEqual(skill.read_bytes(), (root / "SKILL.md").read_bytes(), "bundle must not copy SKILL.md")
+        skill.write_bytes((root / "SKILL.md").read_bytes())
+        problems = verify.check_skill_entry(skill, root / "SKILL.md", root)
+        self.assertTrue(any(p.startswith("broken relative link") for p in problems), problems)
+
     def test_verify_missing_python(self) -> None:
         import importlib.util
         spec1 = importlib.util.spec_from_file_location("export", str(ROOT / ".codex-plugin" / "export.py"))

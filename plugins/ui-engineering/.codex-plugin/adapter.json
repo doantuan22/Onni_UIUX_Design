@@ -44,13 +44,12 @@
   },
   "rendered_files": [
     {"template": "templates/plugin.json", "target": "plugin.json"},
-    {"template": "templates/mcp.json", "target": "mcp.json"},
-    {"template": "SKILL.md", "target": "skills/ui-ux-workflow/SKILL.md"}
+    {"template": "templates/mcp.json", "target": "mcp.json"}
   ],
   "bundle_layout": {
     "payload_dir": ".",
     "skill_at_root": true,
-    "note": "The full generic package is the plugin root; SKILL.md is copied to skills/ui-ux-workflow/SKILL.md."
+    "note": "The full generic package is the plugin root; the packaged skills/ui-ux-workflow/SKILL.md delegates to the canonical SKILL.md (no copy)."
   },
   "limitations": [
     "Requires local Python environment to run the shared MCP server.",

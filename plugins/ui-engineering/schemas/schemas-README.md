@@ -2,7 +2,7 @@
 
 | Schema | Describes | Produced by | Checked by |
 |---|---|---|---|
-| [package-manifest.schema.json](package-manifest.schema.json) | `PACKAGE-MANIFEST.json`, embedded in every artifact and published next to it: identity, provenance and per-file sha256 | `plugin/packaging/build.py` | `plugin/packaging/verify.py` (V1) |
+| [package-manifest.schema.json](package-manifest.schema.json) | `PACKAGE-MANIFEST.json`, embedded in every artifact and published next to it: identity, provenance and per-file sha256 | `plugins/ui-engineering/packaging/build.py` | `plugins/ui-engineering/packaging/verify.py` (V1) |
 | [build-info.schema.json](build-info.schema.json) | `<artifact>.build-info.json`: the build environment record (outside the archive, not in `SHA256SUMS`) | `build.py` | tests |
 | [adapter.schema.json](adapter.schema.json) | Host-neutral adapter metadata, including the MCP protocol pin/method list when an adapter exposes `mcp-stdio` | adapter metadata | V10 / tests |
 | [orchestrator.schema.json](orchestrator.schema.json) | UI Orchestrator machine-readable contract: inputs, routing outputs, UI state, change budgets (L1/L2/L3) and preservation rules | `uiux.engine.orchestrator` | `tests/test_orchestrator.py` |
@@ -16,4 +16,4 @@
 | [critic-report.schema.json](critic-report.schema.json) | Phase 7 Runtime Critic report: multi-dimensional inspection, regressions, plan-drift, pre-existing vs new issues, and repair recommendations | `uiux.engine.runtime_critic` | `tests/test_runtime_critic.py` |
 | [repair-plan.schema.json](repair-plan.schema.json) | Phase 7 Targeted Repair plan: scoped repair actions, blocked violations, scope constraints, and evidence recapture plan | `uiux.engine.runtime_critic` | `tests/test_runtime_critic.py` |
 
-The plugin manifest schema stays at [../manifest/plugin.schema.json](../manifest/plugin.schema.json). Validation uses the JSON Schema subset implemented in `plugin/packaging/artifact.py` (`validate_schema`), so no third-party validator is needed.
+The plugin manifest schema is [plugin.schema.json](plugin.schema.json). Validation uses the JSON Schema subset implemented in `plugins/ui-engineering/packaging/artifact.py` (`validate_schema`), so no third-party validator is needed.

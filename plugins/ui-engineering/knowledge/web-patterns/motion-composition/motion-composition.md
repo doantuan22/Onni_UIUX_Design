@@ -30,4 +30,4 @@ Travel:           media-led with search (low) → listing (low, feedback only) �
 
 If two HIGH patterns are both justified on a long page, separate them by at least two low sections and confirm the performance budget. Otherwise downgrade one.
 
-Pattern names above are the `aliases` of structured layout entries (e.g., minimal-typographic → `layout.hero-centered`, cinematic-product → `layout.hero-cinematic`). The motion cost of every layout is its `motion_cost` field, and the page budget is enforced by the [Capability Resolver](../../capability-resolver/resolver.md#motion-gating).
+Pattern names above are the `aliases` of structured layout entries (e.g., minimal-typographic → `layout.hero-centered`, cinematic-product → `layout.hero-cinematic`). The motion cost of every layout is its `motion_cost` field, and the page budget is enforced by the [Capability Resolver](../../../skills/capability-resolver/resolver.md#motion-gating).

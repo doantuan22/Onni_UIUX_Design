@@ -1,10 +1,10 @@
 """Deterministic artifact builder for the plugin package.
 
-    python plugin/packaging/build.py                         # release build of HEAD (clean tree required)
-    python plugin/packaging/build.py --commit v0.2.0         # release build of a tag/commit (clean tree required)
-    python plugin/packaging/build.py --dev                   # developer build of the working tree (never a release)
-    python plugin/packaging/build.py --verify                # build, then verify the artifact (verify.py)
-    python plugin/packaging/build.py --repo <dir> --out <dir>
+    python plugins/ui-engineering/packaging/build.py                         # release build of HEAD (clean tree required)
+    python plugins/ui-engineering/packaging/build.py --commit v0.2.0         # release build of a tag/commit (clean tree required)
+    python plugins/ui-engineering/packaging/build.py --dev                   # developer build of the working tree (never a release)
+    python plugins/ui-engineering/packaging/build.py --verify                # build, then verify the artifact (verify.py)
+    python plugins/ui-engineering/packaging/build.py --repo <dir> --out <dir>
 
 Release flow: git commit -> git archive (LF via .gitattributes, core.autocrlf off) -> staging dir (system temp)
 -> the staged tree's own package_files.py selects files -> preflight (registry fresh, VERSION == manifest,
@@ -239,7 +239,7 @@ def build(repo: Path = DEFAULT_REPO, commit: str = "HEAD", dev: bool = False, ou
                 "archives": [{"file": p.name, "sha256": artifact.sha256_file(p), "size": p.stat().st_size} for p in written],
                 "environment": {"python": platform.python_version(), "implementation": platform.python_implementation(),
                                 "platform": platform.platform(), "zlib": zlib.ZLIB_RUNTIME_VERSION},
-                "tool": {"name": "plugin/packaging/build.py", "archive_format_version": rules["artifact"]["format_version"]}}
+                "tool": {"name": "plugins/ui-engineering/packaging/build.py", "archive_format_version": rules["artifact"]["format_version"]}}
         info_path = out_dir / f"{base}.build-info.json"
         info_path.write_bytes(artifact.canonical_json(info))
     return {"status": "BUILT", "build_mode": manifest["build_mode"], "release": manifest["release"],
