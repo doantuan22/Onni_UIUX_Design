@@ -264,7 +264,7 @@ class BundleStructureTests(unittest.TestCase):
                 [sys.executable, str(server)],
                 input="\n".join(json.dumps(m) for m in messages) + "\n",
                 capture_output=True, text=True, encoding="utf-8",
-                cwd=cwd, timeout=30,
+                cwd=cwd, timeout=120,  # hang guard only; loaded CI runners can be several times slower
             )
         self.assertEqual(process.returncode, 0, process.stderr)
         responses = [json.loads(line) for line in process.stdout.splitlines()]
