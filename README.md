@@ -1,112 +1,185 @@
-# UI Engineering Plugin
+# Onni UI/UX Design
 
-A structured AI coding plugin for frontend engineering, design systems, and UI/UX implementation.
+**`ui-ux-design`** is a plugin for AI coding agents (Claude Code, Codex, any MCP client) that turns
+"build me a UI" into a disciplined design-and-engineering workflow: the agent first locks the UX
+structure, then designs and implements the interface, and only calls it done when rendered evidence
+passes review.
 
-It drives an AI coding agent through a two-phase web UI/UX workflow — Phase 1 locks the UX structure
-(actors, flows, pages, information architecture), Phase 2 realizes the visual design and frontend with
-rendered evidence — backed by a Design Knowledge System, capability/technology resolvers, a Playwright
-runtime runner and design-quality evals.
-
-## Architecture
-
-The repository holds one shared, platform-neutral plugin core (`plugins/ui-engineering`) with thin
-platform adapters for different AI agents (Claude Code, Codex, MCP).
-
-```
-.
-├── plugins/ui-engineering/      # Shared plugin core (the packaged artifact)
-│   ├── SKILL.md                 # Workflow controller — agents start here
-│   ├── plugin.json              # Platform-neutral plugin manifest
-│   ├── workflows/               # State machine, routing, preservation rules, artifact contracts
-│   ├── skills/                  # Phase skills; skills/ui-ux-workflow/SKILL.md is the host-discoverable entry
-│   ├── knowledge/               # Design Knowledge System (domains/registry.json, motion, web-patterns, …)
-│   ├── templates/               # Artifact templates (STRUCTURE-LOCK.md, PAGE-SPEC.md, FINAL-REVIEW.md, …)
-│   ├── review/                  # Phase and final review checklists
-│   ├── execution/               # Browser runtime, accessibility and evidence contracts
-│   ├── uiux/                    # Python core package (public API: uiux.api; tools: uiux/core/tools.json)
-│   ├── scripts/                 # CLIs (uiux_cli.py, validate_skill.py, knowledge_lib.py, …)
-│   ├── adapters/                # Generic adapter and shared MCP stdio transport
-│   ├── .mcp.json                # MCP server declaration (Claude Code)
-│   ├── .claude-plugin/          # Claude Code manifest (plugin.json) + bundle export/verify
-│   ├── .codex-plugin/           # Codex manifest (plugin.json, mcp.json) + bundle export/verify
-│   ├── packaging/               # Deterministic artifact build and verification
-│   ├── schemas/                 # JSON schemas for manifests and engine outputs
-│   ├── evals/                   # Eval scenarios, fixtures and rubric
-│   └── docs/                    # User-facing install, compatibility and troubleshooting docs
-├── .claude-plugin/marketplace.json   # Claude Code marketplace (plugin source: ./plugins/ui-engineering)
-├── .agents/plugins/marketplace.json  # Codex marketplace (plugin source: ./plugins/ui-engineering)
-├── tests/                       # Unit test suite (run from the repository root)
-├── development/                 # Architecture docs, phase docs, benchmark harness, fixture targets
-└── .github/workflows/           # CI (tests on Windows/Linux/macOS) and packaging
-```
-
-Detailed architecture documentation lives in `development/docs/`
-(start with `architecture.md` and `plugin-architecture.md`). Installation and compatibility notes for
-users are in `plugins/ui-engineering/docs/`.
-
-## Install
-
-Claude Code, directly from GitHub (the repository is a plugin marketplace named `ui-engineering`):
+[![Release](https://img.shields.io/github/v/release/doantuan22/Onni_UIUX_Design)](https://github.com/doantuan22/Onni_UIUX_Design/releases)
+[![CI](https://github.com/doantuan22/Onni_UIUX_Design/actions/workflows/ci.yml/badge.svg)](https://github.com/doantuan22/Onni_UIUX_Design/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
 ```bash
 claude plugin marketplace add doantuan22/Onni_UIUX_Design
 claude plugin install ui-ux-design@ui-engineering
 ```
 
-Codex (from a clone): `codex plugin marketplace add ./Onni_UIUX_Design` (reads `.agents/plugins/marketplace.json`).
-Other options — a single session with `claude --plugin-dir plugins/ui-engineering`, release archives and a standalone
-MCP server — are described in [plugins/ui-engineering/docs/INSTALLATION.md](plugins/ui-engineering/docs/INSTALLATION.md).
+---
 
-## Requirements
+## Why
 
-- Python 3.9+ (standard library only).
-- Optional, for browser evidence and accessibility scans: Node.js with Playwright (and `@axe-core/playwright`
-  or `axe-core`) installed in the **target** project. The plugin never installs them; without them the
-  runtime tools report `BLOCKED`.
+Left alone, coding agents jump straight to CSS: pages get invented, flows drift, every product ends
+up with the same generic "AI look", and "done" means "it compiles". This plugin gives the agent a
+workflow, a design knowledge base and executable checks so that UI work is:
+
+- **Structured before styled** — actors, use cases, pages, flows and states are specified and locked
+  before any visual decision.
+- **Intentional, not generic** — style, layout, typography and motion are chosen from a curated
+  knowledge system with an explicit *why* and *why not*, and reviewed against "AI-slop" patterns.
+- **Safe on existing code** — existing UIs are preserved first and improved second; redesigns need
+  explicit permission.
+- **Verified** — completion requires review gates and, when a browser runtime is available, real
+  screenshots and accessibility evidence — never claimed without proof.
+
+## How it works
+
+```
+INITIAL → ANALYZING → PHASE_1 → PHASE_1_REVIEW → STRUCTURE_LOCKED → PHASE_2 → PHASE_2_REVIEW → FINAL_REVIEW → DONE
+                                                                                   (BLOCKED whenever a contract cannot be met)
+```
+
+| Phase | What the agent produces | What it may not do |
+|---|---|---|
+| **Phase 1 — UX structure** | Requirement spec, actor and use-case maps, information architecture, page map, UX flows, state model, wireframe specs → `STRUCTURE-LOCK.md` | Choose colors, fonts, CSS or components; invent business rules |
+| **Phase 2 — Visual realization** | Design direction and inspiration, design system and tokens, typography, visual grammar, motion, component specs, frontend implementation, rendered evidence | Change anything locked in Phase 1 (a structural change sends work back to Phase 1) |
+| **Review gates** | Phase 1 review, Phase 2 review, final quality gate (accessibility, performance, consistency) → `FINAL-REVIEW.md` | Declare `DONE` without passing evidence |
+
+**Existing UIs** follow *preserve first → improve second → redesign only when explicitly requested*,
+with a change budget: **L1** safe refinement (allowed), **L2** local structural change (justified
+only), **L3** major redesign (denied unless you explicitly permit it). Vague requests such as
+"make it prettier" never unlock L3.
+
+## Features
+
+- **Workflow controller** — [`SKILL.md`](plugins/ui-engineering/SKILL.md) with a state machine,
+  routing for greenfield vs. existing UI, artifact contracts and rollback rules; 15 focused skills
+  (UX structure, design direction, inspiration, typography, visual language, design system,
+  responsive interaction, frontend implementation, visual QA, final quality gate, …) and 42 artifact
+  templates.
+- **Design Knowledge System** — 248 catalogued entries (31 styles, 37 layouts, 28 screens,
+  68 motion, 26 interactions, 26 effects, 16 recipes, 4 graphics techniques, 12 technologies), plus
+  8 domain packs (SaaS/AI, fintech, e-commerce, healthcare, developer tools, …) and 10 framework packs
+  (React, Next.js, Vue, Nuxt, Svelte/SvelteKit, Angular, static HTML, …), retrieved progressively
+  instead of loaded wholesale.
+- **Resolvers** — a capability resolver turns a design profile (brand, audience, density, intensity)
+  into a ranked plan; a technology resolver picks the simplest way to build it, preferring what the
+  project already has and never adding dependencies automatically.
+- **Repository intelligence** — detects framework, routes, components, styling and design tokens;
+  profiles an existing UI and plans modifications with blast radius and scope gates.
+- **Runtime evidence** — screenshots, motion probes and axe accessibility scans using the *target
+  project's own* Playwright; reports `BLOCKED` instead of installing anything.
+- **Quality evals** — static design-quality analysis and 80 eval scenarios (E01–E80).
+
+### Tools (MCP / CLI)
+
+24 tools, exposed through the bundled MCP server `ui-ux-design-mcp` and the CLI:
+
+| Area | Tools |
+|---|---|
+| Orchestration & knowledge | `orchestrate_ui`, `route_knowledge`, `build_knowledge_plan`, `retrieve_knowledge`, `resolve_capabilities`, `resolve_technology` |
+| Repository & existing UI | `analyze_repository`, `analyze_existing_ui`, `plan_modification`, `build_validation_handoff` |
+| Runtime & accessibility | `detect_runtime`, `run_runtime`, `accessibility_scan`, `run_runtime_validation`, `build_critic_report`, `evaluate_runtime_result`, `build_repair_plan`, `run_targeted_repair`, `recapture_evidence` |
+| Quality & health | `analyze_design_quality`, `run_evals`, `validate_skill`, `capability_map`, `self_test` |
+
+## Install
+
+### Claude Code (recommended)
+
+```bash
+claude plugin marketplace add doantuan22/Onni_UIUX_Design
+claude plugin install ui-ux-design@ui-engineering
+```
+
+or inside a session: `/plugin marketplace add doantuan22/Onni_UIUX_Design`, then
+`/plugin install ui-ux-design@ui-engineering`. This registers the `ui-ux-workflow` skill and the
+`ui-ux-design-mcp` MCP server. For a single session from a clone:
+`claude --plugin-dir plugins/ui-engineering`.
+
+### Codex (experimental)
+
+From a clone: `codex plugin marketplace add ./Onni_UIUX_Design` (reads
+`.agents/plugins/marketplace.json`), or use `ui-ux-design-0.1.0-codex-marketplace.zip` from the
+[release](https://github.com/doantuan22/Onni_UIUX_Design/releases/tag/v0.1.0).
+
+### Release archive or any MCP client
+
+Download `ui-ux-design-0.1.0.zip` and `SHA256SUMS` from
+[Releases](https://github.com/doantuan22/Onni_UIUX_Design/releases), verify, extract, then run
+`claude --plugin-dir ui-ux-design-0.1.0` — or register the stdio server
+`python3 <plugin-root>/adapters/mcp/server.py` in any MCP client.
+
+Full instructions, Windows notes and troubleshooting:
+[INSTALLATION.md](plugins/ui-engineering/docs/INSTALLATION.md) ·
+[COMPATIBILITY.md](plugins/ui-engineering/docs/COMPATIBILITY.md) ·
+[TROUBLESHOOTING.md](plugins/ui-engineering/docs/TROUBLESHOOTING.md).
+
+### Requirements
+
+- Python 3.9+ on `PATH` (standard library only; nothing to `pip install`).
+- Optional: Node.js with Playwright (and `@axe-core/playwright` or `axe-core`) in the **target**
+  project for screenshots and accessibility scans. Without it those tools report `BLOCKED`; the plugin
+  never installs packages or downloads browsers.
 
 ## Usage
 
+After installing, just describe the UI work; the agent picks up the `ui-ux-workflow` skill:
+
+- *"Design and build a pricing page for our developer-tool SaaS in this Next.js app."*
+- *"Audit the dashboard in `src/app/dashboard` and fix spacing, states and accessibility — keep the
+  current look."* (existing UI, L1 budget)
+- *"Plan an onboarding flow for a fintech app — structure first, no styling yet."* (Phase 1 only)
+
+The agent writes its artifacts (`REQUIREMENT-SPEC.md`, `STRUCTURE-LOCK.md`, `DESIGN-DIRECTION.md`,
+`DESIGN-SYSTEM.md`, `FINAL-REVIEW.md`, …) into your project as it goes, so every decision is
+reviewable.
+
+The tools also work without an agent:
+
 ```bash
-# Version, tool list and a tool call through the unified CLI
-python plugins/ui-engineering/scripts/uiux_cli.py version
 python plugins/ui-engineering/scripts/uiux_cli.py tools
 python plugins/ui-engineering/scripts/uiux_cli.py call self_test
 python plugins/ui-engineering/scripts/uiux_cli.py call analyze_repository --params '{"project": "path/to/app"}'
-
-# Shared MCP server (stdio JSON-RPC)
-python plugins/ui-engineering/adapters/mcp/server.py
-
-# Host bundles (Claude Code / Codex) and their verification
-python plugins/ui-engineering/.claude-plugin/export.py --dev --source plugins/ui-engineering --out dist/dev/adapters
-python plugins/ui-engineering/.codex-plugin/export.py --dev --source plugins/ui-engineering --out dist/dev/adapters
-python plugins/ui-engineering/.claude-plugin/verify.py --bundle dist/dev/adapters/ui-ux-design-0.1.0-dev-claude-code.zip
 ```
+
+## Repository layout
+
+```
+plugins/ui-engineering/     The plugin (packaged artifact): SKILL.md, skills/, workflows/, knowledge/,
+                            templates/, review/, execution/, uiux/ (Python core), adapters/ (MCP),
+                            .claude-plugin/, .codex-plugin/, packaging/, schemas/, evals/, docs/
+.claude-plugin/             Claude Code marketplace (ui-engineering → ./plugins/ui-engineering)
+.agents/plugins/            Codex marketplace
+tests/                      Test suite (run from the repository root)
+development/                Architecture and phase docs, benchmark harness, fixture targets
+.github/workflows/          CI (Python 3.9–3.13 × Linux/Windows/macOS) and packaging (build, verify, cross-OS parity)
+```
+
+Architecture: [development/docs/architecture.md](development/docs/architecture.md) and
+[development/docs/plugin-architecture.md](development/docs/plugin-architecture.md).
 
 ## Development
 
-Run the same checks as CI from the repository root:
-
 ```bash
-python -m unittest discover -s tests -t tests
-python plugins/ui-engineering/scripts/validate_skill.py
-python plugins/ui-engineering/scripts/knowledge_lib.py check
-python plugins/ui-engineering/packaging/package_files.py
+python -m unittest discover -s tests -t tests                 # full test suite
+python plugins/ui-engineering/scripts/validate_skill.py         # skill structure and links
+python plugins/ui-engineering/scripts/knowledge_lib.py check    # knowledge catalogs and registry
 python plugins/ui-engineering/scripts/uiux_cli.py call run_evals
+python plugins/ui-engineering/packaging/build.py --dev --verify   # build + verify a package into dist/
+claude plugin validate . && claude plugin validate plugins/ui-engineering
 ```
 
-Validate the installable manifests with the Claude Code CLI: `claude plugin validate .` and
-`claude plugin validate plugins/ui-engineering`.
+`VERSION` is the single version source. See [CHANGELOG.md](CHANGELOG.md) and
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
-Build and verify a package (outputs go to the git-ignored `dist/`):
+## Status
 
-```bash
-python plugins/ui-engineering/packaging/build.py --dev --verify   # developer build of the working tree
-python plugins/ui-engineering/packaging/build.py --verify         # release build (clean commit required)
-```
+Version **0.1.0** — first public release.
 
-`VERSION` (mirrored in `plugins/ui-engineering/VERSION`) is the single version source; see
-[CHANGELOG.md](CHANGELOG.md) for changes and [CONTRIBUTING.md](CONTRIBUTING.md) for contribution rules.
+- Claude Code: install, skill discovery and MCP connection verified with the Claude Code CLI.
+- Codex: structurally verified; not yet tested on a live Codex host.
+- Windows with the python.org installer: change `python3` to `python` or `py -3` in the MCP
+  configuration.
 
 ## License
 
-Licensed under the [Apache License, Version 2.0](LICENSE); see [NOTICE](NOTICE). The packaged plugin carries the same `LICENSE` and `NOTICE` files.
+[Apache License 2.0](LICENSE) — see [NOTICE](NOTICE).
