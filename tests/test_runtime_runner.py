@@ -78,7 +78,8 @@ class RunnerMotionOptionTests(unittest.TestCase):
         with tempfile.NamedTemporaryFile("w", suffix=".cjs", delete=False, encoding="utf-8") as handle:
             handle.write(runner.HELPER)
         try:
-            result = subprocess.run(["node", "--check", handle.name], capture_output=True, text=True, timeout=30)
+            # Generous hang guard: a cold node start on a loaded Windows runner exceeded 30 s (syntax check only).
+            result = subprocess.run(["node", "--check", handle.name], capture_output=True, text=True, timeout=120)
             self.assertEqual(result.returncode, 0, result.stderr)
         finally:
             os.unlink(handle.name)
