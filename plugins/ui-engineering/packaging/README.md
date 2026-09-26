@@ -1,6 +1,6 @@
 # Packaging: build and verification
 
-Implements spec phases P0–P2 plus the experimental shared MCP transport smoke checks ([docs/plugin-packaging-spec.md](../../docs/plugin-packaging-spec.md)). Release archives are the primary distribution format. Nothing is published, tagged or installed by these tools.
+Implements spec phases P0–P2 plus the experimental shared MCP transport smoke checks ([docs/plugin-packaging-spec.md](../../../development/docs/plugin-packaging-spec.md)). Release archives are the primary distribution format. Nothing is published, tagged or installed by these tools.
 
 | File | Role |
 |---|---|

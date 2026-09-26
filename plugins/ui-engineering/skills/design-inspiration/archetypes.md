@@ -245,6 +245,6 @@ Mix at most one primary + one secondary (+ one scoped accent trait). `✓` compa
 
 Common coherent mixes: `premium-product + technical-platform` (premium hardware/silicon, "technical minimalism"), `developer-tool + editorial-product` (docs-first developer brands), `marketplace + travel-commerce` (booking platforms), `modern-saas + data-heavy-product` (product site → app continuity), `editorial-product + luxury` (fashion journals).
 
-Archetypes are product-level families; visual languages that realize them are in the [style catalog](../knowledge/styles/README.md) (e.g., premium-product → `style.calm-futurism`, `style.cinematic`, `style.minimal`; developer-tool → `style.developer-tool`, `style.monochrome`; editorial-product → `style.editorial`, `style.swiss`).
+Archetypes are product-level families; visual languages that realize them are in the [style catalog](../../knowledge/domains/styles/README.md) (e.g., premium-product → `style.calm-futurism`, `style.cinematic`, `style.minimal`; developer-tool → `style.developer-tool`, `style.monochrome`; editorial-product → `style.editorial`, `style.swiss`).
 
 A mix is rejected (`INCOMPATIBLE_REFERENCE_MIX`) when the two sources disagree on **density** by two levels *in the same region*, on **motion character** (cinematic vs snappy for the same element type), or on **surface philosophy** (card-driven vs card-free) without a scoped rule.

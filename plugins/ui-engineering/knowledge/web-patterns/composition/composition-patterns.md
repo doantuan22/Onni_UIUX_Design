@@ -13,4 +13,4 @@ Page-level composition decides how space, alignment and scale are distributed. C
 | **high-density product** | efficient | dashboards, admin, results | App shell, compact spacing, tables and panels | Clutter without hierarchy; card-in-card |
 | **low-density premium** | exclusive, calm | premium, luxury, minimal | Few elements per viewport; strong scale contrast | Hiding productive actions; excessive scrolling |
 
-Compatibility with archetypes follows [archetypes.md](../../design-inspiration/archetypes.md). Composition must preserve reading order in the DOM; visual reordering must not change keyboard/screen-reader order.
+Compatibility with archetypes follows [archetypes.md](../../../skills/design-inspiration/archetypes.md). Composition must preserve reading order in the DOM; visual reordering must not change keyboard/screen-reader order.

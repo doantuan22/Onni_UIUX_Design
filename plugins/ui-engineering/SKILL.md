@@ -34,9 +34,9 @@ All requests enter via the UI Orchestrator (`uiux.api.orchestrate_ui` or CLI `py
 7. In Phase 2 visual realization, load [skills/ui-orchestrator/README.md](skills/ui-orchestrator/README.md), the active `STRUCTURE-LOCK.md`, and [skills/ui-orchestrator/router.md](skills/ui-orchestrator/router.md).
 8. For review, load the applicable file in [review/](review/).
 
-Executable tools (capability resolver, knowledge retrieval, technology resolver, quality analyzer, runtime runner, evals, validation) are listed in `uiux/core/tools.json` and run with `python scripts/uiux_cli.py call <tool-id>`; see [../development/docs/plugin-architecture.md](../development/docs/plugin-architecture.md).
+Executable tools (capability resolver, knowledge retrieval, technology resolver, quality analyzer, runtime runner, evals, validation) are listed in `uiux/core/tools.json` and run with `python scripts/uiux_cli.py call <tool-id>`; see [../development/docs/plugin-architecture.md](../../development/docs/plugin-architecture.md).
 
-Do not load the entire skill directory by default. Detailed contracts are in [workflows/artifact-contract.md](workflows/artifact-contract.md); the architectural rationale is in [../development/docs/architecture.md](../development/docs/architecture.md).
+Do not load the entire skill directory by default. Detailed contracts are in [workflows/artifact-contract.md](workflows/artifact-contract.md); the architectural rationale is in [../development/docs/architecture.md](../../development/docs/architecture.md).
 
 ## Global execution invariants
 

@@ -2,7 +2,7 @@
 
 Status: **experimental** (structurally verified; local-marketplace install verified with the Claude Code CLI; interactive session test not yet run)
 
-This adapter bundles the platform-neutral UI/UX Design Skill as a Claude Code plugin with MCP tool exposure through the shared stdio transport. It contains no design, knowledge, eval or runtime logic (see [CONTRACT.md](../CONTRACT.md)).
+This adapter bundles the platform-neutral UI/UX Design Skill as a Claude Code plugin with MCP tool exposure through the shared stdio transport. It contains no design, knowledge, eval or runtime logic (see [CONTRACT.md](../adapters/CONTRACT.md)).
 
 ## Plugin structure
 

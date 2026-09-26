@@ -1,6 +1,6 @@
 # Accessibility contract for advanced design
 
-Every advanced effect, motion, interaction or graphic must satisfy this contract before it ships. It extends, and does not replace, the [Accessibility Gate](../../execution/accessibility/gate.md) and Phase 2 [accessibility quality](../08-final-quality-gate/accessibility.md). Accessibility is never optional polish.
+Every advanced effect, motion, interaction or graphic must satisfy this contract before it ships. It extends, and does not replace, the [Accessibility Gate](../../execution/accessibility/gate.md) and Phase 2 [accessibility quality](../../skills/final-quality-gate/accessibility.md). Accessibility is never optional polish.
 
 | Requirement | Applies to | Rule |
 |---|---|---|

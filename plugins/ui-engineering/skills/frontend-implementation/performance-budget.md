@@ -1,6 +1,6 @@
 # Performance budget for advanced design
 
-Advanced design must not break performance. This file sets **effect, motion and interaction budgets** and device degradation. Motion-specific implementation rules (transform/opacity, scroll listeners, rAF, IntersectionObserver) are in [motion performance safety](../motion/performance-safety.md) and are not repeated here.
+Advanced design must not break performance. This file sets **effect, motion and interaction budgets** and device degradation. Motion-specific implementation rules (transform/opacity, scroll listeners, rAF, IntersectionObserver) are in [motion performance safety](../../knowledge/motion/performance-safety.md) and are not repeated here.
 
 ## Cost model
 
@@ -28,7 +28,7 @@ Points count distinct effects in use on a page, not instances. More than 2–3 `
 
 ## Motion budget
 
-- At most **one HIGH motion region** per page ([intensity budget](../motion/motion-principles.md#intensity-budget)).
+- At most **one HIGH motion region** per page ([intensity budget](../../knowledge/motion/motion-principles.md#intensity-budget)).
 - At most **one continuous animation visible** at a time (ambient drift, shader, particles, video loop).
 - At most **one scroll-linked region active** at a time.
 - Application surfaces: no continuous decorative motion at all.
@@ -48,7 +48,7 @@ Points count distinct effects in use on a page, not instances. More than 2–3 `
 | Large `box-shadow` | Paint on each change | Animate the opacity of a pre-rendered shadow layer |
 | Large gradients/meshes | Repaint when animated | Animate transforms of a layer, not gradient stops |
 | Blend modes | Extra compositing | Small areas only |
-| Canvas/WebGL | Continuous GPU/CPU | Visibility-gated loops, DPR cap, dispose on unmount ([graphics](../knowledge/graphics/techniques.md)) |
+| Canvas/WebGL | Continuous GPU/CPU | Visibility-gated loops, DPR cap, dispose on unmount ([graphics](../../knowledge/domains/graphics/techniques.md)) |
 | Video backgrounds | Decode and bandwidth | Poster LCP, `preload="none"` or metadata, pause off-screen |
 
 ## Lifecycle requirements

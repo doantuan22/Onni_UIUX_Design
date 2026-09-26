@@ -1,6 +1,6 @@
 # Plugin manifest
 
-[plugin.json](plugin.json) describes the package to any host platform without assuming one. It is **metadata only**: it points at core entry points (SKILL.md, `uiux.api`, registries) and never duplicates their content.
+[plugin.json](../plugin.json) describes the package to any host platform without assuming one. It is **metadata only**: it points at core entry points (SKILL.md, `uiux.api`, registries) and never duplicates their content.
 
 | Field | Meaning |
 |---|---|

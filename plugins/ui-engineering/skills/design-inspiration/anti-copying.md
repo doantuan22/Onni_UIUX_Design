@@ -19,7 +19,7 @@ References are design-language inspiration, not templates to reproduce. This fil
 | A signature visual (gradient field, illustration style) | A project-owned signature moment derived from its own brand/product |
 | A proprietary typeface | A licensed family chosen by [font-selection](../typography/font-selection.md) for similar character |
 | An interaction | The interaction's *job* (orientation, proof, comparison) realized with a fitting pattern |
-| A section sequence | A narrative built from [storytelling patterns](../web-patterns/storytelling/storytelling-patterns.md) and the locked content |
+| A section sequence | A narrative built from [storytelling patterns](../../knowledge/web-patterns/storytelling/storytelling-patterns.md) and the locked content |
 
 ## Distance test (run before implementation)
 

@@ -2,7 +2,7 @@
 
 Two layers of knowledge:
 
-- **Technologies** (SVG, Canvas, WebGL, Three.js, Rive, Lottie) are defined once in the [technology resolver](../../05-frontend-implementation/technology-resolver.md). Each one has when to use, when not to use, cost, fallback, accessibility, responsive strategy and lifecycle.
+- **Technologies** (SVG, Canvas, WebGL, Three.js, Rive, Lottie) are defined once in the [technology resolver](../../../skills/frontend-implementation/technology-resolver.md). Each one has when to use, when not to use, cost, fallback, accessibility, responsive strategy and lifecycle.
 - **Techniques** below (shaders, particle systems, procedural graphics, interactive illustration) are built with those technologies. They inherit the technology rules and add their own.
 
 ## Engineering rules for every advanced graphic

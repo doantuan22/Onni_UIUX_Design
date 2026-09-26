@@ -35,7 +35,7 @@ Load only references signalled by the selected pages and task: `typography`, `co
 
 | Trigger in task | Load | Never load for this trigger |
 |---|---|---|
-| New build, visual redesign, landing/product site, "make it premium/distinctive", benchmark tasks | [capability-resolver](capability-resolver/README.md) + `resolver.md`; then **only** the files in the plan's retrieval list ([retrieval.md](knowledge/retrieval.md)) and the composition anchor in `knowledge/composition/recipes.md` | whole catalog folders |
+| New build, visual redesign, landing/product site, "make it premium/distinctive", benchmark tasks | [capability-resolver](../capability-resolver/README.md) + `resolver.md`; then **only** the files in the plan's retrieval list ([retrieval.md](../../knowledge/domains/retrieval.md)) and the composition anchor in `knowledge/composition/recipes.md` | whole catalog folders |
 | Style/"look" questions, generic or homogenized output | the resolved `knowledge/styles/` entries, `knowledge/composition/anti-homogenization.md`, `premium-quality-model.md` | unrelated style families |
 | Screen types (dashboard, settings, AI chat, kanban, …) | the matching `knowledge/screens/` entry (structure stays locked) | marketing hero/storytelling layouts |
 | Application shells or grids | `web-patterns/application/application-layouts.md` or `grid/grid-patterns.md` entries | cinematic layouts |

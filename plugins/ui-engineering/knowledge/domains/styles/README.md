@@ -1,6 +1,6 @@
 # Style Intelligence
 
-A style is a **visual language**: a coherent set of decisions about layout, type, color, surfaces, imagery, motion, interaction and effects. It is not a keyword. Product-level [design archetypes](../../design-inspiration/archetypes.md) say *what kind of product experience* is needed; styles say *which visual language realizes it*. The archetype constrains the style, never the reverse.
+A style is a **visual language**: a coherent set of decisions about layout, type, color, surfaces, imagery, motion, interaction and effects. It is not a keyword. Product-level [design archetypes](../../../skills/design-inspiration/archetypes.md) say *what kind of product experience* is needed; styles say *which visual language realizes it*. The archetype constrains the style, never the reverse.
 
 | File | Family | Styles |
 |---|---|---|
@@ -12,7 +12,7 @@ A style is a **visual language**: a coherent set of decisions about layout, type
 
 ## Using a style entry
 
-1. Do not browse this folder. The [Capability Resolver](../../capability-resolver/README.md) ranks candidates from intent; load only the chosen primary (and at most one secondary) entry.
+1. Do not browse this folder. The [Capability Resolver](../../../skills/capability-resolver/README.md) ranks candidates from intent; load only the chosen primary (and at most one secondary) entry.
 2. Treat every field as a **direction**, then encode it in tokens (Design System), behavior (Visual Grammar), motion (Motion System) and components.
 3. `compatible_styles` lists safe secondaries. Mixing is limited to a primary plus one secondary, with the secondary scoped (e.g., "hero only").
 4. `default_tell: true` marks styles that are overused in AI-generated interfaces. They are allowed with a recorded product reason; they are never a default. See [anti-homogenization](../composition/anti-homogenization.md).

@@ -11,4 +11,4 @@ Use `PHASE-2-REVIEW.md`, `VISUAL-REVIEW.md`, and `ACCESSIBILITY-REVIEW.md` as ap
 
 Run at most three automatic visual-refinement iterations. A non-structural failure returns to `PHASE_2`; a structural/business/semantic mismatch is a blocker, requires a rollback request, and returns to `PHASE_1`. A pass requires no unresolved blocker and authorizes the final quality gate.
 
-When inspiration, typography or motion were in scope, the review also applies the added [craft review](../phase-2/visual-language/craft-review.md) lenses and the codes in [typography-review](../phase-2/typography/typography-review.md) and [motion-review](../phase-2/motion/motion-review.md).
+When inspiration, typography or motion were in scope, the review also applies the added [craft review](../skills/visual-language/craft-review.md) lenses and the codes in [typography-review](../skills/typography/typography-review.md) and [motion-review](../knowledge/motion/motion-review.md).

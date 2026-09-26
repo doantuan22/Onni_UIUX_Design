@@ -1,6 +1,6 @@
 # Web Pattern Library
 
-A curated composition vocabulary for realizing locked content. Patterns are **options chosen by reasoning**, never defaults. Selection happens in the [Pattern Selection Engine](../design-inspiration/pattern-selection.md); this library describes each option's requirements and failure modes.
+A curated composition vocabulary for realizing locked content. Patterns are **options chosen by reasoning**, never defaults. Selection happens in the [Pattern Selection Engine](../../skills/design-inspiration/pattern-selection.md); this library describes each option's requirements and failure modes.
 
 Boundary: Phase 1 (`PAGE-SPEC`, `WIREFRAME-SPEC`) owns which blocks exist and their responsibility. Patterns decide composition, pacing and interaction presentation within that. A pattern that needs new content or changes meaning triggers a Phase 1 rollback request.
 
@@ -38,4 +38,4 @@ Boundary: Phase 1 (`PAGE-SPEC`, `WIREFRAME-SPEC`) owns which blocks exist and th
 - Floating pill navigation, bento grids, and three-card rows are allowed only with a recorded reason; none is a default.
 - Keep this library small. Add a pattern only when a real project needs one that no existing entry covers.
 
-Hero, grid, storytelling-layout and application entries are structured catalog entries of the [Design Knowledge System](../knowledge/README.md) (schema `layout`). They are ranked by the [Capability Resolver](../capability-resolver/README.md) from style compatibility, content requirements, density and motion cost.
+Hero, grid, storytelling-layout and application entries are structured catalog entries of the [Design Knowledge System](../domains/README.md) (schema `layout`). They are ranked by the [Capability Resolver](../../skills/capability-resolver/README.md) from style compatibility, content requirements, density and motion cost.

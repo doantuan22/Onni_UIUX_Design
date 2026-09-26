@@ -16,7 +16,7 @@ Composition turns separate choices (style, layout, typography, color, components
 4. **Choose one signature per page.** Name one memorable moment (a lighting treatment, a product walkthrough, a typographic statement). Everything else supports it. Two signatures compete.
 5. **Map each layer to its owner artifact.** Type → Design System typography section; tokens → DESIGN-TOKENS; visual behavior → VISUAL-GRAMMAR; temporal behavior → MOTION-SYSTEM; composition → pattern selection in DESIGN-INSPIRATION; tech → CAPABILITY-PLAN. Nothing is decided twice.
 6. **Write the WHY lines.** For style, layout, interaction, motion, effect and technology, record *why this* and *why not the runner-up*. The resolver's scores are evidence, not a substitute for the sentence.
-7. **Check the budgets** in [performance-budget.md](../../05-frontend-implementation/performance-budget.md) and the [premium quality model](premium-quality-model.md) before implementation.
+7. **Check the budgets** in [performance-budget.md](../../../skills/frontend-implementation/performance-budget.md) and the [premium quality model](premium-quality-model.md) before implementation.
 
 ## Coherence rules
 

@@ -3,7 +3,7 @@
 - Status: **proposed** (specification only; nothing in this document is implemented yet unless marked *existing*)
 - Target version range: `0.2.0` (first packaged release) → `1.0.0`
 - Audience: an engineer or AI coding agent implementing the packaging phase without further architectural input
-- Related: [plugin-architecture.md](plugin-architecture.md) (current architecture), [plugins/ui-engineering/adapters/CONTRACT.md](../plugins/ui-engineering/adapters/CONTRACT.md), [plugins/ui-engineering/schemas/plugin-manifest-README.md](../plugins/ui-engineering/schemas/plugin-manifest-README.md), [plugins/ui-engineering/packaging/README.md](../plugins/ui-engineering/packaging/README.md)
+- Related: [plugin-architecture.md](plugin-architecture.md) (current architecture), [plugins/ui-engineering/adapters/CONTRACT.md](../../plugins/ui-engineering/adapters/CONTRACT.md), [plugins/ui-engineering/schemas/plugin-manifest-README.md](../../plugins/ui-engineering/schemas/plugin-manifest-README.md), [plugins/ui-engineering/packaging/README.md](../../plugins/ui-engineering/packaging/README.md)
 
 Normative words: **MUST**, **MUST NOT**, **SHOULD**, **MAY** as in RFC 2119. Paths are package-relative POSIX paths unless stated otherwise.
 
