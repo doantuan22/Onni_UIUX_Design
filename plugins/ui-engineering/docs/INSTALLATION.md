@@ -47,8 +47,8 @@ cd Onni_UIUX_Design
 Download `ui-ux-design-<version>.zip` and `SHA256SUMS` from GitHub Releases, check the checksum and extract:
 
 ```bash
-unzip ui-ux-design-0.1.0.zip -d ~/.plugins
-claude --plugin-dir ~/.plugins/ui-ux-design-0.1.0
+unzip ui-ux-design-0.1.1.zip -d ~/.plugins
+claude --plugin-dir ~/.plugins/ui-ux-design-0.1.1
 ```
 
 Host-specific bundles can also be exported from a clone:
@@ -91,8 +91,11 @@ Add the stdio server to any MCP client configuration (e.g. `claude_desktop_confi
 
 ### Python launcher
 
-The MCP configs call `python3`, which exists on Linux, macOS and Windows installs from the Microsoft Store.
-With the python.org Windows installer, replace `python3` by `python` or `py` (with args `["-3", ...]`) in
+The Claude Code MCP config launches `${UIUX_PYTHON:-python3}`: `python3` by default (Linux, macOS, Microsoft Store
+Python on Windows). If the `ui-ux-design-mcp` server shows as failed (`claude mcp list` reports
+`Executable not found`), set the `UIUX_PYTHON` environment variable to your interpreter and restart Claude Code —
+for the python.org Windows installer: `setx UIUX_PYTHON python` (or the full path to `python.exe`).
+For other MCP clients, replace `python3` by `python` or `py` (with args `["-3", ...]`) in
 the host's MCP configuration.
 
 ---
@@ -106,7 +109,7 @@ After installation, verify the installation immediately using the public CLI:
 python plugins/ui-engineering/scripts/uiux_cli.py call self_test
 
 # Expected output:
-# {"status": "PASS", "version": "0.1.0", "checks": [...]}
+# {"status": "PASS", "version": "0.1.1", "checks": [...]}
 ```
 
 ---

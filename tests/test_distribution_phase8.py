@@ -51,7 +51,17 @@ import build
 import package_files
 import verify
 
-ARTIFACT_BASE = "ui-ux-design-0.1.0-dev"
+VERSION = (PACKAGE_ROOT / "VERSION").read_text(encoding="utf-8").strip()
+ARTIFACT_BASE = f"ui-ux-design-{VERSION}-dev"
+
+
+def _version_satisfies(found: str, requirement: str) -> bool:
+    """Range check shared with the generic adapter (e.g. ``>=0.1.0,<1.0.0`` admits ``0.1.1``)."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("generic_adapter", PACKAGE_ROOT / "adapters" / "generic" / "adapter.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return bool(requirement) and module.version_satisfies(found, requirement)
 
 
 class Phase8DistributionTests(unittest.TestCase):
@@ -125,14 +135,16 @@ class Phase8DistributionTests(unittest.TestCase):
         if claude_adapter_json.is_file():
             data = json.loads(claude_adapter_json.read_text(encoding="utf-8"))
             core_req = data.get("core_api", {}).get("core_version", "")
-            self.assertIn(canonical_version, core_req, "Claude adapter must be compatible with canonical version")
+            self.assertTrue(_version_satisfies(canonical_version, core_req),
+                            f"Claude adapter core_version {core_req} must admit canonical version {canonical_version}")
 
         # Codex adapter metadata
         codex_adapter_json = PACKAGE_ROOT / ".codex-plugin" / "adapter.json"
         if codex_adapter_json.is_file():
             data = json.loads(codex_adapter_json.read_text(encoding="utf-8"))
             core_req = data.get("core_api", {}).get("core_version", "")
-            self.assertIn(canonical_version, core_req, "Codex adapter must be compatible with canonical version")
+            self.assertTrue(_version_satisfies(canonical_version, core_req),
+                            f"Codex adapter core_version {core_req} must admit canonical version {canonical_version}")
 
     # -------------------------------------------------------------------------
     # 2. Package Content Contract & Classification
@@ -372,7 +384,7 @@ class Phase8DistributionTests(unittest.TestCase):
         )
         self.assertEqual(res_version.returncode, 0, f"CLI version failed: {res_version.stderr}")
         data_ver = json.loads(res_version.stdout)
-        self.assertEqual(data_ver["version"], "0.1.0")
+        self.assertEqual(data_ver["version"], VERSION)
 
         # Run python -m uiux.cli tools
         res_tools = subprocess.run(

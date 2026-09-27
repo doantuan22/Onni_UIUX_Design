@@ -67,3 +67,13 @@ This document lists common issues and resolution procedures when installing, exe
 - **Resolution**:
   - `VERSION` in `plugins/ui-engineering/VERSION` is the single source of truth.
   - Update `plugin.json` and adapter manifests to match `VERSION`.
+
+## MCP server `ui-ux-design-mcp` fails to connect (red status)
+
+`claude mcp list` shows `Failed to connect — ENOENT: Executable not found`: Claude Code could not start the
+Python interpreter. The server is launched with `${UIUX_PYTHON:-python3}`.
+
+1. Check `python3 --version` (and `python --version`). Python 3.9+ is required.
+2. If `python3` is missing — typical on Windows with the python.org installer — point `UIUX_PYTHON` at a
+   working interpreter: `setx UIUX_PYTHON python` (Windows) or `export UIUX_PYTHON=/path/to/python3`.
+3. Open a new terminal, restart Claude Code, and re-check with `claude mcp list` or `/mcp`.
