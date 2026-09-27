@@ -17,7 +17,20 @@
 
 ## Current flows
 
+## Section inventory (required for Elevate and Reimagine)
+
+One table per key page, sections in reading order. The content column is the preservation contract: every
+item must still exist after the visual change.
+
+| Page | # | Section role | Current pattern | Content inventory (headings, copy blocks, media, fields, actions) | Components/files |
+|---|---|---|---|---|---|
+
+## Before evidence
+
+- Screenshots (375 / 768 / 1440 px):
+- Runtime unavailable reason, if any:
+
 ## Difference from requested state
 
-_Record current structure only; visual assessment is out of scope._
+_Record current structure and inventory only; visual assessment belongs in `DESIGN-DIRECTION.md`._
 

@@ -78,6 +78,7 @@ def normalize_profile(raw: dict, entries: dict[str, dict]) -> dict:
         "platform": list(raw.get("platform", ["desktop", "mobile"])),
         "existing_dependencies": list(raw.get("existing_dependencies", [])),
         "allow_new_dependencies": bool(raw.get("allow_new_dependencies", False)),
+        "allow_motion_library": bool(raw.get("allow_motion_library", False)),
         "explicit_styles": list(raw.get("explicit_styles", [])),
         "exclude_styles": list(raw.get("exclude_styles", [])),
     }

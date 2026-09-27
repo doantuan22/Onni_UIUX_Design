@@ -122,11 +122,12 @@ def resolve_capabilities(profile: dict) -> dict:
 
 
 def resolve_technology(capabilities: list[str], existing_dependencies: list[str] | None = None,
-                       allow_new_dependencies: bool | None = None) -> dict:
+                       allow_new_dependencies: bool | None = None, allow_motion_library: bool | None = None) -> dict:
     from uiux.engine import technology
 
     try:
-        return technology.resolve(capabilities, existing_dependencies or [], allow_new_dependencies)
+        return technology.resolve(capabilities, existing_dependencies or [], allow_new_dependencies,
+                                  allow_motion_library=bool(allow_motion_library))
     except ValueError as exc:
         raise _tool_error(exc) from exc
 

@@ -45,9 +45,18 @@ INITIAL → ANALYZING → PHASE_1 → PHASE_1_REVIEW → STRUCTURE_LOCKED → PH
 | **Review gates** | Phase 1 review, Phase 2 review, final quality gate (accessibility, performance, consistency) → `FINAL-REVIEW.md` | Declare `DONE` without passing evidence |
 
 **Existing UIs** follow *preserve first → improve second → redesign only when explicitly requested*,
-with a change budget: **L1** safe refinement (allowed), **L2** local structural change (justified
-only), **L3** major redesign (denied unless you explicitly permit it). Vague requests such as
-"make it prettier" never unlock L3.
+with a change budget — **L1** safe refinement, **L2** local structural change, **L3** major redesign
+(only with your explicit permission) — and an **ambition level** that says how far the result must move:
+
+| Ambition | When | What changes | What stays |
+|---|---|---|---|
+| **Refine** | "keep the current look", local fixes, a11y/responsive | Spacing, states, contrast, responsive polish | Everything visible |
+| **Elevate** *(default for "nâng cấp / làm đẹp / modernize")* | Upgrade requests | Page composition, hierarchy, type scale, surfaces, motion — with a committed direction, signature moves and no generic "AI look" defaults | App shell, navigation, routes, content, data, brand hues and logo |
+| **Reimagine** | "full redesign", greenfield | Whatever you explicitly unlock | Whatever you don't |
+
+Under Elevate/Reimagine the agent may propose one motion library (Motion/Framer Motion or GSAP) when CSS is
+not enough; it never installs packages itself. See
+[ambition-levels.md](plugins/ui-engineering/workflows/ambition-levels.md).
 
 ## Features
 
@@ -125,8 +134,10 @@ Full instructions, Windows notes and troubleshooting:
 After installing, just describe the UI work; the agent picks up the `ui-ux-workflow` skill:
 
 - *"Design and build a pricing page for our developer-tool SaaS in this Next.js app."*
+- *"Nâng cấp giao diện trang chủ cho chuyên nghiệp hơn."* (existing UI, **Elevate**: new composition,
+  type and motion; content, routes and brand kept)
 - *"Audit the dashboard in `src/app/dashboard` and fix spacing, states and accessibility — keep the
-  current look."* (existing UI, L1 budget)
+  current look."* (existing UI, **Refine**, L1 budget)
 - *"Plan an onboarding flow for a fintech app — structure first, no styling yet."* (Phase 1 only)
 
 The agent writes its artifacts (`REQUIREMENT-SPEC.md`, `STRUCTURE-LOCK.md`, `DESIGN-DIRECTION.md`,

@@ -3,6 +3,14 @@
 Versions follow semantic versioning; `VERSION` is the single source (see `plugins/ui-engineering/schemas/plugin-manifest-README.md`).
 The repository root `VERSION` mirrors `plugins/ui-engineering/VERSION`. Paths below are relative to the repository root; the plugin package lives in `plugins/ui-engineering/`.
 
+## Unreleased — ambition levels (UI upgrade overhaul, step 1)
+
+- Ambition levels on top of the L1/L2/L3 change budget: `orchestrate_ui` now returns `ambition` (`refine` | `elevate` | `reimagine`), `protected_properties.page_composition` and `allow_motion_library`. Upgrade requests on an existing UI ("nâng cấp giao diện", "làm đẹp", "modernize", "premium") resolve to **Elevate**: page composition, hierarchy, type scale, surfaces and motion may be re-composed (L2) while palette hues, brand, app shell, navigation, routes, content and data stay protected and L3 stays denied. Conservative phrasing ("keep the current look", "giữ nguyên bố cục") and local scope resolve to **Refine**; explicit redesign and greenfield to **Reimagine**.
+- New `workflows/ambition-levels.md` (Elevate contract and procedure), `skills/design-direction/signature-moves.md` (composition, typography, surface and motion moves with Tailwind hints) and `knowledge/visual-language/anti-slop/default-banlist.md` (generic defaults with their code signatures and replacements); `DESIGN-DIRECTION.md` and `CURRENT-UX-MAP.md` templates gain thesis, signature moves, banlist exceptions, section inventory and before evidence.
+- Modification planner and preservation guard understand Elevate: section re-composition is an authorized L2 change justified by the design direction; the new `CONTENT_PRESERVATION` rule fails a change that removes content or actions.
+- Motion libraries: under Elevate/Reimagine, `resolve_technology` / `resolve_capabilities` accept `allow_motion_library`, which sanctions exactly one of Motion (`motion`/`framer-motion`) or GSAP when no native option is preferred, reusing an installed one; it is still reported in `new_dependencies` and never installed automatically.
+- Guidance now prioritizes React + Tailwind CSS and Next.js.
+
 ## 0.1.1 — MCP launcher fix
 
 - Claude Code MCP launcher: `.mcp.json` starts `${UIUX_PYTHON:-python3}`, so hosts without `python3` (Windows with the python.org installer) can set `UIUX_PYTHON=python` instead of editing the plugin; docs and troubleshooting explain the `Executable not found` failure.

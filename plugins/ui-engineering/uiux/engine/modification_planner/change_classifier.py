@@ -7,6 +7,8 @@ Enforces:
 - L3 Permission Gate: Requires explicit user instruction.
   Vague requests ("modernize", "làm đẹp") are strictly rejected.
 - Granular permissions: Palette != Layout, Layout != Navigation, Navigation != Framework.
+- Ambition ELEVATE (preservation_profile["ambition"] == "elevate"): section re-composition inside the
+  protected shell is an authorized L2 change justified by the recorded design direction.
 """
 from __future__ import annotations
 
@@ -80,6 +82,7 @@ def classify_changes(
     brand_perm = granular_perms.get("brand", "locked")
     layout_perm = granular_perms.get("layout", "protected")
     nav_perm = granular_perms.get("navigation", "protected")
+    ambition = str(active_pres.get("ambition", "refine")).lower()
 
     explicit_perms = extract_explicit_permissions(user_goal)
     is_vague = is_vague_enhancement(user_goal)
@@ -190,7 +193,30 @@ def classify_changes(
     if wants_l2:
         # Check if justification was provided or extractable
         has_issue_keyword = any(k in goal_lower for k in ("overflow", "usability", "clutter", "cản trở", "tràn màn hình", "lỗi", "friction"))
-        if has_issue_keyword:
+        if ambition == "elevate" and not has_issue_keyword:
+            changes.append({
+                "id": "change_section_recomposition",
+                "target": "section_structure",
+                "change_type": "layout",
+                "level": L2,
+                "reason": "ELEVATE: re-compose sections inside the protected shell following the design direction.",
+                "evidence": "Ambition ELEVATE resolved by the preservation policy.",
+                "permission_required": None,
+                "justification": {
+                    "issue": "Current composition does not express the product's hierarchy or character.",
+                    "evidence": "Ambition ELEVATE plus the recorded DESIGN-DIRECTION.md signature moves.",
+                    "why_L1_is_insufficient": "Spacing and token polish cannot change hierarchy, rhythm or composition.",
+                    "affected_scope": "page",
+                    "expected_improvement": "Clear focal hierarchy and a distinctive, brand-consistent composition.",
+                },
+                "permission_trace": {
+                    "explicit_user_instruction": user_goal,
+                    "allowed_property": "page_composition",
+                    "scope": "page",
+                    "source": "ambition_elevate",
+                },
+            })
+        elif has_issue_keyword:
             changes.append({
                 "id": "change_section_reorder",
                 "target": "section_structure",

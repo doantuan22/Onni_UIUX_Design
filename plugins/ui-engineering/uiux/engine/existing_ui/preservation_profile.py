@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from uiux.engine.preservation import extract_explicit_permissions
+from uiux.engine.preservation import AMBITION_LEVELS, ELEVATE, REFINE, REIMAGINE, extract_explicit_permissions
 
 
 def build_preservation_profile(
@@ -30,6 +30,13 @@ def build_preservation_profile(
     else:
         merged_perms = extract_explicit_permissions(user_request="")
 
+    # Ambition: REIMAGINE needs explicit L3; unknown values fall back to REFINE
+    ambition = str((permissions or {}).get("ambition", REFINE)).strip().lower()
+    if ambition not in AMBITION_LEVELS:
+        ambition = REFINE
+    if ambition == REIMAGINE and not merged_perms["explicit_l3_granted"]:
+        ambition = ELEVATE
+
     # Determine policies based strictly on granular permissions
     palette_policy = "unlocked" if merged_perms["allow_palette_change"] else "locked"
     branding_policy = "unlocked" if merged_perms["allow_branding_change"] else "locked"
@@ -47,8 +54,17 @@ def build_preservation_profile(
 
     granted_l3_items = [k for k, v in merged_perms.items() if v and k != "explicit_l3_granted"]
 
+    if merged_perms["allow_layout_change"] or ambition == REIMAGINE:
+        composition_policy = "editable"
+    elif ambition == ELEVATE:
+        composition_policy = "evolvable"
+    else:
+        composition_policy = "protected"
+    evidence.append(f"Page composition policy: {composition_policy.upper()} (ambition {ambition.upper()})")
+
     return {
       "schema_version": 1,
+      "ambition": ambition,
       "protected_design": {
         "color_palette": {
           "policy": palette_policy,
@@ -80,6 +96,12 @@ def build_preservation_profile(
           "baseline": layout.get("navigation_structure", {}),
           "evidence": ["Baseline navigation structure preserved."],
         },
+        "page_composition": {
+          "policy": composition_policy,
+          "scope": ["section_layout", "hierarchy", "type_scale", "surfaces", "depth", "motion", "imagery_treatment"],
+          "invariants": ["content_inventory", "primary_actions", "routes", "data_bindings", "brand_hues"],
+          "evidence": ["Sections may be re-composed under ELEVATE; content, actions, routes and data are kept."],
+        },
         "information_architecture": {
           "policy": ia_policy,
           "routes_pages": layout.get("navigation_structure", {}).get("items", []),
@@ -92,8 +114,12 @@ def build_preservation_profile(
           "scope": ["spacing", "typography_scale", "responsive", "states", "a11y", "token_alignment"],
         },
         "L2": {
-          "policy": "justified_only",
-          "required_justification": "Requires clear UX friction or structural defect evidence in change trace.",
+          "policy": "allowed" if ambition == ELEVATE else "justified_only",
+          "required_justification": (
+              "ELEVATE: justified by the recorded design direction (DESIGN-DIRECTION.md signature moves)."
+              if ambition == ELEVATE else
+              "Requires clear UX friction or structural defect evidence in change trace."
+          ),
         },
         "L3": {
           "policy": "granted" if merged_perms["explicit_l3_granted"] else "explicit_user_permission_only",

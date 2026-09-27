@@ -34,7 +34,7 @@
       "description": "Choose the simplest technology for capability ids: installed dependency, native platform, authorized library, native fallback, or degrade.",
       "entrypoint": "uiux.api:resolve_technology",
       "cli": "python scripts/uiux_cli.py call resolve_technology --params '{\"capabilities\": [\"motion.m4-pinned-section\"]}'",
-      "input": {"type": "object", "required": ["capabilities"], "properties": {"capabilities": {"type": "array", "items": {"type": "string"}, "description": "Capability ids, e.g. motion.m4-pinned-section"}, "existing_dependencies": {"type": ["array", "null"], "items": {"type": "string"}}, "allow_new_dependencies": {"type": ["boolean", "null"], "description": "null = dependency_policy.allow_new_dependencies from config"}}, "additionalProperties": false},
+      "input": {"type": "object", "required": ["capabilities"], "properties": {"capabilities": {"type": "array", "items": {"type": "string"}, "description": "Capability ids, e.g. motion.m4-pinned-section"}, "existing_dependencies": {"type": ["array", "null"], "items": {"type": "string"}}, "allow_new_dependencies": {"type": ["boolean", "null"], "description": "null = dependency_policy.allow_new_dependencies from config"}, "allow_motion_library": {"type": ["boolean", "null"], "description": "ELEVATE/REIMAGINE: sanction one motion library (motion/framer-motion or gsap) when no native option is preferred"}}, "additionalProperties": false},
       "output": {"type": "object", "required": ["assignments", "technologies", "existing_reused", "new_dependencies", "degraded"], "description": "{assignments, technologies, existing_reused, new_dependencies, degraded}"},
       "dependencies": {"python": ">=3.9", "packages": []},
       "runtime_requirements": [],

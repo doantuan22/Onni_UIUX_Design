@@ -63,6 +63,7 @@
         "color_palette": {"type": "string", "enum": ["locked", "unlocked"]},
         "brand_identity": {"type": "string", "enum": ["locked", "unlocked"]},
         "overall_layout_identity": {"type": "string", "enum": ["protected", "unprotected"]},
+        "page_composition": {"type": "string", "enum": ["protected", "evolvable", "unlocked"], "description": "Section layout, hierarchy, surfaces and motion inside pages; evolvable under ELEVATE."},
         "navigation_model": {"type": "string", "enum": ["protected", "unprotected"]},
         "information_architecture": {"type": "string", "enum": ["protected", "unprotected"]},
         "component_structure": {"type": "string", "enum": ["controlled", "uncontrolled"]}
@@ -131,6 +132,15 @@
         "design_freedom": {
           "type": "string",
           "enum": ["high", "medium", "low", "constrained"]
+        },
+        "ambition": {
+          "type": "string",
+          "enum": ["refine", "elevate", "reimagine"],
+          "description": "How far visual realization may move: refine in place, elevate page composition inside the protected shell and brand, or reimagine (explicit L3 / greenfield)."
+        },
+        "allow_motion_library": {
+          "type": "boolean",
+          "description": "ELEVATE/REIMAGINE: one motion library (motion/framer-motion or gsap) may be added when native CSS cannot deliver the chosen motion; pass it to resolve_technology and report the addition."
         },
         "preservation_required": {
           "type": "boolean"
