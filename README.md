@@ -75,18 +75,22 @@ not enough; it never installs packages itself. See
   project already has and never adding dependencies automatically.
 - **Repository intelligence** — detects framework, routes, components, styling and design tokens;
   profiles an existing UI and plans modifications with blast radius and scope gates.
+- **UI structure map** — `map_ui_structure` reads React/Next.js (+ Tailwind), Vue, Svelte, Astro and HTML
+  sources into routes → layout shell → ordered sections → components, with each section's role, content
+  inventory, layout pattern, motion and "AI look" signals; `diff_ui_maps` compares before/after to prove
+  content was kept and the composition really changed.
 - **Runtime evidence** — screenshots, motion probes and axe accessibility scans using the *target
   project's own* Playwright; reports `BLOCKED` instead of installing anything.
 - **Quality evals** — static design-quality analysis and 80 eval scenarios (E01–E80).
 
 ### Tools (MCP / CLI)
 
-24 tools, exposed through the bundled MCP server `ui-ux-design-mcp` and the CLI:
+26 tools, exposed through the bundled MCP server `ui-ux-design-mcp` and the CLI:
 
 | Area | Tools |
 |---|---|
 | Orchestration & knowledge | `orchestrate_ui`, `route_knowledge`, `build_knowledge_plan`, `retrieve_knowledge`, `resolve_capabilities`, `resolve_technology` |
-| Repository & existing UI | `analyze_repository`, `analyze_existing_ui`, `plan_modification`, `build_validation_handoff` |
+| Repository & existing UI | `analyze_repository`, `analyze_existing_ui`, `map_ui_structure`, `diff_ui_maps`, `plan_modification`, `build_validation_handoff` |
 | Runtime & accessibility | `detect_runtime`, `run_runtime`, `accessibility_scan`, `run_runtime_validation`, `build_critic_report`, `evaluate_runtime_result`, `build_repair_plan`, `run_targeted_repair`, `recapture_evidence` |
 | Quality & health | `analyze_design_quality`, `run_evals`, `validate_skill`, `capability_map`, `self_test` |
 

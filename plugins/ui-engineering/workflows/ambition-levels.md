@@ -54,11 +54,15 @@ architecture stay protected. Elevate is about composition and craft, not about a
 
 ## Elevate procedure
 
-1. **Map before touching.** Run `analyze_repository` and `analyze_existing_ui`, then write
-   `CURRENT-UX-MAP.md`: routes → pages → sections (in order) → components, with each section's role
-   (hero, proof, feature, workflow, pricing, FAQ, CTA, data, form…) and its content inventory. Capture
-   *before* screenshots at 375, 768 and 1440 px when a runtime is available (`run_runtime`).
-2. **Diagnose.** For each key page list what makes it generic or weak: check it against the
+1. **Map before touching.** Run `map_ui_structure` (options `{"markdown": true}`) and save the result as
+   `.uiux/ui-map.json`. It gives routes → layout shell → ordered sections → components, each section's role
+   (hero, proof, features, steps, pricing, FAQ, CTA, data, form…), content inventory and fingerprint,
+   current layout pattern, motion and default-banlist signals, plus the tokens actually in use. Paste its
+   section inventory into `CURRENT-UX-MAP.md` and correct any role it got wrong (roles are heuristics; the
+   content inventory is the contract). Use `analyze_existing_ui` for identity and design-system maturity.
+   Capture *before* screenshots at 375, 768 and 1440 px when a runtime is available (`run_runtime`).
+2. **Diagnose.** Start from the map's `banlist` and `generic_density` per route, then list for each key
+   page what makes it generic or weak: check it against the
    [default banlist](../knowledge/visual-language/anti-slop/default-banlist.md) and the
    [AI tell density](../knowledge/visual-language/ai-tell-density.md) scale. Name the problem in terms of
    hierarchy, rhythm, composition, type, surfaces and motion — not "looks old".
@@ -72,9 +76,12 @@ architecture stay protected. Elevate is about composition and craft, not about a
 5. **Build in layers.** Tokens first (derived color steps, type scale, spacing rhythm, radii, shadows,
    motion durations/easings), then section compositions, then motion and micro-interaction. Reuse the
    project's components and extend their variants; do not fork a parallel component set.
-6. **Prove it.** Capture *after* screenshots at the same viewports, run the accessibility scan, and check
-   the invariants above (routes, content inventory, data, brand hues). Review the before/after pair
-   against the banlist and the direction; iterate at most twice on the weakest page.
+6. **Prove it.** Run `map_ui_structure` again and `diff_ui_maps` with the saved map: `content_preserved`
+   must be true (any `content_removed` item is restored or explicitly approved by the user) and
+   `elevate_bar.met` should be true (at least half of the matched sections re-composed); report
+   `banlist_resolved` and `banlist_introduced`. Capture *after* screenshots at the same viewports, run the
+   accessibility scan, and check the remaining invariants (routes, data, brand hues). Review the
+   before/after pair against the banlist and the direction; iterate at most twice on the weakest page.
 
 Elevate is not done when the diff only touches spacing, colors of existing elements, or border radii. The
 review asks: *would a user recognize the product, and would they notice that it got better at first

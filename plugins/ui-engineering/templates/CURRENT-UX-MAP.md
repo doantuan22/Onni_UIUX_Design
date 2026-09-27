@@ -19,8 +19,9 @@
 
 ## Section inventory (required for Elevate and Reimagine)
 
-One table per key page, sections in reading order. The content column is the preservation contract: every
-item must still exist after the visual change.
+One table per key page, sections in reading order — generate it with `map_ui_structure`
+(`{"markdown": true}`) and keep the JSON as `.uiux/ui-map.json` for `diff_ui_maps`. The content column is the
+preservation contract: every item must still exist after the visual change.
 
 | Page | # | Section role | Current pattern | Content inventory (headings, copy blocks, media, fields, actions) | Components/files |
 |---|---|---|---|---|---|

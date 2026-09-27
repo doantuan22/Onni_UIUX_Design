@@ -2,7 +2,7 @@
   "schema_version": 1,
   "description": "Capability map (spec section 6.3): every capability id declared in the plugin manifest 'capabilities' list maps to the registered tools (uiux/core/tools.json) and instruction entrypoints (package-relative files) that provide it. Owned by the core so a distribution without plugin/ keeps the same discovery; the manifest references this file. Whether a capability is static or runtime-dependent is derived from its tools' annotations (requires_node/requires_browser), never declared here.",
   "capabilities": {
-    "ux-structure-workflow": {"tools": ["orchestrate_ui", "analyze_repository", "analyze_existing_ui"], "instructions": ["SKILL.md", "workflows/overview.md", "skills/ux-structure/README.md"]},
+    "ux-structure-workflow": {"tools": ["orchestrate_ui", "analyze_repository", "analyze_existing_ui", "map_ui_structure", "diff_ui_maps"], "instructions": ["SKILL.md", "workflows/overview.md", "skills/ux-structure/README.md"]},
     "structure-lock": {"tools": ["plan_modification", "build_validation_handoff"], "instructions": ["skills/ux-structure/structure-lock.md", "workflows/phase-transition.md"]},
     "design-direction-and-inspiration": {"tools": ["retrieve_knowledge", "route_knowledge", "build_knowledge_plan"], "instructions": ["skills/ui-orchestrator/README.md", "skills/design-inspiration/README.md"]},
     "typography-intelligence": {"tools": ["retrieve_knowledge"], "instructions": ["skills/typography/README.md"]},

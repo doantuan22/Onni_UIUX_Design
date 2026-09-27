@@ -79,9 +79,9 @@ Such requests resolve to ambition **Elevate** ([ambition-levels.md](ambition-lev
 
 ## Execution Flow for Existing UI
 
-1. **Extraction / Observation**: Inspect current components, styling conventions, design tokens, and layout (`CURRENT-UX-MAP.md`, including the section inventory and before screenshots for Elevate).
+1. **Extraction / Observation**: Inspect current components, styling conventions, design tokens, and layout (`CURRENT-UX-MAP.md`, including the section inventory from `map_ui_structure` saved as `.uiux/ui-map.json`, and before screenshots for Elevate).
 2. **Scope Isolation**: Determine if the task is global, page-level, or local component-level. Local component tasks are strictly isolated from global redesign.
 3. **Change Budget & Ambition Determination**: Verify permissions for L1, L2, or L3 based on explicit user prompt, and read `ambition` from `orchestrate_ui`.
 4. **Direction (Elevate/Reimagine)**: Diagnose against the default banlist and commit to a direction with signature moves and a re-composition plan (`DESIGN-DIRECTION.md`).
 5. **Targeted Improvement**: Refine applies polish with existing tokens and components; Elevate builds derived tokens, re-composes sections and adds purposeful motion, extending existing components rather than forking them.
-6. **Preservation & Non-regression Gate**: Validate that brand hues, logo, shell, navigation, routes, content inventory and data are intact; for Elevate also compare before/after screenshots and confirm the change is visible at first glance.
+6. **Preservation & Non-regression Gate**: Validate that brand hues, logo, shell, navigation, routes, content inventory and data are intact; for Elevate also run `diff_ui_maps` against the saved map (`content_preserved` true, `elevate_bar.met`), compare before/after screenshots and confirm the change is visible at first glance.

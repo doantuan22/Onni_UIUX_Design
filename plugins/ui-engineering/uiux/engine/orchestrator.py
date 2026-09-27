@@ -298,9 +298,10 @@ def orchestrate(request: dict[str, Any]) -> dict[str, Any]:
                 "target_workflow": "workflows/ambition-levels.md",
                 "recommended_handoff": "skills/design-direction",
                 "rationale": (
-                    "ELEVATE: map the current pages and content, commit to a design direction with signature "
+                    "ELEVATE: map the current pages and content (map_ui_structure -> .uiux/ui-map.json), commit "
+                    "to a design direction with signature "
                     "moves, then re-compose layout, hierarchy, surfaces and motion inside the protected shell. "
-                    "Brand hues, navigation, routes, content and data stay intact."
+                    "Brand hues, navigation, routes, content and data stay intact; prove it with diff_ui_maps."
                 ),
             }
         elif max_level == L3:

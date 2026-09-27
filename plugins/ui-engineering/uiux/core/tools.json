@@ -331,6 +331,47 @@
       "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package", "target-project"], "requires_node": false, "requires_browser": false, "long_running": false}
     },
     {
+      "id": "map_ui_structure",
+      "visibility": "public",
+      "description": "Map the frontend structure of a project: routes, the layout shell around the page slot, ordered page sections with role (hero, features, pricing, ...), content inventory (headings, actions, media, fields), layout pattern and signature, motion, default-banlist signals and generic density, components and tokens in use. Focus: React/Next.js + Tailwind; Vue, Svelte, Astro and HTML templates with less precision. Save the result as .uiux/ui-map.json before an Elevate change.",
+      "entrypoint": "uiux.api:map_ui_structure",
+      "cli": "python scripts/uiux_cli.py call map_ui_structure --params '{\"project\": \".\", \"options\": {\"markdown\": true}}'",
+      "input": {
+        "type": "object",
+        "properties": {
+          "project": {"type": "string", "default": "."},
+          "options": {"type": ["object", "null"], "description": "routes (list of paths), max_routes (30), max_depth (4, component expansion), detail ('full'|'summary'), markdown (bool: add a CURRENT-UX-MAP section inventory), files/file_contents/package_json (in-memory project)"}
+        },
+        "additionalProperties": false
+      },
+      "output": {"type": "object", "required": ["schema_version", "routes", "shell", "components", "tokens", "summary"], "description": "UI map: {schema_version, framework, styling, shell, routes[{path, file, layouts, sections[{id, order, role, pattern, layout_signature, content, fingerprint, motion, banlist}], page_banlist, generic_density, fingerprint}], components, tokens{declared, used}, summary, limits}"},
+      "dependencies": {"python": ">=3.9", "packages": []},
+      "runtime_requirements": [],
+      "side_effects": "none (read-only static scan of the project)",
+      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package", "target-project"], "requires_node": false, "requires_browser": false, "long_running": false}
+    },
+    {
+      "id": "diff_ui_maps",
+      "visibility": "public",
+      "description": "Compare a before and an after UI map (map_ui_structure): routes and content items removed or added, sections re-composed per route, banlist signals resolved, introduced or remaining, and whether the Elevate bar is met (content preserved and at least half of the matched sections re-composed).",
+      "entrypoint": "uiux.api:diff_ui_maps",
+      "cli": "python scripts/uiux_cli.py call diff_ui_maps --params '{\"before\": {...}, \"after\": {...}}'",
+      "input": {
+        "type": "object",
+        "required": ["before", "after"],
+        "properties": {
+          "before": {"type": "object", "description": "UI map captured before the change"},
+          "after": {"type": "object", "description": "UI map captured after the change"}
+        },
+        "additionalProperties": false
+      },
+      "output": {"type": "object", "required": ["routes", "content_preserved", "recomposition_ratio", "elevate_bar"], "description": "{routes_removed, routes_added, routes[{path, content_removed, content_added, sections_recomposed, recomposition_ratio, pattern_changes, banlist_resolved, banlist_introduced, banlist_remaining}], content_preserved, recomposition_ratio, elevate_bar}"},
+      "dependencies": {"python": ">=3.9", "packages": []},
+      "runtime_requirements": [],
+      "side_effects": "none",
+      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+    },
+    {
       "id": "route_knowledge",
       "visibility": "public",
       "description": "Route required knowledge packs, skills, preservation invariants, and runtime validation from task intent and repo profile.",

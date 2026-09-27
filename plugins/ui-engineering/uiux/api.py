@@ -37,6 +37,7 @@ __all__ = [
     "capability_map", "self_test", "error_contract", "error_envelope", "API_VERSION", "UiuxError", "ToolError",
     "orchestrate_ui", "detect_ui_state", "analyze_repository", "detect_framework",
     "analyze_existing_ui", "build_preservation_profile", "evaluate_preservation",
+    "map_ui_structure", "diff_ui_maps",
     "route_knowledge", "build_knowledge_plan", "resolve_framework_pack",
     "detect_domain", "resolve_domain_pack",
     "plan_modification", "validate_modification_plan", "evaluate_plan_permissions",
@@ -184,6 +185,30 @@ def analyze_existing_ui(
 
     try:
         return existing_ui.analyze_existing_ui(project=project, repo_profile=repo_profile, options=options)
+    except Exception as exc:
+        raise _tool_error(exc) from exc
+
+
+def map_ui_structure(project: str = ".", options: dict | None = None) -> dict:
+    """Map the frontend structure: routes, layout shell, ordered page sections with roles, content inventory,
+    layout pattern, motion and default-banlist signals, components and tokens in use."""
+    from uiux.engine import ui_map
+
+    try:
+        result = ui_map.build_ui_map(project, options)
+        if (options or {}).get("markdown"):
+            result["markdown"] = ui_map.render_markdown(result)
+        return result
+    except Exception as exc:
+        raise _tool_error(exc) from exc
+
+
+def diff_ui_maps(before: dict, after: dict) -> dict:
+    """Compare two UI maps: content preservation, section re-composition and banlist signals resolved."""
+    from uiux.engine import ui_map
+
+    try:
+        return ui_map.diff_ui_maps(before, after)
     except Exception as exc:
         raise _tool_error(exc) from exc
 
@@ -809,6 +834,8 @@ _DISPATCH = {
     "orchestrate_ui": orchestrate_ui,
     "analyze_repository": analyze_repository,
     "analyze_existing_ui": analyze_existing_ui,
+    "map_ui_structure": map_ui_structure,
+    "diff_ui_maps": diff_ui_maps,
     "route_knowledge": route_knowledge,
     "build_knowledge_plan": build_knowledge_plan,
     "plan_modification": plan_modification,
