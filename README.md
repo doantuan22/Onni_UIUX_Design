@@ -177,8 +177,8 @@ Version **0.1.0** — first public release.
 
 - Claude Code: install, skill discovery and MCP connection verified with the Claude Code CLI.
 - Codex: structurally verified; not yet tested on a live Codex host.
-- Windows with the python.org installer: change `python3` to `python` or `py -3` in the MCP
-  configuration.
+- The MCP server starts with `python3`. On Windows with the python.org installer (no `python3`),
+  run `setx UIUX_PYTHON python`, open a new terminal and restart Claude Code.
 
 ## License
 

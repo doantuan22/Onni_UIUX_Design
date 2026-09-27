@@ -28,7 +28,7 @@ def _mcp_json_content() -> str:
     return json.dumps({
         "mcpServers": {
             "ui-ux-design-mcp": {
-                "command": "python3",
+                "command": "${UIUX_PYTHON:-python3}",  # override with UIUX_PYTHON (e.g. python or py on Windows)
                 "args": ["${CLAUDE_PLUGIN_ROOT}/adapters/mcp/server.py"],
                 "env": {}
             }

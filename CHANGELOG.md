@@ -3,6 +3,10 @@
 Versions follow semantic versioning; `VERSION` is the single source (see `plugins/ui-engineering/schemas/plugin-manifest-README.md`).
 The repository root `VERSION` mirrors `plugins/ui-engineering/VERSION`. Paths below are relative to the repository root; the plugin package lives in `plugins/ui-engineering/`.
 
+## Unreleased
+
+- Claude Code MCP launcher: `.mcp.json` starts `${UIUX_PYTHON:-python3}`, so hosts without `python3` (Windows with the python.org installer) can set `UIUX_PYTHON=python` instead of editing the plugin; docs and troubleshooting explain the `Executable not found` failure.
+
 ## 0.1.0 — plugin-ready architecture
 
 First release: shared plugin core, packaging, and direct installation from GitHub for Claude Code and Codex.

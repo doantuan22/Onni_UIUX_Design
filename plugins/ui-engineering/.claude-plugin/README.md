@@ -84,7 +84,7 @@ The `.mcp.json` at the plugin root declares one MCP server:
 {
   "mcpServers": {
     "ui-ux-design-mcp": {
-      "command": "python3",
+      "command": "${UIUX_PYTHON:-python3}",
       "args": ["${CLAUDE_PLUGIN_ROOT}/adapters/mcp/server.py"],
       "env": {}
     }
@@ -94,7 +94,7 @@ The `.mcp.json` at the plugin root declares one MCP server:
 
 - `${CLAUDE_PLUGIN_ROOT}` is resolved by Claude Code to the plugin installation directory
 - The command launches the **shared** MCP stdio transport; no second MCP implementation exists
-- On Windows, `python3` may need to be `python` or `py -3` — see Python runtime below
+- The interpreter is `python3` unless the `UIUX_PYTHON` environment variable names another one (e.g. `python` on Windows) — see Python runtime below
 
 ## Python runtime
 
@@ -108,7 +108,7 @@ The plugin requires Python 3.9+ on PATH. No Python runtime is bundled or auto-in
 
 If Python is not found, the MCP server will fail to start and Claude Code will report the MCP server as unavailable. The error message will indicate that Python 3 is required.
 
-**To configure a non-standard Python path**, edit `.mcp.json` in the extracted bundle:
+**To use another interpreter**, set `UIUX_PYTHON` before starting Claude Code (Windows: `setx UIUX_PYTHON python`, then open a new terminal; macOS/Linux: `export UIUX_PYTHON=/path/to/python3`). Check with `claude mcp list`. Alternatively edit `.mcp.json` in the extracted bundle:
 
 ```json
 {
@@ -183,7 +183,7 @@ python plugins/ui-engineering/.claude-plugin/verify.py --marketplace --bundle di
 - Verified with the Claude Code CLI (2.1.x): `claude plugin validate`, local marketplace add/install, component inventory (1 skill, 1 MCP server) and MCP health (`Connected`); an interactive session and a GitHub-hosted install have not been run yet
 - No `min_version` for Claude Code is declared (docs verified 2026-09-25, no pinned host release)
 - Python 3 must be available on PATH
-- On Windows, `.mcp.json` uses `python3`; users may need to adjust to `python` or `py -3`
+- `.mcp.json` launches `python3` by default; on Windows with the python.org installer set `UIUX_PYTHON=python`
 - Tool auto-approval is not configured (Claude Code manages this through its own permission system)
 
 ## Docs checked

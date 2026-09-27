@@ -92,8 +92,8 @@ claude plugin remove ui-ux-design
 ## Troubleshooting
 
 - **Plugin not visible:** Check if you correctly extracted the bundle and provided the absolute path to `marketplace add`. Make sure you reloaded the VS Code window or used `/reload-plugins`.
-- **MCP disconnected:** Verify that Python 3 is installed. Run `python3 --version` in your terminal.
-- **Python not found:** Ensure `python3` is available in your `PATH`.
+- **MCP disconnected / "Executable not found":** the MCP server is started with `python3` unless `UIUX_PYTHON` is set. Run `python3 --version`; if it fails (typical on Windows with the python.org installer), set `UIUX_PYTHON` to a working interpreter (`setx UIUX_PYTHON python`), open a new terminal and restart Claude Code. Check with `claude mcp list`.
+- **Python not found:** Ensure Python 3.9+ is on your `PATH`.
 - **Marketplace not recognized:** Verify the `marketplace.json` exists in the `.claude-plugin` directory of the extracted marketplace archive.
 - **Stale plugin cache:** Use `/reload-plugins` in the chat or restart VS Code.
 
