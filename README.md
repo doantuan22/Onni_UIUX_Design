@@ -98,14 +98,14 @@ or inside a session: `/plugin marketplace add doantuan22/Onni_UIUX_Design`, then
 ### Codex (experimental)
 
 From a clone: `codex plugin marketplace add ./Onni_UIUX_Design` (reads
-`.agents/plugins/marketplace.json`), or use `ui-ux-design-0.1.0-codex-marketplace.zip` from the
-[release](https://github.com/doantuan22/Onni_UIUX_Design/releases/tag/v0.1.0).
+`.agents/plugins/marketplace.json`), or use `ui-ux-design-<version>-codex-marketplace.zip` from the
+[latest release](https://github.com/doantuan22/Onni_UIUX_Design/releases/latest).
 
 ### Release archive or any MCP client
 
-Download `ui-ux-design-0.1.0.zip` and `SHA256SUMS` from
+Download `ui-ux-design-<version>.zip` and `SHA256SUMS` from
 [Releases](https://github.com/doantuan22/Onni_UIUX_Design/releases), verify, extract, then run
-`claude --plugin-dir ui-ux-design-0.1.0` — or register the stdio server
+`claude --plugin-dir ui-ux-design-<version>` — or register the stdio server
 `python3 <plugin-root>/adapters/mcp/server.py` in any MCP client.
 
 Full instructions, Windows notes and troubleshooting:
@@ -173,7 +173,7 @@ claude plugin validate . && claude plugin validate plugins/ui-engineering
 
 ## Status
 
-Version **0.1.0** — first public release.
+Version **0.1.1** — MCP launcher fix on top of the first public release (0.1.0); see [CHANGELOG.md](CHANGELOG.md).
 
 - Claude Code: install, skill discovery and MCP connection verified with the Claude Code CLI.
 - Codex: structurally verified; not yet tested on a live Codex host.

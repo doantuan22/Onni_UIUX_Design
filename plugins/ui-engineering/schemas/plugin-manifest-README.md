@@ -18,6 +18,6 @@
 
 ## Versioning
 
-- `VERSION` at the package root is the single source (currently `0.1.0`); `uiux.__version__` reads it, and the manifest must match.
+- `VERSION` at the package root is the single source (currently `0.1.1`); `uiux.__version__` reads it, and the manifest must match.
 - Semantic versioning: breaking change to the public API (`uiux.api`, tool ids/inputs, manifest schema, registry schema) → major; new tools, collections or knowledge entries → minor; fixes and content corrections → patch. While `0.y.z`, minor releases may still refine public contracts, and each such change is recorded in `CHANGELOG.md`.
 - Git commit hashes are build metadata at most (e.g., `0.1.0+abc123`), never the version.

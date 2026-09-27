@@ -35,7 +35,7 @@ class ManifestTests(unittest.TestCase):
 
     def test_single_version_source(self) -> None:
         version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
-        self.assertEqual(version, "0.1.0")
+        self.assertRegex(version, r"^\d+\.\d+\.\d+$")
         self.assertEqual({version}, {MANIFEST["version"], __version__, api.version()})
         self.assertIn(f"## {version}", (ROOT / "CHANGELOG.md").read_text(encoding="utf-8"))
 

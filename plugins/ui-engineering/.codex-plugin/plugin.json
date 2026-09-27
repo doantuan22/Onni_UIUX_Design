@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "ui-ux-design",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "UI/UX Design Skill for AI coding agents",
   "license": "Apache-2.0",
   "type": "agent-plugin",

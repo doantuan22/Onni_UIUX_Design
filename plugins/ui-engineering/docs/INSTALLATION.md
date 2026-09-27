@@ -47,8 +47,8 @@ cd Onni_UIUX_Design
 Download `ui-ux-design-<version>.zip` and `SHA256SUMS` from GitHub Releases, check the checksum and extract:
 
 ```bash
-unzip ui-ux-design-0.1.0.zip -d ~/.plugins
-claude --plugin-dir ~/.plugins/ui-ux-design-0.1.0
+unzip ui-ux-design-0.1.1.zip -d ~/.plugins
+claude --plugin-dir ~/.plugins/ui-ux-design-0.1.1
 ```
 
 Host-specific bundles can also be exported from a clone:
@@ -109,7 +109,7 @@ After installation, verify the installation immediately using the public CLI:
 python plugins/ui-engineering/scripts/uiux_cli.py call self_test
 
 # Expected output:
-# {"status": "PASS", "version": "0.1.0", "checks": [...]}
+# {"status": "PASS", "version": "0.1.1", "checks": [...]}
 ```
 
 ---

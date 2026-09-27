@@ -11,7 +11,7 @@
       "name": "ui-ux-design",
       "source": "./plugins/ui-engineering",
       "description": "Two-phase web UI/UX workflow with a Design Knowledge System, capability resolvers, runtime runner and design quality evals.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "category": "development"
     }
   ]
