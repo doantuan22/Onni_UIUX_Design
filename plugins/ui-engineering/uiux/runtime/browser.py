@@ -10,13 +10,13 @@ from pathlib import Path
 
 from uiux.core import config, resources
 from uiux.runtime import capabilities
-from uiux.runtime.probes import PROBE_JS
+from uiux.runtime.probes import LAYOUT_PROBE_JS, PROBE_JS
 
 ROOT = resources.get_package_root()
 VIEWPORTS = json.loads(resources.get_viewports_path().read_text(encoding="utf-8"))
 SESSION_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
 
-HELPER = r'''const fs=require('fs'),path=require('path');const PROBE=__PROBE__;
+HELPER = r'''const fs=require('fs'),path=require('path');const PROBE=__PROBE__;const LAYOUT=__LAYOUT__;
 const i=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));let pw;
 try{pw=require('playwright')}catch(e){try{pw=require('@playwright/test')}catch(e2){console.error('PLAYWRIGHT_IMPORT_FAILURE');process.exit(2)}}
 (async()=>{const out={captures:[],errors:[],console:[]};let browser;
@@ -31,13 +31,14 @@ try{pw=require('playwright')}catch(e){try{pw=require('@playwright/test')}catch(e
     if(r.expected_text && !await p.getByText(r.expected_text,{exact:false}).count())throw Object.assign(new Error('expected text missing'),{code:'NAVIGATION_FAILURE'});
     await p.screenshot({path:path.join(i.output_dir,file),fullPage:i.full_page,timeout:i.screenshot_timeout_ms});
     let probe;if(i.motion_probe){try{probe=await p.evaluate(PROBE,i.probe_wait_ms)}catch(e){probe={error:String(e.message||e).slice(0,200)}}}
-    out.captures.push({id,page_id:r.page_id,route:r.route,viewport:v.id,width:v.width,height:v.height,iteration:i.iteration,status:'CAPTURED',file,basic_render:basic,...(i.reduced_motion?{reduced_motion:i.reduced_motion}:{}),...(probe?{motion_probe:probe}:{})});
+    let layout;if(i.layout_probe){try{layout=await p.evaluate(LAYOUT)}catch(e){layout={error:String(e.message||e).slice(0,200)}}}
+    out.captures.push({id,page_id:r.page_id,route:r.route,viewport:v.id,width:v.width,height:v.height,iteration:i.iteration,status:'CAPTURED',file,basic_render:basic,...(i.reduced_motion?{reduced_motion:i.reduced_motion}:{}),...(probe?{motion_probe:probe}:{}),...(layout?{layout_probe:layout}:{})});
    }catch(e){out.errors.push({code:e.code||'SCREENSHOT_FAILURE',page_id:r.page_id,route:r.route,viewport:v.id,message:String(e.message||e).slice(0,500),recoverable:true});out.captures.push({id,page_id:r.page_id,route:r.route,viewport:v.id,width:v.width,height:v.height,iteration:i.iteration,status:'SCREENSHOT_FAILURE',file:null})}
    finally{if(c)await c.close().catch(()=>{})}
   }
  }catch(e){out.errors.push({code:'BROWSER_LAUNCH_FAILURE',page_id:null,route:null,viewport:null,message:String(e.message||e).slice(0,500),recoverable:false})}
  finally{if(browser)await browser.close().catch(()=>{});console.log(JSON.stringify(out))}
-})();'''.replace("__PROBE__", PROBE_JS)
+})();'''.replace("__PROBE__", PROBE_JS).replace("__LAYOUT__", LAYOUT_PROBE_JS)
 REDUCED_MOTION = {"reduce", "no-preference"}
 
 def atomic(path: Path, data: object) -> None:
@@ -101,6 +102,7 @@ def validate_options(opts: object) -> dict[str, object]:
     reduced = opts.get("reduced_motion")
     if reduced is not None and reduced not in REDUCED_MOTION: raise ValueError("options.reduced_motion must be reduce or no-preference")
     if "motion_probe" in opts and not isinstance(opts["motion_probe"], bool): raise ValueError("options.motion_probe must be boolean")
+    if "layout_probe" in opts and not isinstance(opts["layout_probe"], bool): raise ValueError("options.layout_probe must be boolean")
     wait = opts.get("probe_wait_ms", config.get()["browser"]["probe_wait_ms"])
     if not isinstance(wait, int) or not 0 <= wait <= 10000: raise ValueError("options.probe_wait_ms must be 0..10000")
     return opts
@@ -136,7 +138,7 @@ def execute(raw: object, project: Path, dry_run: bool = False, allow_start: bool
         timeout=int(raw.get("readiness",{}).get("timeout_ms",60000)); report["readiness"]={"url":raw["base_url"],"timeout_ms":timeout}
         if not ready(raw["base_url"],timeout): raise RuntimeError("READINESS_TIMEOUT")
         helper=session/"runtime-helper.cjs"; payload=session/"runtime-input.json"; helper.write_text(HELPER,encoding="utf-8")
-        payload_data={"base_url":raw["base_url"],"routes":[{**r,"safe_id":re.sub(r"[^A-Za-z0-9_-]","-",r["page_id"])} for r in raw["routes"]],"viewports":[{"id":v,**VIEWPORTS[v]} for v in raw["viewports"]],"iteration":raw["iteration"],"output_dir":str(session),"browser":opts.get("browser",browser_cfg["default_browser"]),"collect_console":bool(opts.get("collect_console",False)),"full_page":bool(opts.get("full_page",True)),"navigation_timeout_ms":int(opts.get("navigation_timeout_ms",browser_cfg["navigation_timeout_ms"])),"screenshot_timeout_ms":int(opts.get("screenshot_timeout_ms",browser_cfg["screenshot_timeout_ms"])),"reduced_motion":opts.get("reduced_motion"),"motion_probe":bool(opts.get("motion_probe",config.get()["feature_flags"]["motion_probe"])),"probe_wait_ms":int(opts.get("probe_wait_ms",browser_cfg["probe_wait_ms"]))}
+        payload_data={"base_url":raw["base_url"],"routes":[{**r,"safe_id":re.sub(r"[^A-Za-z0-9_-]","-",r["page_id"])} for r in raw["routes"]],"viewports":[{"id":v,**VIEWPORTS[v]} for v in raw["viewports"]],"iteration":raw["iteration"],"output_dir":str(session),"browser":opts.get("browser",browser_cfg["default_browser"]),"collect_console":bool(opts.get("collect_console",False)),"full_page":bool(opts.get("full_page",True)),"navigation_timeout_ms":int(opts.get("navigation_timeout_ms",browser_cfg["navigation_timeout_ms"])),"screenshot_timeout_ms":int(opts.get("screenshot_timeout_ms",browser_cfg["screenshot_timeout_ms"])),"reduced_motion":opts.get("reduced_motion"),"motion_probe":bool(opts.get("motion_probe",config.get()["feature_flags"]["motion_probe"])),"probe_wait_ms":int(opts.get("probe_wait_ms",browser_cfg["probe_wait_ms"])),"layout_probe":bool(opts.get("layout_probe",False))}
         atomic(payload,payload_data); run=subprocess.run(["node",str(helper),str(payload)],cwd=project,capture_output=True,text=True,timeout=max(60,payload_data["navigation_timeout_ms"]//1000*len(raw["routes"])*len(raw["viewports"])+30))
         result=json.loads(run.stdout) if run.stdout.strip() else {"captures":[],"errors":[err("BROWSER_LAUNCH_FAILURE",run.stderr or "helper produced no output")]}
         report["errors"].extend(result.get("errors",[])); captures=result.get("captures",[]); report["captures_completed"]=sum(c.get("status")=="CAPTURED" for c in captures)

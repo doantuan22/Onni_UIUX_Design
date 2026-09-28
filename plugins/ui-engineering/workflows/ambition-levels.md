@@ -79,12 +79,14 @@ architecture stay protected. Elevate is about composition and craft, not about a
    derived color steps, type, radii, elevation, motion), then section compositions fed with the existing content
    through props, then motion and micro-interaction. Reuse the project's components and extend their variants; do not
    fork a parallel component set.
-6. **Prove it.** Run `map_ui_structure` again and `diff_ui_maps` with the saved map: `content_preserved`
-   must be true (any `content_removed` item is restored or explicitly approved by the user) and
-   `elevate_bar.met` should be true (at least half of the matched sections re-composed); report
-   `banlist_resolved` and `banlist_introduced`. Capture *after* screenshots at the same viewports, run the
-   accessibility scan, and check the remaining invariants (routes, data, brand hues). Review the
-   before/after pair against the banlist and the direction; iterate at most twice on the weakest page.
+6. **Prove it with the critique loop** ([review/visual-critique.md](../review/visual-critique.md)). Run
+   `map_ui_structure` again and `diff_ui_maps` with the saved map: `content_preserved` must be true (any
+   `content_removed` item is restored or explicitly approved by the user). Capture *after* screenshots with
+   `run_runtime` at the same routes and viewports (`layout_probe` and `motion_probe` on, plus a reduced-motion
+   capture) and run `accessibility_scan`. An independent critic — the `visual-critic` subagent in Claude Code, a
+   fresh-context critique elsewhere — scores before and after with the rubric; `score_visual_critique` merges its
+   scores with the measured gates and returns `pass`, `iterate` (fix `next_focus`, recapture, score again) or
+   `stop` (at most two iterations; open issues go to the user). Record the result in `VISUAL-CRITIQUE.md`.
 
 Elevate is not done when the diff only touches spacing, colors of existing elements, or border radii. The
 review asks: *would a user recognize the product, and would they notice that it got better at first

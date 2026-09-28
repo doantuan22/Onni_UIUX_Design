@@ -83,19 +83,23 @@ not enough; it never installs packages itself. See
   sticky narrative, pricing emphasis, testimonial spotlight, FAQ split, CTA band, dashboard focus, Motion and GSAP
   motion, brand-derived tokens) in [knowledge/code-recipes](plugins/ui-engineering/knowledge/code-recipes/README.md);
   `suggest_recipes` picks them per mapped section by role and by the "AI look" signals they replace.
+- **Visual critique loop** — before/after screenshots from the project's Playwright with a layout probe
+  (overflow, tap targets, small text, fold) and axe, scored by an independent `visual-critic` subagent against a
+  rubric; `score_visual_critique` merges the scores with measured gates and returns pass, iterate (with what to fix)
+  or stop.
 - **Runtime evidence** — screenshots, motion probes and axe accessibility scans using the *target
   project's own* Playwright; reports `BLOCKED` instead of installing anything.
 - **Quality evals** — static design-quality analysis and 80 eval scenarios (E01–E80).
 
 ### Tools (MCP / CLI)
 
-27 tools, exposed through the bundled MCP server `ui-ux-design-mcp` and the CLI:
+28 tools, exposed through the bundled MCP server `ui-ux-design-mcp` and the CLI:
 
 | Area | Tools |
 |---|---|
 | Orchestration & knowledge | `orchestrate_ui`, `route_knowledge`, `build_knowledge_plan`, `retrieve_knowledge`, `resolve_capabilities`, `resolve_technology` |
 | Repository & existing UI | `analyze_repository`, `analyze_existing_ui`, `map_ui_structure`, `diff_ui_maps`, `suggest_recipes`, `plan_modification`, `build_validation_handoff` |
-| Runtime & accessibility | `detect_runtime`, `run_runtime`, `accessibility_scan`, `run_runtime_validation`, `build_critic_report`, `evaluate_runtime_result`, `build_repair_plan`, `run_targeted_repair`, `recapture_evidence` |
+| Runtime & accessibility | `detect_runtime`, `run_runtime`, `accessibility_scan`, `score_visual_critique`, `run_runtime_validation`, `build_critic_report`, `evaluate_runtime_result`, `build_repair_plan`, `run_targeted_repair`, `recapture_evidence` |
 | Quality & health | `analyze_design_quality`, `run_evals`, `validate_skill`, `capability_map`, `self_test` |
 
 ## Install

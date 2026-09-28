@@ -13,7 +13,7 @@
     {"id": "evals", "title": "Evaluation", "package": true, "paths": ["uiux/evals/**", "evals/**"]},
     {"id": "tooling", "title": "Tooling", "package": true, "paths": ["uiux/tooling/**", "scripts/**"]},
     {"id": "core-skill", "title": "Core Skill (workflow, reasoning, contracts, templates)", "package": true,
-     "paths": ["SKILL.md", "workflows/**", "skills/**", "review/**", "templates/**"]},
+     "paths": ["SKILL.md", "workflows/**", "skills/**", "review/**", "templates/**", "agents/**"]},
     {"id": "docs", "title": "Documentation", "package": true, "paths": ["docs/**", "../development/docs/**", "CHANGELOG.md", "README.md", "LICENSE", "NOTICE"]},
     {"id": "tests", "title": "Tests", "package": false, "paths": ["../tests/**"]},
     {"id": "development", "title": "Development-only research, CI and repository metadata", "package": false,
