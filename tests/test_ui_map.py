@@ -104,7 +104,7 @@ class FixtureMapTests(unittest.TestCase):
         self.assertEqual(hero["content"]["headings"][0], {"level": 1, "text": "Unlock the power of seamless automation"})
         self.assertEqual([a["label"] for a in hero["content"]["actions"]], ["Start free trial", "Book a demo"])
         self.assertIn("h1:unlock the power of seamless automation", self.home["fingerprint"])
-        self.assertIn("link:start free trial", self.home["fingerprint"])
+        self.assertIn("action:start free trial", self.home["fingerprint"])
         pricing = self.home["sections"][3]
         self.assertTrue(pricing["content"]["repeated"])
         self.assertIn("equal cards", pricing["pattern"]["summary"])

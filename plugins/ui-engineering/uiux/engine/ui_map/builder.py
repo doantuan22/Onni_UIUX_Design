@@ -14,7 +14,7 @@ from typing import Any
 
 from uiux.engine.repo_intelligence.profile import build_repo_profile
 from uiux.engine.repo_intelligence.scanner import RepositorySnapshot
-from uiux.engine.ui_map import markup, signals
+from uiux.engine.ui_map import literals, markup, signals
 from uiux.engine.ui_map.markup import class_string
 
 SCHEMA_VERSION = 1
@@ -110,8 +110,32 @@ class SourceIndex:
             imports[m.group(1)] = {"spec": m.group(2), "name": "default"}
         result["imports"] = imports
         result["text"] = text
+        result["consts"] = literals.module_constants(text) if suffix in ("tsx", "jsx", "ts", "js", "mjs") else {}
         self.cache[path] = result
         return result
+
+    def component_defaults(self, path: str, name: str | None) -> dict[str, Any]:
+        """Literal defaults from a component's destructured props: ``function X({ id = "faq", n = 3 })``."""
+        text = self.parsed(path)["text"]
+        names = [name] if name and name not in ("default", "*") else []
+        names += [c["name"] for c in self.parsed(path)["components"] if c["default"]]
+        for comp in names:
+            m = re.search(rf"(?:function\s+{re.escape(comp)}\s*(?:<[^>]*>)?\s*\(|const\s+{re.escape(comp)}\s*=\s*(?:\w+\()?\s*\()"
+                          r"\s*\{", text)
+            if not m:
+                continue
+            depth, i = 1, m.end()
+            while i < len(text) and depth:
+                depth += {"{": 1, "}": -1}.get(text[i], 0)
+                i += 1
+            body = text[m.end():i - 1]
+            defaults: dict[str, Any] = {}
+            for dm in re.finditer(r"([A-Za-z_$][\w$]*)\s*=\s*", body):
+                value, _ = literals.parse_literal(body, dm.end())
+                if isinstance(value, (str, int, float, list)) and not isinstance(value, bool):
+                    defaults[dm.group(1)] = value
+            return defaults
+        return {}
 
     def component_roots(self, path: str, name: str | None) -> list[dict]:
         parsed = self.parsed(path)
@@ -144,47 +168,114 @@ def _pascal(tag: str) -> str:
 
 
 # ---------------------------------------------------------------------------------------------- expansion
+_MAP_EXPR = re.compile(
+    r"^\s*([A-Za-z_$][\w$]*(?:\s*\??\.\s*[A-Za-z_$][\w$]*)*)\s*\??\.\s*map\s*\(\s*(?:async\s*)?"
+    r"(?:\(\s*(?:([A-Za-z_$][\w$]*)|\{([^}]*)\})\s*(?:,\s*([A-Za-z_$][\w$]*))?\s*(?::[^)]*)?\)|([A-Za-z_$][\w$]*))\s*=>")
+_MAX_LIST_COPIES = 12
+
+
+def _scope_for_item(scope: dict[str, Any], m: re.Match, item: Any, index: int) -> dict[str, Any]:
+    inner = dict(scope)
+    name = m.group(2) or m.group(5)
+    if name:
+        inner[name] = item
+    elif m.group(3) and isinstance(item, dict):
+        for part in m.group(3).split(","):
+            key, _, alias = part.strip().partition(":")
+            key = key.split("=")[0].strip()
+            if key:
+                inner[(alias or key).split("=")[0].strip()] = item.get(key, literals.UNKNOWN)
+    if m.group(4):
+        inner[m.group(4)] = index
+    return inner
+
+
+def _eval_attr(value: Any, scope: dict[str, Any]) -> Any:
+    """Literal value of an attribute for prop passing (strings stay strings; ``{expr}`` is evaluated)."""
+    if isinstance(value, str):
+        return value
+    if value is True:
+        return True
+    if isinstance(value, dict) and "expr" in value:
+        return literals.literal_of(value["expr"], scope)
+    return literals.UNKNOWN
+
+
 def expand(index: SourceIndex, nodes: list[dict], file: str, depth: int, max_depth: int, stack: tuple[str, ...],
-           usage: Counter) -> list[dict]:
-    """Copy ``nodes`` and inline the rendered roots of locally resolvable custom components."""
+           usage: Counter, scope: dict[str, Any] | None = None) -> list[dict]:
+    """Copy ``nodes`` and inline the rendered roots of locally resolvable custom components.
+
+    ``scope`` carries literal values (module constants, props, ``.map`` items) so text and attributes that come from
+    data are materialized: ``{plan.name}`` becomes the plan's name, one copy per literal list item.
+    """
     parsed = index.parsed(file)
     local = {c["name"] for c in parsed["components"]}
+    if scope is None:
+        scope = dict(parsed.get("consts", {}))
     out: list[dict] = []
     for node in nodes:
+        if node.get("type") == "expr":
+            text = literals.as_text(literals.literal_of(node["expr"], scope))
+            out.append({"type": "text", "text": text} if text is not None else dict(node))
+            continue
         if node.get("type") != "element":
             out.append(dict(node))
             continue
-        new = {k: v for k, v in node.items() if k not in ("children", "attrs")}
-        new["attrs"] = {}
-        for key, value in node["attrs"].items():
-            if isinstance(value, dict) and value.get("elements"):
-                value = dict(value, elements=expand(index, value["elements"], file, depth, max_depth, stack, usage))
-            new["attrs"][key] = value
-        new["children"] = expand(index, node["children"], file, depth, max_depth, stack, usage)
-        tag = node["tag"]
-        head = _pascal(tag.split(".")[0])
-        if head[:1].isupper():
-            imp = parsed["imports"].get(head)
-            target, name = None, None
-            if imp:
-                target = index.resolve(imp["spec"], file)
-                name = imp["name"] if "." not in tag else tag.split(".", 1)[1]
-                if target is None:
-                    new["library"] = imp["spec"]
-                    if ICON_PACKAGES.search(imp["spec"]):
-                        new["icon"] = True
-            elif head in local:
-                target, name = file, head
-            if target:
-                new["component"] = tag
-                new["file"] = target
-                usage[(tag, target)] += 1
-                key = f"{target}#{name}"
-                if depth < max_depth and key not in stack:
-                    roots = index.component_roots(target, name)
-                    new["expanded"] = expand(index, roots, target, depth + 1, max_depth, stack + (key,), usage)
-        out.append(new)
+        m = _MAP_EXPR.match(node.get("source_expr", "")) if node.get("repeated") else None
+        items = literals.resolve_path(re.sub(r"\s+", "", m.group(1)), scope) if m else literals.UNKNOWN
+        if m and isinstance(items, list) and items:
+            for i, item in enumerate(items[:_MAX_LIST_COPIES]):
+                copy = _expand_element(index, node, file, depth, max_depth, stack, usage,
+                                       _scope_for_item(scope, m, item, i), parsed, local)
+                copy["list_item"] = i
+                out.append(copy)
+            continue
+        out.append(_expand_element(index, node, file, depth, max_depth, stack, usage, scope, parsed, local))
     return out
+
+
+def _expand_element(index: SourceIndex, node: dict, file: str, depth: int, max_depth: int, stack: tuple[str, ...],
+                    usage: Counter, scope: dict[str, Any], parsed: dict[str, Any], local: set[str]) -> dict:
+    new = {k: v for k, v in node.items() if k not in ("children", "attrs")}
+    new["attrs"] = {}
+    for key, value in node["attrs"].items():
+        if isinstance(value, dict) and value.get("elements"):
+            value = dict(value, elements=expand(index, value["elements"], file, depth, max_depth, stack, usage, scope))
+        elif isinstance(value, dict) and "expr" in value:
+            text = literals.as_text(literals.literal_of(value["expr"], scope))
+            if text is not None:
+                value = text
+        new["attrs"][key] = value
+    new["children"] = expand(index, node["children"], file, depth, max_depth, stack, usage, scope)
+    tag = node["tag"]
+    head = _pascal(tag.split(".")[0])
+    if head[:1].isupper():
+        imp = parsed["imports"].get(head)
+        target, name = None, None
+        if imp:
+            target = index.resolve(imp["spec"], file)
+            name = imp["name"] if "." not in tag else tag.split(".", 1)[1]
+            if target is None:
+                new["library"] = imp["spec"]
+                if ICON_PACKAGES.search(imp["spec"]):
+                    new["icon"] = True
+        elif head in local:
+            target, name = file, head
+        if target:
+            new["component"] = tag
+            new["file"] = target
+            usage[(tag, target)] += 1
+            key = f"{target}#{name}"
+            if depth < max_depth and key not in stack:
+                roots = index.component_roots(target, name)
+                props = {k: _eval_attr(v, scope) for k, v in node["attrs"].items() if k != "..."}
+                child_scope = dict(index.parsed(target).get("consts", {}))
+                child_scope.update(index.component_defaults(target, name))
+                child_scope.update({k: v for k, v in props.items() if v is not literals.UNKNOWN})
+                child_scope["props"] = props
+                new["expanded"] = expand(index, roots, target, depth + 1, max_depth, stack + (key,), usage,
+                                         child_scope)
+    return new
 
 
 # ---------------------------------------------------------------------------------------------- sections
@@ -258,8 +349,18 @@ def _slug(path: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", path.lower()).strip("-") or "root"
 
 
+def _is_decorative(node: dict) -> bool:
+    """aria-hidden layers and elements without any content (textures, dividers, spacers) are not sections."""
+    root = signals.effective_root(node)
+    if root.get("attrs", {}).get("aria-hidden") in ("true", True):
+        return True
+    inv = signals.inventory(node)
+    return not any(inv[k] for k in ("headings", "text_blocks", "actions", "media", "fields", "forms", "tables",
+                                    "charts", "data_bindings")) and not signals.label_of(node)
+
+
 def describe_sections(candidates: list[dict], prefix: str) -> list[dict[str, Any]]:
-    sections = [c for c in candidates if c.get("type") == "element"]
+    sections = [c for c in candidates if c.get("type") == "element" and not _is_decorative(c)]
     described = []
     for i, node in enumerate(sections):
         inv = signals.inventory(node)

@@ -372,6 +372,31 @@
       "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
     },
     {
+      "id": "suggest_recipes",
+      "visibility": "public",
+      "description": "Rank the React + Tailwind / Next.js code recipes (knowledge/code-recipes) for each section of a UI map from map_ui_structure, or for given roles: fits by section role and by the default-banlist signals each recipe replaces, plus token, motion and surface recipes with their dependency status (available, needs_install with the command to propose, or css_fallback). Never installs anything.",
+      "entrypoint": "uiux.api:suggest_recipes",
+      "cli": "python scripts/uiux_cli.py call suggest_recipes --params '{\"roles\": [\"hero\", \"features\"], \"banlist\": [\"centered-hero\"]}'",
+      "input": {
+        "type": "object",
+        "properties": {
+          "ui_map": {"type": ["object", "null"], "description": "Result of map_ui_structure"},
+          "roles": {"type": ["array", "null"], "items": {"type": "string"}, "description": "Section roles when no ui_map is given"},
+          "banlist": {"type": ["array", "null"], "items": {"type": "string"}, "description": "Signal ids when no ui_map is given"},
+          "allow_motion_library": {"type": "boolean", "default": false, "description": "From orchestrate_ui (Elevate/Reimagine): one motion library may be proposed"},
+          "existing_dependencies": {"type": ["array", "null"], "items": {"type": "string"}, "description": "Package names already installed in the project"},
+          "include_code": {"type": "boolean", "default": false, "description": "Include each suggested recipe's source"},
+          "limit": {"type": "integer", "default": 2, "description": "Candidates per section"}
+        },
+        "additionalProperties": false
+      },
+      "output": {"type": "object", "required": ["tokens", "sections", "motion", "unmatched_sections", "notes"], "description": "{stacks, tokens[], sections[{route, section_id, role, banlist, candidates[{id, file, score, why, status}]}], motion[], unmatched_sections[], motion_library, notes[]}"},
+      "dependencies": {"python": ">=3.9", "packages": []},
+      "runtime_requirements": [],
+      "side_effects": "none",
+      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+    },
+    {
       "id": "route_knowledge",
       "visibility": "public",
       "description": "Route required knowledge packs, skills, preservation invariants, and runtime validation from task intent and repo profile.",

@@ -174,7 +174,7 @@ class MarkupParser:
                     i = end + 1
                 elif i < self.n and self.s[i] == "{":
                     raw, found, i = self._read_braced(i)
-                    attrs[name] = {"expr": raw.strip()[:400]}
+                    attrs[name] = {"expr": raw.strip()[:4000]}
                     if found:
                         attrs[name]["elements"] = found
                 else:
@@ -258,6 +258,8 @@ class MarkupParser:
                     conditional = bool(re.search(r"&&|\?|\bif\b|#if", expr))
                     if found:
                         for el in found:
+                            if repeated or conditional:
+                                el.setdefault("source_expr", expr[:300])
                             el["repeated"] = el["repeated"] or repeated
                             el["conditional"] = el["conditional"] or (conditional and not repeated)
                         children.extend(found)

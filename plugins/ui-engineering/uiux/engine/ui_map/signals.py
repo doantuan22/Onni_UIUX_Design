@@ -6,6 +6,7 @@ reason may keep an item), not violations.
 from __future__ import annotations
 
 import re
+import unicodedata
 from collections import Counter
 from typing import Any
 
@@ -21,6 +22,12 @@ LAYOUT_CLASS = re.compile(
     r"^(?:[a-z0-9]+:)*(?:grid|flex|inline-flex|grid-cols-\S+|col-span-\S+|row-span-\S+|flex-(?:row|col)\S*|order-\S+|"
     r"text-(?:center|left|right)|max-w-\S+|mx-auto|items-\S+|justify-\S+|self-\S+|place-\S+|absolute|relative|"
     r"sticky|fixed|basis-\S+|w-(?:full|screen|1/2|1/3|2/3)|aspect-\S+|columns-\S+|overflow-\S+|-?m[tblrxy]?-\S+)$")
+# Signal ids emitted below; documented in knowledge/visual-language/anti-slop/default-banlist.md ("Signal ids")
+BANLIST_IDS = (
+    "centered-hero", "equal-icon-cards", "centered-everything", "uniform-rhythm", "round-number-stats",
+    "purple-gradient", "blur-blobs", "glass-everywhere", "uniform-radius-shadow", "neon-glow", "low-contrast-body",
+    "gradient-text", "hype-copy", "emoji-icons", "hover-scale", "infinite-decor", "fade-up-everything",
+)
 _EMOJI = re.compile("[\U0001F300-\U0001FAFF☀-➿✨⭐]")
 _PRICE = re.compile(r"(?:[$€£¥₫]\s?\d|\d\s?(?:[$€£₫]|usd|vnd|đ)\b|/\s?(?:mo|month|year|yr|tháng|năm)\b)", re.I)
 _ROUND_STAT = re.compile(r"\b\d+(?:[.,]\d+)?\s?(?:[kKmMbB]\+?|\+|%)(?=\s|$)|\b24/7\b|99\.9+%")
@@ -87,7 +94,8 @@ def all_classes(nodes: list[dict], limit: int = 4000, weight_repeated: int = 1) 
         node, in_list = stack.pop()
         if node.get("type") != "element":
             continue
-        in_list = in_list or bool(node.get("repeated"))
+        # a `.map` element counts as several items unless the list was materialized into real copies
+        in_list = in_list or (bool(node.get("repeated")) and "list_item" not in node)
         out.extend(class_string(node).split() * (weight_repeated if in_list else 1))
         if len(out) > limit:
             break
@@ -119,7 +127,8 @@ def inventory(section: dict) -> dict[str, Any]:
             headings.append({"level": HEADING_TAGS.get(tag, 2), "text": label_of(node)})
         elif low in ("p", "blockquote", "li", "dd", "figcaption") and label_of(node):
             texts.append(label_of(node))
-        if low in {t.lower() for t in LINK_TAGS} or _is_button(tag):
+        if low in {t.lower() for t in LINK_TAGS} or _is_button(tag) or (
+                isinstance(attrs.get("href"), (str, dict)) and tag[:1].isupper() and not node.get("icon")):
             href = attrs.get("href") or attrs.get("to")
             actions.append({"kind": "button" if _is_button(tag) else "link", "label": label_of(node),
                             "href": href if isinstance(href, str) else (("{" + href["expr"] + "}") if isinstance(href, dict) else None)})
@@ -166,14 +175,17 @@ def inventory(section: dict) -> dict[str, Any]:
 def fingerprint(inv: dict[str, Any]) -> list[str]:
     """Normalized content items used to prove that a visual change kept the content."""
     items = [f"h{h['level']}:{_norm(h['text'])}" for h in inv["headings"] if h["text"]]
-    items += [f"{a['kind']}:{_norm(a['label'])}" for a in inv["actions"] if a["label"]]
+    # buttons and links are one kind here: re-composition may turn a <button> into a styled link and keep the action
+    items += [f"action:{_norm(a['label'])}" for a in inv["actions"] if _norm(a["label"])]
     items += [f"field:{_norm(str(f['name']))}" for f in inv["fields"] if f["name"]]
     items += [f"media:{_norm(m['alt'] or m['src'] or m['tag'])}" for m in inv["media"]]
     return sorted(set(items))
 
 
 def _norm(text: str) -> str:
-    return " ".join(str(text).lower().split())[:80]
+    """Lowercase, drop decorative symbols (arrows, bullets, marks) and collapse whitespace."""
+    kept = "".join(ch for ch in str(text) if unicodedata.category(ch) not in ("So", "Sm", "Sk"))
+    return " ".join(kept.lower().split())[:80]
 
 
 # ---------------------------------------------------------------------------------------------- roles

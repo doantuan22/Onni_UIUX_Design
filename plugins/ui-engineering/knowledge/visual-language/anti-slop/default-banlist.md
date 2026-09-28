@@ -59,3 +59,28 @@ to diagnose the current UI, and again when reviewing the result.
 
 Count unexplained items per page. Zero or one: fine. Two or three in one region: rework that region.
 Four or more: the page has not been elevated — return to the composition plan.
+
+## Signal ids
+
+`map_ui_structure` reports these ids per section (`banlist`) and per page (`page_banlist`); `suggest_recipes`
+ranks [code recipes](../../code-recipes/README.md) by the ids they replace.
+
+| Id | Row above |
+|---|---|
+| `centered-hero` | Centered hero |
+| `equal-icon-cards` | Three (or six) equal icon cards |
+| `centered-everything` | Every section centered (page level) |
+| `uniform-rhythm` | Uniform vertical rhythm (page level) |
+| `round-number-stats` | Stats row of round numbers |
+| `purple-gradient` | Purple/indigo → pink/blue gradients |
+| `blur-blobs` | Blurred gradient blobs and orbs |
+| `glass-everywhere` | Glassmorphism on everything |
+| `uniform-radius-shadow` | Same radius and shadow on every element |
+| `neon-glow` | Dark mode with neon glow |
+| `low-contrast-body` | Low-contrast grey body text |
+| `gradient-text` | Gradient text on headings |
+| `hype-copy` | Generic hype copy (flag to the user; Elevate keeps copy) |
+| `emoji-icons` | Emoji as icons |
+| `hover-scale` | Hover scale on every card |
+| `infinite-decor` | Infinite decorative animations |
+| `fade-up-everything` | Fade-up on every element (page level) |

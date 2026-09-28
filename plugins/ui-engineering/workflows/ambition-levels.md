@@ -73,9 +73,12 @@ architecture stay protected. Elevate is about composition and craft, not about a
 4. **Plan the re-composition.** Per key page, a before → after table: section, current pattern, new
    pattern, content kept, reason. Sections may be re-composed and, when the reading order improves the
    task, reordered; no section is deleted.
-5. **Build in layers.** Tokens first (derived color steps, type scale, spacing rhythm, radii, shadows,
-   motion durations/easings), then section compositions, then motion and micro-interaction. Reuse the
-   project's components and extend their variants; do not fork a parallel component set.
+5. **Build in layers.** Run `suggest_recipes` with the saved map (and `allow_motion_library`, the project's
+   dependencies) and pick from the [code recipes](../knowledge/code-recipes/README.md) the ones that serve the
+   signature moves. Tokens first ([brand-derived theme](../knowledge/code-recipes/react-tailwind/tokens/brand-theme.css):
+   derived color steps, type, radii, elevation, motion), then section compositions fed with the existing content
+   through props, then motion and micro-interaction. Reuse the project's components and extend their variants; do not
+   fork a parallel component set.
 6. **Prove it.** Run `map_ui_structure` again and `diff_ui_maps` with the saved map: `content_preserved`
    must be true (any `content_removed` item is restored or explicitly approved by the user) and
    `elevate_bar.met` should be true (at least half of the matched sections re-composed); report

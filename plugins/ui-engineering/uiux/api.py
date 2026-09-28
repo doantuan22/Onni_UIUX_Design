@@ -37,7 +37,7 @@ __all__ = [
     "capability_map", "self_test", "error_contract", "error_envelope", "API_VERSION", "UiuxError", "ToolError",
     "orchestrate_ui", "detect_ui_state", "analyze_repository", "detect_framework",
     "analyze_existing_ui", "build_preservation_profile", "evaluate_preservation",
-    "map_ui_structure", "diff_ui_maps",
+    "map_ui_structure", "diff_ui_maps", "suggest_recipes",
     "route_knowledge", "build_knowledge_plan", "resolve_framework_pack",
     "detect_domain", "resolve_domain_pack",
     "plan_modification", "validate_modification_plan", "evaluate_plan_permissions",
@@ -209,6 +209,19 @@ def diff_ui_maps(before: dict, after: dict) -> dict:
 
     try:
         return ui_map.diff_ui_maps(before, after)
+    except Exception as exc:
+        raise _tool_error(exc) from exc
+
+
+def suggest_recipes(ui_map: dict | None = None, roles: list[str] | None = None, banlist: list[str] | None = None,
+                    allow_motion_library: bool = False, existing_dependencies: list[str] | None = None,
+                    include_code: bool = False, limit: int = 2) -> dict:
+    """Rank the React + Tailwind / Next.js code recipes for each section of a UI map (or for given roles)."""
+    from uiux.engine import recipes
+
+    try:
+        return recipes.suggest(ui_map, roles, banlist, bool(allow_motion_library), existing_dependencies,
+                               bool(include_code), int(limit))
     except Exception as exc:
         raise _tool_error(exc) from exc
 
@@ -836,6 +849,7 @@ _DISPATCH = {
     "analyze_existing_ui": analyze_existing_ui,
     "map_ui_structure": map_ui_structure,
     "diff_ui_maps": diff_ui_maps,
+    "suggest_recipes": suggest_recipes,
     "route_knowledge": route_knowledge,
     "build_knowledge_plan": build_knowledge_plan,
     "plan_modification": plan_modification,

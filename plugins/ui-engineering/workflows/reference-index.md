@@ -187,6 +187,11 @@ references:
     phase: 2
     triggers: [elevate, generic-ui, ai-look, anti-slop, premium-review, visual-redesign]
     excludes: [structure-only]
+  phase_2_code_recipes:
+    file: knowledge/code-recipes/README.md
+    phase: 2
+    triggers: [elevate, reimagine, react, nextjs, tailwind, hero, bento, pricing, faq, motion, framer-motion, gsap]
+    excludes: [structure-only, accessibility-only]
   phase_2_design_quality_evals:
     file: evals/quality/README.md
     phase: 2
