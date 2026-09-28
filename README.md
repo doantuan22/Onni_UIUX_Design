@@ -177,6 +177,8 @@ development/                Architecture and phase docs, benchmark harness, fixt
 .github/workflows/          CI (Python 3.9–3.13 × Linux/Windows/macOS) and packaging (build, verify, cross-OS parity)
 ```
 
+Upgrade history, open plan items and roadmap (Vietnamese): [docs/nang-cap](docs/nang-cap/README.md).
+
 Architecture: [development/docs/architecture.md](development/docs/architecture.md) and
 [development/docs/plugin-architecture.md](development/docs/plugin-architecture.md).
 
