@@ -45,6 +45,7 @@ __all__ = [
     # Phase 7 – Runtime Critic + Repair Loop
     "run_runtime_validation", "build_critic_report", "evaluate_runtime_result",
     "build_repair_plan", "run_targeted_repair", "recapture_evidence",
+    "check_understanding",
 ]
 
 API_VERSION = 1
@@ -185,6 +186,19 @@ def analyze_existing_ui(
 
     try:
         return existing_ui.analyze_existing_ui(project=project, repo_profile=repo_profile, options=options)
+    except Exception as exc:
+        raise _tool_error(exc) from exc
+
+
+def check_understanding(
+    existing_ui_profile: dict,
+    repo_profile: dict,
+) -> dict:
+    """Evaluate if the gathered UI context is sufficient to proceed with design modifications."""
+    from uiux.engine.existing_ui.understanding_gate import evaluate_understanding_gate
+
+    try:
+        return evaluate_understanding_gate(existing_ui_profile, repo_profile)
     except Exception as exc:
         raise _tool_error(exc) from exc
 

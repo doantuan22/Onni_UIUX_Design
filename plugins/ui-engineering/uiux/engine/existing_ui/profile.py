@@ -4,12 +4,15 @@ from __future__ import annotations
 from typing import Any
 
 from uiux.engine.existing_ui.accessibility import analyze_accessibility
+from uiux.engine.existing_ui.component_graph import analyze_component_graph
 from uiux.engine.existing_ui.components import analyze_component_consistency
 from uiux.engine.existing_ui.design_system import extract_design_system
 from uiux.engine.existing_ui.identity import analyze_visual_identity
 from uiux.engine.existing_ui.layout import analyze_layout
 from uiux.engine.existing_ui.responsive import analyze_responsive
+from uiux.engine.existing_ui.understanding_gate import evaluate_understanding_gate
 from uiux.engine.existing_ui.ux_flows import analyze_ux_flows
+from uiux.engine.existing_ui.visual_analyzer import analyze_visual_ui
 from uiux.engine.repo_intelligence.scanner import RepositorySnapshot
 
 
@@ -53,10 +56,17 @@ def build_existing_ui_profile(
     # 3. Component Consistency Analysis
     try:
         comp_data = analyze_component_consistency(repo_profile, snapshot)
+        comp_graph = analyze_component_graph(repo_profile, snapshot)
+        comp_data["component_graph"] = {
+            "dependencies": comp_graph["dependencies"],
+            "dependents": comp_graph["dependents"],
+            "blast_radius": comp_graph["blast_radius"]
+        }
     except Exception as exc:
         comp_data = {
             "variants": {}, "consistency": "unknown", "shared_patterns": [],
             "anomalies": [], "canonical_patterns": {}, "duplicate_signals": [],
+            "component_graph": {},
             "severity": "info", "confidence": 0.0, "evidence": [f"ComponentAnalyzer failed: {exc}"],
         }
         analyzer_failures.append(f"ComponentAnalyzer: {exc}")
@@ -104,6 +114,16 @@ def build_existing_ui_profile(
         }
         analyzer_failures.append(f"DesignSystemExtractor: {exc}")
 
+    # 8. Visual UI Analysis
+    try:
+        visual_data = analyze_visual_ui(repo_profile, layout_data, identity_data, snapshot)
+    except Exception as exc:
+        visual_data = {
+            "measured": {}, "inferred": {}, "model_interpretable_evidence": [],
+            "confidence": 0.0, "evidence": [f"VisualUIAnalyzer failed: {exc}"],
+        }
+        analyzer_failures.append(f"VisualUIAnalyzer: {exc}")
+
     # Monorepo notice
     if repo_profile.get("repository_signals", {}).get("is_monorepo"):
         warnings.append("Monorepo detected: Existing UI profile scoped to primary application context.")
@@ -116,10 +136,11 @@ def build_existing_ui_profile(
         responsive_data["confidence"],
         accessibility_data["confidence"],
         design_system_data["confidence"],
+        visual_data.get("confidence", 0.0),
     ]
     overall_confidence = round(sum(confidences) / len(confidences), 2)
 
-    return {
+    result = {
         "schema_version": 1,
         "identity": identity_data,
         "layout": layout_data,
@@ -128,6 +149,7 @@ def build_existing_ui_profile(
         "responsive": responsive_data,
         "accessibility": accessibility_data,
         "design_system": design_system_data,
+        "visual_analysis": visual_data,
         "diagnostics": {
             "warnings": warnings,
             "unsupported_analysis": unsupported_analysis,
@@ -138,3 +160,17 @@ def build_existing_ui_profile(
         ],
         "overall_confidence": overall_confidence,
     }
+
+    # 9. Understanding Gate
+    try:
+        gate_data = evaluate_understanding_gate(result, repo_profile)
+        result["understanding_gate"] = gate_data
+    except Exception as exc:
+        result["understanding_gate"] = {
+            "status": "BLOCKED", "missing_context": ["understanding_gate_failed"],
+            "required_next_actions": [f"Fix Understanding Gate: {exc}"],
+            "confidence": 0.0
+        }
+        analyzer_failures.append(f"UnderstandingGate: {exc}")
+
+    return result
