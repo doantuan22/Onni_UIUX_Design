@@ -37,7 +37,7 @@ __all__ = [
     "capability_map", "self_test", "error_contract", "error_envelope", "API_VERSION", "UiuxError", "ToolError",
     "orchestrate_ui", "detect_ui_state", "analyze_repository", "detect_framework",
     "analyze_existing_ui", "build_preservation_profile", "evaluate_preservation",
-    "map_ui_structure", "diff_ui_maps", "suggest_recipes",
+    "map_ui_structure", "diff_ui_maps", "suggest_recipes", "score_visual_critique",
     "route_knowledge", "build_knowledge_plan", "resolve_framework_pack",
     "detect_domain", "resolve_domain_pack",
     "plan_modification", "validate_modification_plan", "evaluate_plan_permissions",
@@ -222,6 +222,22 @@ def suggest_recipes(ui_map: dict | None = None, roles: list[str] | None = None, 
     try:
         return recipes.suggest(ui_map, roles, banlist, bool(allow_motion_library), existing_dependencies,
                                bool(include_code), int(limit))
+    except Exception as exc:
+        raise _tool_error(exc) from exc
+
+
+def score_visual_critique(after: dict, before: dict | None = None, ui_map_diff: dict | None = None,
+                          captures: list[dict] | None = None, accessibility_scans: list[dict] | None = None,
+                          ambition: str = "elevate", iteration: int = 1, max_iterations: int = 3,
+                          previous_score: float | None = None) -> dict:
+    """Merge an independent critic's rubric scores with measured gates; decide pass / iterate / stop."""
+    from uiux.engine import critique
+
+    try:
+        return critique.score(after, before, ui_map_diff, captures, accessibility_scans, ambition, int(iteration),
+                              int(max_iterations), previous_score)
+    except critique.CritiqueError as exc:
+        raise ToolError(str(exc)) from exc
     except Exception as exc:
         raise _tool_error(exc) from exc
 
@@ -850,6 +866,7 @@ _DISPATCH = {
     "map_ui_structure": map_ui_structure,
     "diff_ui_maps": diff_ui_maps,
     "suggest_recipes": suggest_recipes,
+    "score_visual_critique": score_visual_critique,
     "route_knowledge": route_knowledge,
     "build_knowledge_plan": build_knowledge_plan,
     "plan_modification": plan_modification,

@@ -129,7 +129,7 @@ class ReleaseCandidateQualificationTests(unittest.TestCase):
         )
         self.assertEqual(r_tools.returncode, 0, f"tools command failed: {r_tools.stderr}")
         data_tools = json.loads(r_tools.stdout)
-        self.assertEqual(len(data_tools["tools"]), 27)
+        self.assertEqual(len(data_tools["tools"]), 28)
 
         # 3. Self-test
         r_st = subprocess.run(
@@ -147,7 +147,7 @@ class ReleaseCandidateQualificationTests(unittest.TestCase):
     # RC-09: Public Tool Parity
     # -------------------------------------------------------------------------
     def test_rc_09_public_tool_parity(self) -> None:
-        """All 27 public tools are present in tools registry and API."""
+        """All 28 public tools are present in tools registry and API."""
         r_tools = subprocess.run(
             [sys.executable, "-m", "uiux.cli", "tools"],
             cwd=str(self.consumer_ws),
@@ -165,7 +165,7 @@ class ReleaseCandidateQualificationTests(unittest.TestCase):
             "plan_modification", "recapture_evidence", "resolve_capabilities",
             "resolve_technology", "retrieve_knowledge", "route_knowledge",
             "run_evals", "run_runtime", "run_runtime_validation",
-            "run_targeted_repair", "self_test", "suggest_recipes", "validate_skill",
+            "run_targeted_repair", "score_visual_critique", "self_test", "suggest_recipes", "validate_skill",
         }
         self.assertEqual(tool_ids, expected)
 
@@ -384,7 +384,7 @@ from mcp import protocol, server
 
 # Test tools listing via server handle
 tools_resp = server.list_tools()
-assert len(tools_resp["tools"]) == 27, f"MCP tools count mismatch: {len(tools_resp['tools'])}"
+assert len(tools_resp["tools"]) == 28, f"MCP tools count mismatch: {len(tools_resp['tools'])}"
 
 # Test session message handling: initialize -> initialized -> tools/list
 session = server.McpServer()
@@ -394,7 +394,7 @@ assert resp.get("result", {}).get("protocolVersion") == "2025-06-18"
 
 session.handle({"jsonrpc": "2.0", "method": "notifications/initialized"})
 list_resp = session.handle({"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}})
-assert len(list_resp["result"]["tools"]) == 27
+assert len(list_resp["result"]["tools"]) == 28
 print("MCP_OK")
 """
         res = subprocess.run(

@@ -192,6 +192,11 @@ references:
     phase: 2
     triggers: [elevate, reimagine, react, nextjs, tailwind, hero, bento, pricing, faq, motion, framer-motion, gsap]
     excludes: [structure-only, accessibility-only]
+  phase_2_visual_critique:
+    file: review/visual-critique.md
+    phase: 2
+    triggers: [elevate, reimagine, screenshot-review, visual-critique, before-after, rendered-evidence]
+    excludes: [structure-only]
   phase_2_design_quality_evals:
     file: evals/quality/README.md
     phase: 2

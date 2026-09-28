@@ -47,7 +47,7 @@ export function PricingEmphasis({ id = "pricing", title, intro, plans }: Pricing
             <div className="flex items-baseline justify-between gap-4">
               <h3 className="text-lg font-semibold text-ink-950">{plan.name}</h3>
               {plan.recommended && (
-                <span className="font-mono text-[0.7rem] uppercase tracking-[0.18em] text-brand-700">Recommended</span>
+                <span className="font-mono text-xs uppercase tracking-[0.18em] text-brand-700">Recommended</span>
               )}
             </div>
             <p className="mt-6 flex items-baseline gap-1">

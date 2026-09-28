@@ -75,7 +75,7 @@ class TaxonomyTests(unittest.TestCase):
         not_error_codes = {  # runtime states, result/scan statuses, environment variables and helper markers
             "NOT_DECLARED", "DECLARED_NOT_INSTALLED", "PACKAGE_AVAILABLE_BROWSER_MISSING", "NOT_AVAILABLE",
             "AVAILABLE_WITH_LIMITATIONS", "DRY_RUN", "INVALID_INPUT", "SCAN_FAILURE", "AXE_NOT",
-            "PLAYWRIGHT_BROWSERS_PATH", "XDG_CACHE_HOME", "PROBE_JS"}
+            "PLAYWRIGHT_BROWSERS_PATH", "XDG_CACHE_HOME", "PROBE_JS", "LAYOUT_PROBE_JS"}
         codes = literals - not_error_codes
         self.assertTrue({"PLAYWRIGHT_IMPORT_FAILURE", "AXE_NOT_AVAILABLE", "BLANK_RENDER"} <= codes, codes)
         self.assertEqual(sorted(codes - set(self.data["codes"])), [])

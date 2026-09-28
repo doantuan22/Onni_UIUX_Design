@@ -397,6 +397,34 @@
       "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
     },
     {
+      "id": "score_visual_critique",
+      "visibility": "public",
+      "description": "Score a visual change for the critique loop (review/visual-critique.md): validates the independent critic's rubric JSON for the after (and before) state, computes the weighted score, applies measured gates from diff_ui_maps, run_runtime capture probes (layout_probe, motion_probe) and accessibility scans, and returns pass, iterate (with next_focus) or stop, plus a VISUAL-CRITIQUE markdown section.",
+      "entrypoint": "uiux.api:score_visual_critique",
+      "cli": "python scripts/uiux_cli.py call score_visual_critique --params '{\"after\": {...}, \"before\": {...}, \"ui_map_diff\": {...}}'",
+      "input": {
+        "type": "object",
+        "required": ["after"],
+        "properties": {
+          "after": {"type": "object", "description": "Critic JSON for the after state (scores for all 8 rubric dimensions, issues)"},
+          "before": {"type": ["object", "null"], "description": "Critic JSON for the before state"},
+          "ui_map_diff": {"type": ["object", "null"], "description": "Result of diff_ui_maps"},
+          "captures": {"type": ["array", "null"], "items": {"type": "object"}, "description": "Capture entries from run_runtime manifests (with layout_probe / motion_probe)"},
+          "accessibility_scans": {"type": ["array", "null"], "items": {"type": "object"}, "description": "Scan entries from the accessibility_scan manifest (violations, impacts)"},
+          "ambition": {"type": "string", "default": "elevate", "description": "refine | elevate | reimagine (orchestrate_ui)"},
+          "iteration": {"type": "integer", "default": 1},
+          "max_iterations": {"type": "integer", "default": 3, "description": "First score plus at most two iterations"},
+          "previous_score": {"type": ["number", "null"], "description": "Weighted after-score of the previous iteration (no-progress detection)"}
+        },
+        "additionalProperties": false
+      },
+      "output": {"type": "object", "required": ["verdict", "score", "dimensions", "criteria", "gates", "issues", "next_focus", "markdown"], "description": "{verdict: pass|iterate|stop, reason, score{after, before, delta, progress}, dimensions, criteria, gates, issues, next_focus, markdown}"},
+      "dependencies": {"python": ">=3.9", "packages": []},
+      "runtime_requirements": [],
+      "side_effects": "none",
+      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+    },
+    {
       "id": "route_knowledge",
       "visibility": "public",
       "description": "Route required knowledge packs, skills, preservation invariants, and runtime validation from task intent and repo profile.",
