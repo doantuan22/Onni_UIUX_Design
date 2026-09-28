@@ -172,6 +172,26 @@ references:
     phase: 2
     triggers: [visual-effect, continuous-animation, scroll-effect, webgl, backdrop-filter]
     excludes: [static-content-only]
+  phase_2_ambition_levels:
+    file: workflows/ambition-levels.md
+    phase: 2
+    triggers: [modernize, upgrade, elevate, polish, premium, redesign, visual-upgrade, less-generic]
+    excludes: [single-component, accessibility-only, structure-only]
+  phase_2_signature_moves:
+    file: skills/design-direction/signature-moves.md
+    phase: 2
+    triggers: [elevate, reimagine, visual-redesign, distinctive, anti-homogenization, premium]
+    excludes: [targeted-polish-with-stable-system, structure-only]
+  phase_2_default_banlist:
+    file: knowledge/visual-language/anti-slop/default-banlist.md
+    phase: 2
+    triggers: [elevate, generic-ui, ai-look, anti-slop, premium-review, visual-redesign]
+    excludes: [structure-only]
+  phase_2_code_recipes:
+    file: knowledge/code-recipes/README.md
+    phase: 2
+    triggers: [elevate, reimagine, react, nextjs, tailwind, hero, bento, pricing, faq, motion, framer-motion, gsap]
+    excludes: [structure-only, accessibility-only]
   phase_2_design_quality_evals:
     file: evals/quality/README.md
     phase: 2

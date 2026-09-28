@@ -73,6 +73,7 @@ def resolve_skills_and_knowledge(
     max_change_level: str,
     requested_scope: str,
     user_request: str,
+    ambition: str = "refine",
 ) -> tuple[list[str], list[str]]:
     """Resolve required skills and knowledge categories based on workflow and change level."""
     req_lower = user_request.lower()
@@ -118,6 +119,21 @@ def resolve_skills_and_knowledge(
             skills.append("skills/typography")
         skills.extend(["skills/visual-qa", "skills/final-quality-gate"])
         knowledge.append("components")
+
+    elif max_change_level == L2 and ambition == "elevate":
+        # ELEVATE: re-compose pages inside the protected shell and brand
+        skills.extend([
+            "skills/design-direction",
+            "skills/design-inspiration",
+            "skills/typography",
+            "skills/visual-language",
+            "skills/component-realization",
+            "skills/responsive-interaction",
+            "skills/frontend-implementation",
+            "skills/visual-qa",
+            "skills/final-quality-gate",
+        ])
+        knowledge.extend(["components", "web-patterns", "layouts", "motion", "effects", "visual-language", "typography"])
 
     elif max_change_level == L2:
         # Local structural change
@@ -233,6 +249,7 @@ def orchestrate(request: dict[str, Any]) -> dict[str, Any]:
         max_change_level=max_level,
         requested_scope=scope,
         user_request=user_request,
+        ambition=preservation["ambition"],
     )
 
     # 7. Resolve Validation Requirements
@@ -275,7 +292,19 @@ def orchestrate(request: dict[str, Any]) -> dict[str, Any]:
             ),
         }
     elif workflow == "existing-ui":
-        if max_level == L3:
+        if max_level == L2 and preservation["ambition"] == "elevate":
+            next_action = {
+                "step": "execute_elevated_redesign",
+                "target_workflow": "workflows/ambition-levels.md",
+                "recommended_handoff": "skills/design-direction",
+                "rationale": (
+                    "ELEVATE: map the current pages and content (map_ui_structure -> .uiux/ui-map.json), commit "
+                    "to a design direction with signature "
+                    "moves, then re-compose layout, hierarchy, surfaces and motion inside the protected shell. "
+                    "Brand hues, navigation, routes, content and data stay intact; prove it with diff_ui_maps."
+                ),
+            }
+        elif max_level == L3:
             next_action = {
                 "step": "execute_authorized_redesign",
                 "target_workflow": "workflows/existing-ui-workflow.md",
@@ -321,6 +350,8 @@ def orchestrate(request: dict[str, Any]) -> dict[str, Any]:
         "ui_state": ui_state,
         "confidence": confidence,
         "design_freedom": design_freedom,
+        "ambition": preservation["ambition"],
+        "allow_motion_library": preservation["ambition"] in ("elevate", "reimagine"),
         "preservation_required": preservation["preservation_required"],
         "protected_properties": preservation["protected_properties"],
         "allowed_change_level": preservation["allowed_change_level"],
@@ -372,6 +403,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Workflow: {result['workflow']}")
         print(f"UI State: {result['ui_state']} (confidence: {result['confidence']:.2f})")
         print(f"Design Freedom: {result['design_freedom']}")
+        print(f"Ambition: {result['ambition']}")
         print(f"Max Change Level: {result['allowed_change_level']['max_level']}")
         print(f"Next Action: {result['next_action']['step']} -> {result['next_action']['target_workflow']}")
     return 0

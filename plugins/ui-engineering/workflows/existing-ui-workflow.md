@@ -23,7 +23,8 @@ The primary duty of the agent in an existing codebase is to protect established 
 |---|---|---|
 | **Color palette / brand colors** | `LOCKED` | Must NOT be modified or replaced without explicit user permission. |
 | **Brand identity & typography** | `LOCKED` | Brand font families, voice, and visual character are strictly maintained. |
-| **Overall layout identity** | `PROTECTED` | Header, sidebar, content grid structure are preserved. |
+| **Overall layout identity** | `PROTECTED` | App shell (header, sidebar, footer placement) is preserved. |
+| **Page composition** | `PROTECTED` / `EVOLVABLE` under Elevate | Section layout, hierarchy, type scale, surfaces and motion may be re-composed; content inventory is kept. |
 | **Navigation model** | `PROTECTED` | Route structure, URLs, tab models, and primary nav hierarchy are preserved. |
 | **Information architecture** | `PROTECTED` | Page hierarchies and entity relationships cannot be arbitrarily restructured. |
 | **Component structure** | `CONTROLLED` | Existing component APIs and variants are reused and extended, not rewritten. |
@@ -47,7 +48,7 @@ Requests containing phrases such as:
 - Rewrite navigation or information architecture
 - Swap out the UI framework or component library
 
-Such requests only authorize **L1 Safe Refinements** (or **L2 Local Structural Changes** when accompanied by technical/UX justification).
+Such requests resolve to ambition **Elevate** ([ambition-levels.md](ambition-levels.md)): the page composition, hierarchy, type scale, surfaces and motion are expected to improve visibly (L2, justified by the recorded design direction), while everything in the list above stays protected. When the user adds conservative phrasing ("keep the current look", "giữ nguyên bố cục", "chỉ tinh chỉnh") they resolve to **Refine** (L1) only.
 
 ## Change Budget Model (L1 / L2 / L3)
 
@@ -59,13 +60,14 @@ Such requests only authorize **L1 Safe Refinements** (or **L2 Local Structural C
 - Accessibility fixes (color contrast, ARIA labels, focus traps)
 - Consistency alignment with existing design tokens
 
-### L2 – Local Structural Change (Default: `JUSTIFIED ONLY`)
+### L2 – Local Structural Change (Default: `JUSTIFIED ONLY`; `ALLOWED` under Elevate)
 - Internal component layout reorganization
 - Section arrangement within an existing page
 - Form step grouping or field flow clarification
 - Card internal hierarchy adjustments
 - Local breadcrumb or in-page navigation details
-- *Condition*: Requires explicit UX rationale or technical necessity documented in task scope.
+- Under Elevate: page-level re-composition of sections (layout, rhythm, hierarchy, surfaces, motion) inside the protected shell
+- *Condition*: Requires explicit UX rationale or technical necessity documented in task scope; under Elevate the recorded `DESIGN-DIRECTION.md` (diagnosis, signature moves, re-composition plan) is the justification.
 
 ### L3 – Major Redesign (Default: `DENIED`)
 - Global color palette change or new color system
@@ -77,8 +79,9 @@ Such requests only authorize **L1 Safe Refinements** (or **L2 Local Structural C
 
 ## Execution Flow for Existing UI
 
-1. **Extraction / Observation**: Inspect current components, styling conventions, design tokens, and layout (`CURRENT-UX-MAP.md`).
+1. **Extraction / Observation**: Inspect current components, styling conventions, design tokens, and layout (`CURRENT-UX-MAP.md`, including the section inventory from `map_ui_structure` saved as `.uiux/ui-map.json`, and before screenshots for Elevate).
 2. **Scope Isolation**: Determine if the task is global, page-level, or local component-level. Local component tasks are strictly isolated from global redesign.
-3. **Change Budget Determination**: Verify permissions for L1, L2, or L3 based on explicit user prompt.
-4. **Targeted Improvement**: Apply refinements using existing design system tokens and component patterns.
-5. **Preservation & Non-regression Gate**: Validate that brand colors, fonts, and layout invariants are intact before marking complete.
+3. **Change Budget & Ambition Determination**: Verify permissions for L1, L2, or L3 based on explicit user prompt, and read `ambition` from `orchestrate_ui`.
+4. **Direction (Elevate/Reimagine)**: Diagnose against the default banlist and commit to a direction with signature moves and a re-composition plan (`DESIGN-DIRECTION.md`).
+5. **Targeted Improvement**: Refine applies polish with existing tokens and components; Elevate builds derived tokens, re-composes sections and adds purposeful motion, extending existing components rather than forking them.
+6. **Preservation & Non-regression Gate**: Validate that brand hues, logo, shell, navigation, routes, content inventory and data are intact; for Elevate also run `diff_ui_maps` against the saved map (`content_preserved` true, `elevate_bar.met`), compare before/after screenshots and confirm the change is visible at first glance.

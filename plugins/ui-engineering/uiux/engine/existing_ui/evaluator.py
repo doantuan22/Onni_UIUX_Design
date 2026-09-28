@@ -33,7 +33,9 @@ class PreservationEvaluator:
             "RULE_6: SCOPE_CONFINEMENT",
             "RULE_7: L2_JUSTIFICATION_TRACE",
             "RULE_8: L3_EXPLICIT_PERMISSION_TRACE",
+            "RULE_9: CONTENT_PRESERVATION",
         ]
+        ambition = str(baseline_profile.get("ambition", "refine")).lower()
 
         # 1. Palette Preservation
         palette_policy = protected.get("color_palette", {}).get("policy", "locked")
@@ -128,6 +130,9 @@ class PreservationEvaluator:
         is_l2 = level == "L2" or proposed_changes.get("has_l2_change", False)
         if is_l2:
             reason = proposed_changes.get("change_reason")
+            direction = proposed_changes.get("design_direction")
+            if ambition == "elevate" and not reason and direction:
+                reason = {"issue": f"ELEVATE design direction: {direction}"}
             if not reason or not isinstance(reason, dict) or not (reason.get("issue") or reason.get("why_local_structure_change_needed")):
                 violations.append({
                     "rule": "L2_JUSTIFICATION_TRACE",
@@ -157,6 +162,19 @@ class PreservationEvaluator:
             else:
                 trace = proposed_changes.get("permission_trace", {})
                 warnings.append(f"L3 major redesign verified with explicit permission: {trace.get('user_instruction', 'Granted')}")
+
+        # 9. Content Preservation: re-composition keeps copy, actions and data (ELEVATE never deletes content)
+        content_changes = proposed_changes.get("content_changes", {}) or {}
+        removed = list(content_changes.get("removed", []) or []) + list(content_changes.get("actions_removed", []) or [])
+        if removed and not (merged_perms.get("allow_architecture_change") or merged_perms.get("allow_rebuild")):
+            violations.append({
+                "rule": "CONTENT_PRESERVATION",
+                "severity": "high",
+                "affected_area": "content_inventory",
+                "evidence": f"Content or primary actions removed during a visual change: {', '.join(map(str, removed))}.",
+                "required_permission": "allow_architecture_change",
+                "actual_permission": "denied",
+            })
 
         # Compute status
         has_critical = any(v["severity"] in ("critical", "high") for v in violations)

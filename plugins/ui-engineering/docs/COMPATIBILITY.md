@@ -27,12 +27,12 @@ This document tracks verified integration statuses across AI coding hosts and ex
 
 ## 3. Tool Parity Guarantee
 
-All supported adapters expose the identical set of 24 public tools declared in `uiux/core/tools.json`:
-- `resolve_capabilities`, `retrieve_knowledge`, `resolve_technology`, `analyze_design_quality`
-- `detect_runtime`, `run_browser_execution`, `run_accessibility_scan`, `validate_runtime_evidence`
-- `validate_accessibility_evidence`, `get_knowledge`, `list_knowledge_collections`, `search_knowledge`
-- `validate_skill`, `self_test`, `orchestrate_ui`, `analyze_repository`, `analyze_existing_ui`
-- `build_knowledge_plan`, `plan_modification`, `build_validation_handoff`, `run_runtime_validation`
-- `build_critic_report`, `run_targeted_repair`, `recapture_evidence`
+All supported adapters expose the identical set of 27 public tools declared in `uiux/core/tools.json`:
+- `resolve_capabilities`, `retrieve_knowledge`, `resolve_technology`, `analyze_design_quality`, `detect_runtime`
+- `run_runtime`, `accessibility_scan`, `run_evals`, `validate_skill`, `capability_map`
+- `run_runtime_validation`, `build_critic_report`, `evaluate_runtime_result`, `build_repair_plan`, `run_targeted_repair`
+- `recapture_evidence`, `self_test`, `orchestrate_ui`, `analyze_repository`, `analyze_existing_ui`
+- `map_ui_structure`, `diff_ui_maps`, `suggest_recipes`, `route_knowledge`, `build_knowledge_plan`
+- `plan_modification`, `build_validation_handoff`
 
 No adapter omits any tool unless explicitly marked with an architectural justification.

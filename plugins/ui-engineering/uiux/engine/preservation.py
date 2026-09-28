@@ -8,6 +8,10 @@ by the UI Orchestrator:
 - L2 (Local Structural Change): Justified only by default
 - L3 (Major Redesign): Denied by default, requires explicit user permission
 - Vague enhancement phrases ("modernize", "làm đẹp", "make it professional") DO NOT grant L3
+- Ambition levels (orthogonal to the change budget): REFINE | ELEVATE | REIMAGINE.
+  Upgrade requests on an existing UI default to ELEVATE: page composition, section layout,
+  typography scale, surfaces and motion may evolve (L2), while palette hues, brand identity,
+  navigation model, information architecture, routes, content and data stay protected.
 - Strict Precedence Hierarchy (1..8)
 """
 from __future__ import annotations
@@ -19,6 +23,12 @@ from typing import Any
 L1 = "L1"  # Safe refinement (spacing, typography scale, responsive, states, a11y, consistency)
 L2 = "L2"  # Local structural change (component layout, section arrangement, form flow)
 L3 = "L3"  # Major redesign (global palette, branding, page architecture, rebuild)
+
+# Ambition levels: how far the visual realization may move away from the current look
+REFINE = "refine"        # Polish in place: spacing, states, a11y, responsive, token alignment (L1)
+ELEVATE = "elevate"      # Re-compose pages: layout, hierarchy, type scale, surfaces, motion (L2, brand kept)
+REIMAGINE = "reimagine"  # Explicitly authorized redesign or greenfield build (L3)
+AMBITION_LEVELS = (REFINE, ELEVATE, REIMAGINE)
 
 # Precedence hierarchy: 1 has the highest priority, 8 has the lowest
 PRECEDENCE_HIERARCHY = [
@@ -43,6 +53,42 @@ VAGUE_ENHANCEMENT_PATTERNS = [
     r"\bimprove\s+(?:the\s+)?(?:ui|ux|interface|look|appearance)\b",
     r"\bclean\s+up\s+(?:the\s+)?ui\b",
     r"\btút\s+tát\b",
+]
+
+# Upgrade phrases: ask for a visibly better interface (ELEVATE by default, never L3 by themselves)
+UPGRADE_PATTERNS = [
+    r"\bmodernize\b",
+    r"\bmodernise\b",
+    r"\blàm đẹp\b",
+    r"\bnâng cấp\b",
+    r"\bđẹp hơn\b",
+    r"\bxịn hơn\b",
+    r"\bchuyên nghiệp hơn\b",
+    r"\blàm mới\b",
+    r"\btút\s+tát\b",
+    r"\bupgrade\b",
+    r"\belevate\b",
+    r"\brevamp\b",
+    r"\bpremium\b",
+    r"\bmake\s+it\s+(?:look\s+)?(?:more\s+)?(?:professional|clean|modern|better|pretty|beautiful|premium|polished)\b",
+    r"\brefresh\s+(?:the\s+)?(?:ui|look|design|interface)\b",
+    r"\bimprove\s+(?:the\s+)?(?:ui|ux|interface|look|appearance|design)\b",
+    r"\bless\s+generic\b",
+    r"\b(?:looks?|feels?)\s+(?:like\s+)?(?:ai|generic|template)\b",
+]
+
+# Conservative phrases: the user wants the current look kept (REFINE wins over UPGRADE_PATTERNS)
+REFINE_PATTERNS = [
+    r"\bkeep\s+(?:the\s+)?(?:current|existing|same)\s+(?:look|layout|design|ui|structure)\b",
+    r"\bdon'?t\s+change\s+(?:the\s+)?(?:look|layout|design|structure)\b",
+    r"\bminimal\s+changes?\b",
+    r"\bsubtle\b",
+    r"\bonly\s+(?:polish|refine|fix|tweak)\b",
+    r"\bjust\s+(?:polish|refine|fix|tweak)\b",
+    r"\bgiữ\s+nguyên\s+(?:giao\s+diện|bố\s+cục|layout|thiết\s+kế)\b",
+    r"\bkhông\s+(?:đổi|thay\s+đổi)\s+(?:giao\s+diện|bố\s+cục|layout)\b",
+    r"\bchỉ\s+(?:tinh\s+chỉnh|chỉnh\s+nhẹ|sửa)\b",
+    r"\btinh\s+chỉnh\s+nhẹ\b",
 ]
 
 # Regex patterns indicating explicit L3 permissions in prompt text
@@ -88,6 +134,38 @@ def is_vague_enhancement(text: str) -> bool:
     """Return True if text only contains generic/vague improvement requests."""
     t = text.lower()
     return any(re.search(pat, t) for pat in VAGUE_ENHANCEMENT_PATTERNS)
+
+
+def resolve_ambition(
+    workflow: str,
+    user_request: str,
+    scope: str,
+    explicit_l3: bool,
+    explicit_permissions: dict[str, Any] | None = None,
+) -> str:
+    """Resolve how ambitious the visual realization may be.
+
+    Structured ``explicit_permissions["ambition"]`` wins, except that REIMAGINE on an existing UI
+    still needs explicit L3 permission. Otherwise: greenfield or explicit L3 -> REIMAGINE;
+    unknown state, local scope or conservative phrasing -> REFINE; upgrade phrasing -> ELEVATE.
+    """
+    requested = str((explicit_permissions or {}).get("ambition", "")).strip().lower()
+    if workflow == "greenfield":
+        return REIMAGINE
+    if workflow == "unknown":
+        return REFINE
+    if requested in AMBITION_LEVELS:
+        if requested == REIMAGINE and not explicit_l3:
+            return ELEVATE
+        return requested
+    if explicit_l3 and scope not in ("component", "local", "section"):
+        return REIMAGINE
+    t = user_request.lower()
+    if scope in ("component", "local", "section") or any(re.search(p, t) for p in REFINE_PATTERNS):
+        return REFINE
+    if any(re.search(p, t) for p in UPGRADE_PATTERNS):
+        return ELEVATE
+    return REFINE
 
 
 def extract_explicit_permissions(
@@ -188,10 +266,12 @@ def evaluate_preservation_policy(
         return {
             "preservation_required": False,
             "design_freedom": "high",
+            "ambition": REIMAGINE,
             "protected_properties": {
                 "color_palette": "unlocked",
                 "brand_identity": "unlocked",
                 "overall_layout_identity": "unprotected",
+                "page_composition": "unlocked",
                 "navigation_model": "unprotected",
                 "information_architecture": "unprotected",
                 "component_structure": "uncontrolled",
@@ -223,10 +303,12 @@ def evaluate_preservation_policy(
         return {
             "preservation_required": True,
             "design_freedom": "constrained",
+            "ambition": REFINE,
             "protected_properties": {
                 "color_palette": "locked",
                 "brand_identity": "locked",
                 "overall_layout_identity": "protected",
+                "page_composition": "protected",
                 "navigation_model": "protected",
                 "information_architecture": "protected",
                 "component_structure": "controlled",
@@ -283,6 +365,20 @@ def evaluate_preservation_policy(
         major_redesign_status = "explicit_user_permission_only"
         design_freedom = "constrained"
 
+    ambition = resolve_ambition(workflow, user_request, scope, perms["explicit_l3_granted"], explicit_permissions)
+    if ambition == ELEVATE and max_level == L1:
+        # ELEVATE: page composition may be re-designed (L2) inside the protected shell and brand
+        max_level = L2
+    if ambition == ELEVATE:
+        design_freedom = "medium"
+
+    if max_level == L3 or perms["allow_layout_change"]:
+        page_composition_state = "unlocked"
+    elif ambition == ELEVATE:
+        page_composition_state = "evolvable"
+    else:
+        page_composition_state = "protected"
+
     notes = [
         "Existing UI detected: Hard preservation rules active.",
         "Color palette & brand identity are LOCKED unless explicitly granted by user.",
@@ -294,23 +390,35 @@ def evaluate_preservation_policy(
             "Vague enhancement prompt detected ('modernize/làm đẹp'): L3 redesign and palette change remain DENIED."
         )
 
+    if ambition == ELEVATE:
+        notes.append(
+            "Ambition ELEVATE: re-compose pages for a visibly better result (section layout, hierarchy, type scale, "
+            "surfaces, depth, motion) inside the existing app shell. Keep brand hues, logo, navigation model, "
+            "routes, content and data; derived tints/shades of brand hues are allowed. Commit to a design direction "
+            "with signature moves and avoid the anti-default banlist (workflows/ambition-levels.md)."
+        )
+    elif ambition == REFINE:
+        notes.append("Ambition REFINE: polish in place; the current composition is kept.")
+
     if is_local_scope:
         notes.append("Local/component scope active: changes are confined; global architecture remains untouched.")
 
     return {
         "preservation_required": True,
         "design_freedom": design_freedom,
+        "ambition": ambition,
         "protected_properties": {
             "color_palette": color_palette_state,
             "brand_identity": brand_identity_state,
             "overall_layout_identity": layout_identity_state,
+            "page_composition": page_composition_state,
             "navigation_model": navigation_state,
             "information_architecture": architecture_state,
             "component_structure": "controlled",
         },
         "allowed_change_level": {
             "safe_refinement": True,
-            "local_structural_change": "allowed" if perms["allow_layout_change"] else "justified_only",
+            "local_structural_change": "allowed" if (perms["allow_layout_change"] or ambition == ELEVATE) else "justified_only",
             "major_redesign": major_redesign_status,
             "max_level": max_level,
         },

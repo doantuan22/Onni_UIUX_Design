@@ -1,0 +1,74 @@
+/**
+ * @recipe brand-derived-theme
+ *
+ * Tailwind v4 theme tokens derived from the project's EXISTING brand hue. Elevate keeps the hue and builds the
+ * tints, shades and surfaces from it with color-mix(), so every recipe can use `brand-*`, `ink-*`, `font-display`
+ * and the radius/shadow/motion scales without introducing a new hue family.
+ *
+ * Adapt:
+ *   1. Set --color-brand-500 to the project's primary color (from map_ui_structure -> tokens.used.dominant_hues
+ *      or the existing CSS variable / tailwind.config value). Keep it; do not pick a new one.
+ *   2. Keep the fonts the project already loads; add a display face only when DESIGN-DIRECTION.md asks for it.
+ *   3. Tailwind v3: copy the same values into theme.extend (colors.brand, colors.ink, fontFamily, borderRadius,
+ *      boxShadow, transitionTimingFunction) in tailwind.config.* instead of @theme.
+ *
+ * Next.js: load fonts with next/font and expose them as CSS variables (variable: "--font-sans" / "--font-display")
+ * on <html>; this file then maps them into the theme.
+ */
+@import "tailwindcss";
+
+@theme {
+  /* Brand: one existing hue, derived steps (oklch keeps perceived lightness even). */
+  --color-brand-500: #4f46e5; /* <- replace with the project's existing primary */
+  --color-brand-50: color-mix(in oklch, var(--color-brand-500) 6%, white);
+  --color-brand-100: color-mix(in oklch, var(--color-brand-500) 12%, white);
+  --color-brand-200: color-mix(in oklch, var(--color-brand-500) 25%, white);
+  --color-brand-300: color-mix(in oklch, var(--color-brand-500) 45%, white);
+  --color-brand-400: color-mix(in oklch, var(--color-brand-500) 72%, white);
+  --color-brand-600: color-mix(in oklch, var(--color-brand-500) 85%, black);
+  --color-brand-700: color-mix(in oklch, var(--color-brand-500) 70%, black);
+  --color-brand-800: color-mix(in oklch, var(--color-brand-500) 55%, black);
+  --color-brand-900: color-mix(in oklch, var(--color-brand-500) 40%, black);
+  --color-brand-950: color-mix(in oklch, var(--color-brand-500) 25%, black);
+
+  /* Ink: neutrals tinted 4% toward the brand so greys belong to the product. */
+  --color-ink-50: color-mix(in oklch, var(--color-brand-500) 4%, #fafafa);
+  --color-ink-100: color-mix(in oklch, var(--color-brand-500) 4%, #f4f4f5);
+  --color-ink-200: color-mix(in oklch, var(--color-brand-500) 4%, #e4e4e7);
+  --color-ink-300: color-mix(in oklch, var(--color-brand-500) 4%, #d4d4d8);
+  --color-ink-500: color-mix(in oklch, var(--color-brand-500) 4%, #71717a);
+  --color-ink-600: color-mix(in oklch, var(--color-brand-500) 4%, #52525b);
+  --color-ink-700: color-mix(in oklch, var(--color-brand-500) 4%, #3f3f46);
+  --color-ink-900: color-mix(in oklch, var(--color-brand-500) 4%, #18181b);
+  --color-ink-950: color-mix(in oklch, var(--color-brand-500) 4%, #09090b);
+
+  /* Type: keep the project's families; display falls back to the sans family. */
+  --font-sans: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
+  --font-display: var(--font-display, var(--font-sans));
+  --font-mono: var(--font-mono, ui-monospace, "SFMono-Regular", monospace);
+
+  /* Radii by component size, not one radius everywhere. */
+  --radius-control: 0.5rem;
+  --radius-card: 0.875rem;
+  --radius-panel: 1.25rem;
+
+  /* Elevation by role: hairline surfaces, one raised level, one overlay level. */
+  --shadow-raised: 0 1px 2px rgb(0 0 0 / 0.05), 0 8px 24px -12px color-mix(in oklch, var(--color-brand-500) 35%, transparent);
+  --shadow-overlay: 0 2px 4px rgb(0 0 0 / 0.06), 0 24px 48px -16px rgb(0 0 0 / 0.25);
+
+  /* Motion: two durations and two easings are enough for most products. */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-cubic: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-quick: 160ms;
+  --duration-settle: 480ms;
+}
+
+/* Every animation in the recipes has a reduced-motion path; this is the global safety net. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -8,7 +8,8 @@ Preservation rules are enforced by the UI Orchestrator via machine-readable cont
 protected_design:
   color_palette: locked            # locked | unlocked
   brand_identity: locked           # locked | unlocked
-  overall_layout_identity: protected # protected | unprotected
+  overall_layout_identity: protected # protected | unprotected   (app shell: header, sidebar, footer placement)
+  page_composition: protected      # protected | evolvable | unlocked (evolvable under ambition ELEVATE)
   navigation_model: protected      # protected | unprotected
   information_architecture: protected # protected | unprotected
   component_structure: controlled  # controlled | uncontrolled
@@ -18,6 +19,8 @@ allowed_changes:
   local_structural_change: justified_only # L2: allowed | justified_only | denied
   major_redesign: explicit_user_permission_only # L3: granted | explicit_user_permission_only | denied
   max_level: L1                    # L1 | L2 | L3
+
+ambition: refine                   # refine | elevate | reimagine (upgrade requests -> elevate, max_level L2)
 ```
 
 ## 2. Change Budget (L1 / L2 / L3) Model
@@ -40,6 +43,9 @@ Permissions are strictly **independent and non-transitive**:
    - If the task target is a single component or form (e.g. *"sửa lại nút submit"*), `max_level` is capped at L2 (local); global redesign is strictly denied.
 4. **Vague Enhancement Exclusion**:
    - Generic terms like *"modernize UI"*, *"làm đẹp"*, *"make it professional"* do NOT grant L3 permissions or unlock any protected property.
+   - They do resolve to ambition **ELEVATE**: `page_composition` becomes `evolvable` and `max_level` L2, so sections may be re-composed (layout, hierarchy, type scale, surfaces, motion) inside the protected shell. Content inventory, routes, data and brand hues remain invariants. See [ambition-levels.md](ambition-levels.md).
+5. **Conservative Phrasing Wins**:
+   - *"keep the current look"*, *"giữ nguyên bố cục"*, *"minimal changes"*, *"chỉ tinh chỉnh"* resolve to **REFINE** (L1) even when upgrade words are present.
 
 ## 4. Strict Precedence Hierarchy
 

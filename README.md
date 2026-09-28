@@ -45,9 +45,18 @@ INITIAL → ANALYZING → PHASE_1 → PHASE_1_REVIEW → STRUCTURE_LOCKED → PH
 | **Review gates** | Phase 1 review, Phase 2 review, final quality gate (accessibility, performance, consistency) → `FINAL-REVIEW.md` | Declare `DONE` without passing evidence |
 
 **Existing UIs** follow *preserve first → improve second → redesign only when explicitly requested*,
-with a change budget: **L1** safe refinement (allowed), **L2** local structural change (justified
-only), **L3** major redesign (denied unless you explicitly permit it). Vague requests such as
-"make it prettier" never unlock L3.
+with a change budget — **L1** safe refinement, **L2** local structural change, **L3** major redesign
+(only with your explicit permission) — and an **ambition level** that says how far the result must move:
+
+| Ambition | When | What changes | What stays |
+|---|---|---|---|
+| **Refine** | "keep the current look", local fixes, a11y/responsive | Spacing, states, contrast, responsive polish | Everything visible |
+| **Elevate** *(default for "nâng cấp / làm đẹp / modernize")* | Upgrade requests | Page composition, hierarchy, type scale, surfaces, motion — with a committed direction, signature moves and no generic "AI look" defaults | App shell, navigation, routes, content, data, brand hues and logo |
+| **Reimagine** | "full redesign", greenfield | Whatever you explicitly unlock | Whatever you don't |
+
+Under Elevate/Reimagine the agent may propose one motion library (Motion/Framer Motion or GSAP) when CSS is
+not enough; it never installs packages itself. See
+[ambition-levels.md](plugins/ui-engineering/workflows/ambition-levels.md).
 
 ## Features
 
@@ -66,18 +75,26 @@ only), **L3** major redesign (denied unless you explicitly permit it). Vague req
   project already has and never adding dependencies automatically.
 - **Repository intelligence** — detects framework, routes, components, styling and design tokens;
   profiles an existing UI and plans modifications with blast radius and scope gates.
+- **UI structure map** — `map_ui_structure` reads React/Next.js (+ Tailwind), Vue, Svelte, Astro and HTML
+  sources into routes → layout shell → ordered sections → components, with each section's role, content
+  inventory, layout pattern, motion and "AI look" signals; `diff_ui_maps` compares before/after to prove
+  content was kept and the composition really changed.
+- **Code recipes** — 18 type-checked React + Tailwind / Next.js recipes (asymmetric hero, bento, editorial index,
+  sticky narrative, pricing emphasis, testimonial spotlight, FAQ split, CTA band, dashboard focus, Motion and GSAP
+  motion, brand-derived tokens) in [knowledge/code-recipes](plugins/ui-engineering/knowledge/code-recipes/README.md);
+  `suggest_recipes` picks them per mapped section by role and by the "AI look" signals they replace.
 - **Runtime evidence** — screenshots, motion probes and axe accessibility scans using the *target
   project's own* Playwright; reports `BLOCKED` instead of installing anything.
 - **Quality evals** — static design-quality analysis and 80 eval scenarios (E01–E80).
 
 ### Tools (MCP / CLI)
 
-24 tools, exposed through the bundled MCP server `ui-ux-design-mcp` and the CLI:
+27 tools, exposed through the bundled MCP server `ui-ux-design-mcp` and the CLI:
 
 | Area | Tools |
 |---|---|
 | Orchestration & knowledge | `orchestrate_ui`, `route_knowledge`, `build_knowledge_plan`, `retrieve_knowledge`, `resolve_capabilities`, `resolve_technology` |
-| Repository & existing UI | `analyze_repository`, `analyze_existing_ui`, `plan_modification`, `build_validation_handoff` |
+| Repository & existing UI | `analyze_repository`, `analyze_existing_ui`, `map_ui_structure`, `diff_ui_maps`, `suggest_recipes`, `plan_modification`, `build_validation_handoff` |
 | Runtime & accessibility | `detect_runtime`, `run_runtime`, `accessibility_scan`, `run_runtime_validation`, `build_critic_report`, `evaluate_runtime_result`, `build_repair_plan`, `run_targeted_repair`, `recapture_evidence` |
 | Quality & health | `analyze_design_quality`, `run_evals`, `validate_skill`, `capability_map`, `self_test` |
 
@@ -125,8 +142,10 @@ Full instructions, Windows notes and troubleshooting:
 After installing, just describe the UI work; the agent picks up the `ui-ux-workflow` skill:
 
 - *"Design and build a pricing page for our developer-tool SaaS in this Next.js app."*
+- *"Nâng cấp giao diện trang chủ cho chuyên nghiệp hơn."* (existing UI, **Elevate**: new composition,
+  type and motion; content, routes and brand kept)
 - *"Audit the dashboard in `src/app/dashboard` and fix spacing, states and accessibility — keep the
-  current look."* (existing UI, L1 budget)
+  current look."* (existing UI, **Refine**, L1 budget)
 - *"Plan an onboarding flow for a fintech app — structure first, no styling yet."* (Phase 1 only)
 
 The agent writes its artifacts (`REQUIREMENT-SPEC.md`, `STRUCTURE-LOCK.md`, `DESIGN-DIRECTION.md`,

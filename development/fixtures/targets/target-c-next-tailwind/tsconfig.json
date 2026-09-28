@@ -1,0 +1,8 @@
+{
+  // Next.js defaults
+  "compilerOptions": {
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": { "@/*": ["./src/*"] },
+  }
+}

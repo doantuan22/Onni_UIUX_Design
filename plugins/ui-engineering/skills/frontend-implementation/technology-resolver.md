@@ -6,7 +6,7 @@ Chooses the **simplest technology that satisfies a selected motion, effect, inte
 
 1. **Existing project dependency** that can do the job (detected read-only by `scripts/detect_capabilities.py` → `design_runtime`). Reuse it; do not add a second library for the same job.
 2. **Native platform** option among the capability's *preferred* technologies: CSS (transitions, keyframes, scroll-driven animations, `@starting-style`), native JS (IntersectionObserver, rAF, pointer events), Web Animations API, View Transitions API, SVG, Canvas 2D, WebGL.
-3. **Preferred library**, only if a new dependency is authorized: Motion → GSAP → Rive/Lottie (asset-driven) → Three.js (3D).
+3. **Preferred library**, only if a new dependency is authorized: Motion → GSAP → Rive/Lottie (asset-driven) → Three.js (3D). Under ambition Elevate/Reimagine, `allow_motion_library` sanctions exactly one of Motion or GSAP (reusing whichever is already installed) without a general dependency authorization; it is still listed in `new_dependencies` and reported to the user with its install command.
 4. **Native fallback** among the capability's *alternatives* (e.g., CSS scroll-driven animation instead of GSAP pinning), recorded as a fallback.
 5. Otherwise **degrade**: drop the capability, use its documented reduced/static version, and record why. Never silently add a package.
 
