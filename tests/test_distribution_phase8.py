@@ -12,7 +12,7 @@ Validates the full distribution and release engineering lifecycle:
 - Package build and manifest checksum integrity
 - Artifact verification across source, archive, and extracted tree
 - Clean consumer installation and isolated execution without source repo
-- Tool parity across API, CLI, and adapters (all 28 public tools)
+- Tool parity across API, CLI, and adapters (all 31 public tools)
 - Tag mismatch rejection and CHANGELOG release gating
 - Rollback and upgrade contract simulation
 - Browser runtime qualification honesty (BLOCKED_BROWSER_RUNTIME)
@@ -218,7 +218,7 @@ class Phase8DistributionTests(unittest.TestCase):
         tools = api.list_tools()
         tool_ids = [t["id"] for t in tools]
         self.assertEqual(len(tool_ids), len(set(tool_ids)), "Duplicate tool IDs found")
-        self.assertEqual(len(tool_ids), 28, "Must expose exactly 28 public tools")
+        self.assertEqual(len(tool_ids), 31, "Must expose exactly 31 public tools")
 
         # 2. Capabilities
         cap_file = PACKAGE_ROOT / "uiux" / "core" / "capabilities.json"
@@ -397,7 +397,7 @@ class Phase8DistributionTests(unittest.TestCase):
         )
         self.assertEqual(res_tools.returncode, 0, f"CLI tools failed: {res_tools.stderr}")
         data_tools = json.loads(res_tools.stdout)
-        self.assertEqual(len(data_tools["tools"]), 28)
+        self.assertEqual(len(data_tools["tools"]), 31)
 
         # Run python -m uiux.cli call self_test
         res_selftest = subprocess.run(
@@ -454,9 +454,9 @@ class Phase8DistributionTests(unittest.TestCase):
     # 15. Public Tool Parity
     # -------------------------------------------------------------------------
     def test_15_public_tool_parity(self) -> None:
-        """All 28 tools in core registry are exposed consistently in api.list_tools()."""
+        """All 31 tools in core registry are exposed consistently in api.list_tools()."""
         tools = api.list_tools()
-        self.assertEqual(len(tools), 28)
+        self.assertEqual(len(tools), 31)
         names = {t["id"] for t in tools}
         expected_tools = {
             "accessibility_scan",
@@ -468,9 +468,11 @@ class Phase8DistributionTests(unittest.TestCase):
             "build_repair_plan",
             "build_validation_handoff",
             "capability_map",
+            "check_execution_gate",
             "detect_runtime",
             "diff_ui_maps",
             "evaluate_runtime_result",
+            "guard_edits",
             "map_ui_structure",
             "orchestrate_ui",
             "plan_modification",
@@ -487,6 +489,7 @@ class Phase8DistributionTests(unittest.TestCase):
             "self_test",
             "suggest_recipes",
             "validate_skill",
+            "verify_implementation",
         }
         self.assertEqual(names, expected_tools)
 
@@ -619,7 +622,7 @@ class Phase8DistributionTests(unittest.TestCase):
         self.assertIn("Claude Code", text)
         self.assertIn("Codex", text)
         self.assertIn("MCP", text)
-        self.assertIn("28 public tools", text)
+        self.assertIn("31 public tools", text)
 
     # -------------------------------------------------------------------------
     # 23. Subset Benchmark Execution (Cases A through E)

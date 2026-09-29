@@ -93,12 +93,13 @@ not enough; it never installs packages itself. See
 
 ### Tools (MCP / CLI)
 
-28 tools, exposed through the bundled MCP server `ui-ux-design-mcp` and the CLI:
+31 tools, exposed through the bundled MCP server `ui-ux-design-mcp` and the CLI:
 
 | Area | Tools |
 |---|---|
 | Orchestration & knowledge | `orchestrate_ui`, `route_knowledge`, `build_knowledge_plan`, `retrieve_knowledge`, `resolve_capabilities`, `resolve_technology` |
 | Repository & existing UI | `analyze_repository`, `analyze_existing_ui`, `map_ui_structure`, `diff_ui_maps`, `suggest_recipes`, `plan_modification`, `build_validation_handoff` |
+| Controlled execution & verification | `check_execution_gate`, `guard_edits`, `verify_implementation` |
 | Runtime & accessibility | `detect_runtime`, `run_runtime`, `accessibility_scan`, `score_visual_critique`, `run_runtime_validation`, `build_critic_report`, `evaluate_runtime_result`, `build_repair_plan`, `run_targeted_repair`, `recapture_evidence` |
 | Quality & health | `analyze_design_quality`, `run_evals`, `validate_skill`, `capability_map`, `self_test` |
 

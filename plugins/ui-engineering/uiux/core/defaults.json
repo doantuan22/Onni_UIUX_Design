@@ -3,7 +3,7 @@
   "paths": {
     "skill_entry": "SKILL.md",
     "workflow": "workflows",
-    "knowledge_roots": ["knowledge/domains", "knowledge/motion", "knowledge/web-patterns", "skills/frontend-implementation"],
+    "knowledge_roots": ["knowledge/domains", "knowledge/motion", "knowledge/web-patterns", "knowledge/domain-packs", "knowledge/frameworks", "knowledge/styling", "knowledge/visual-language/components", "knowledge/code-recipes", "skills/frontend-implementation"],
     "knowledge_readme": "knowledge/domains/README.md",
     "knowledge_index": "knowledge/domains/INDEX.md",
     "knowledge_registry": "knowledge/domains/registry.json",

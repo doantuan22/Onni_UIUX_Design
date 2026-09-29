@@ -147,7 +147,7 @@ class ReleaseCandidateQualificationTests(unittest.TestCase):
     # RC-09: Public Tool Parity
     # -------------------------------------------------------------------------
     def test_rc_09_public_tool_parity(self) -> None:
-        """All 28 public tools are present in tools registry and API."""
+        """All 31 public tools are present in tools registry and API."""
         r_tools = subprocess.run(
             [sys.executable, "-m", "uiux.cli", "tools"],
             cwd=str(self.consumer_ws),
@@ -384,7 +384,7 @@ from mcp import protocol, server
 
 # Test tools listing via server handle
 tools_resp = server.list_tools()
-assert len(tools_resp["tools"]) == 28, f"MCP tools count mismatch: {len(tools_resp['tools'])}"
+assert len(tools_resp["tools"]) == 31, f"MCP tools count mismatch: {len(tools_resp['tools'])}"
 
 # Test session message handling: initialize -> initialized -> tools/list
 session = server.McpServer()
@@ -394,7 +394,7 @@ assert resp.get("result", {}).get("protocolVersion") == "2025-06-18"
 
 session.handle({"jsonrpc": "2.0", "method": "notifications/initialized"})
 list_resp = session.handle({"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}})
-assert len(list_resp["result"]["tools"]) == 28
+assert len(list_resp["result"]["tools"]) == 31
 print("MCP_OK")
 """
         res = subprocess.run(

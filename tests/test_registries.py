@@ -16,7 +16,8 @@ class KnowledgeRegistryTests(unittest.TestCase):
         counts = registry.collections()
         for collection in registry.COLLECTIONS:
             self.assertGreater(counts.get(collection, 0), 0, collection)
-        self.assertEqual(sum(v for k, v in counts.items() if k != "components"), len(ENTRIES))
+        documents = len(catalog.component_documents())
+        self.assertEqual(sum(counts.values()) - documents, len(ENTRIES))
 
     def test_query_filters(self) -> None:
         styles = registry.query(collection="styles")
@@ -38,9 +39,9 @@ class KnowledgeRegistryTests(unittest.TestCase):
         self.assertEqual(entry, {**ENTRIES["layout.hero-dashboard"]})
 
     def test_components_are_documents(self) -> None:
-        doc = registry.get("component.buttons")
+        doc = registry.get("component.forms-controls")
         self.assertEqual(doc["collection"], "components")
-        self.assertIn("# Button grammar", doc["content"])
+        self.assertIn("# Form and control grammar", doc["content"])
 
     def test_api_retrieve_knowledge(self) -> None:
         result = api.retrieve_knowledge(collection="recipes", include_content=True)

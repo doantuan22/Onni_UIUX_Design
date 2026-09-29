@@ -19,6 +19,9 @@ from uiux.engine.modification_planner.blast_radius import calculate_blast_radius
 from uiux.engine.modification_planner.change_classifier import classify_changes
 from uiux.engine.modification_planner.scope_resolver import resolve_scope
 from uiux.engine.modification_planner.step_planner import plan_implementation_steps
+from uiux.engine.modification_planner.diagnosis import diagnose_ui_issues
+from uiux.engine.modification_planner.strategy import build_design_strategy
+from uiux.engine.modification_planner.planning_gate import evaluate_planning_gate
 from uiux.engine.preservation import (
     L1,
     L2,
@@ -320,7 +323,91 @@ class ModificationPlanner:
         plan_dict["next_actions"] = [
             "Pass modification_plan to build_validation_handoff, then execute implementation_steps via controlled editing.",
         ]
-        return plan_dict
+        return self._attach_reasoning_layer(
+            plan_dict, active_ui=active_ui, knowledge_plan=knowledge_plan or {}, explicit_constraints=explicit_constraints,
+        )
+
+    def _attach_reasoning_layer(
+        self,
+        plan: dict[str, Any],
+        active_ui: dict[str, Any],
+        knowledge_plan: dict[str, Any],
+        explicit_constraints: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Additively attach the P2 reasoning contract (diagnosis, strategy, impact, chunks, gate).
+
+        Every legacy (schema v1) key is preserved; consumers of the old contract are unaffected.
+        """
+        request = plan.get("request", {})
+        surface = plan.get("affected_surface", {})
+        blast = plan.get("blast_radius", {})
+        preservation = plan["preservation"]
+        user_goal = request.get("user_goal", "")
+
+        plan["p2_schema_version"] = 2
+        plan["metadata"] = {"plan_id": plan.get("plan_id", ""), "workflow": plan.get("workflow", "")}
+        plan["requirement_profile"] = {
+            "user_goal": user_goal,
+            "task_intent": request.get("task_intent", "general_ui"),
+            "requested_scope": request.get("requested_scope", "global"),
+            "explicit_requirements": [],
+            "explicit_constraints": list((explicit_constraints or {}).keys()),
+            "brand_constraints": [
+                k for k, v in preservation.get("granular_permissions", {}).items() if v == "locked"
+            ],
+            "preservation_requests": [],
+            "expected_outcome": f"Implement {request.get('task_intent', 'general_ui')} within scope.",
+        }
+        plan["diagnosis"] = diagnose_ui_issues(user_goal, active_ui, knowledge_plan)
+        plan["strategy"] = build_design_strategy(plan["diagnosis"], knowledge_plan, active_ui)
+
+        granular = preservation.get("granular_permissions", {})
+        preservation["locked"] = [k for k, v in granular.items() if v == "locked"]
+        preservation["protected"] = [k for k, v in granular.items() if v == "protected"]
+        preservation["controlled"] = []
+        preservation["free"] = [k for k, v in granular.items() if v == "editable"]
+        preservation["precedence_rules"] = [preservation.get("permission_level", L1)]
+
+        risk = blast.get("estimated_risk", "medium")
+        plan["impact"] = {
+            "affected_pages": list(surface.get("pages", [])),
+            "affected_components": list(surface.get("components", [])),
+            "shared_components": [c for c in surface.get("components", []) if "shared" in str(c).lower()],
+            "affected_files": list(surface.get("files", [])),
+            "routes": list(surface.get("routes", [])),
+            "blast_radius": risk if risk in ("low", "medium", "high", "critical") else "medium",
+            "business_logic_risk": plan.get("risks", {}).get("architecture", "low"),
+            "visual_regression_risk": risk,
+        }
+        plan["changes"] = [
+            {**c, "change_level": c.get("level", L1)} for c in plan.get("change_classification", {}).get("changes", [])
+        ]
+        plan["recipes"] = []
+        plan["decision_trace"] = []
+        plan["execution_chunks"] = [
+            {
+                "id": f"chunk_{i}",
+                "step_id": step.get("id", f"step_{i + 1}"),
+                "target": step.get("target", ""),
+                "description": step.get("description") or f"{step.get('action', 'modify')} {step.get('target', '')}".strip(),
+                "scope": step.get("scope", "local"),
+                "expected_result": step.get("expected_result", ""),
+                "dependencies": step.get("dependencies", []),
+                "verification_required": [],
+            }
+            for i, step in enumerate(plan.get("implementation_steps", []))
+        ]
+        validation = plan.get("validation", {})
+        plan["verification"] = {
+            "pages": plan["impact"]["affected_pages"],
+            "viewports": validation.get("affected_viewports") or ["desktop_1440", "tablet_768", "mobile_375"],
+            "scenarios": ["default"],
+            "preservation_checks": list(validation.get("preservation", [])) or ["ensure locked properties remain unchanged"],
+            "accessibility_checks": list(validation.get("accessibility", [])) or ["verify wcag contrast"],
+            "check_steps": list(validation.get("required_checks", [])) or ["visual_qa"],
+        }
+        plan["planning_gate"] = evaluate_planning_gate(plan)
+        return plan
 
     def _build_empty_plan(
         self,
@@ -335,7 +422,7 @@ class ModificationPlanner:
         status_reasons: list[str],
     ) -> dict[str, Any]:
         """Build an early blocked/insufficient_context plan."""
-        return {
+        plan = {
             "schema_version": 1,
             "plan_id": f"plan_{uuid.uuid4().hex[:12]}",
             "request": {
@@ -382,3 +469,4 @@ class ModificationPlanner:
             "status": status,
             "status_reasons": status_reasons,
         }
+        return self._attach_reasoning_layer(plan, active_ui={}, knowledge_plan=knowledge_plan or {})

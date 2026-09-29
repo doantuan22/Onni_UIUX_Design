@@ -14,7 +14,7 @@ from uiux.core.errors import RegistryError
 from uiux.core.registry import load_json
 
 COLLECTIONS = ("styles", "layouts", "screens", "motion", "interactions", "effects", "recipes", "graphics",
-               "technologies", "components")
+               "technologies", "components", "domains", "frameworks")
 
 
 class KnowledgeLookupError(KeyError):

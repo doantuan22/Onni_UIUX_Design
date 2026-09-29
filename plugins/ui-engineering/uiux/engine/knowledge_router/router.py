@@ -109,8 +109,16 @@ class KnowledgeRouter:
         selected_framework_packs: list[dict[str, Any]] = []
         framework_pack_id = f"framework.{fw_name}"
 
+        pack_entry: dict[str, Any] | None = None
         if framework_pack_id in FRAMEWORK_PACKS:
             pack_entry = dict(FRAMEWORK_PACKS[framework_pack_id])
+        else:
+            cat_entry = self.resolver.locate_catalog_entry(framework_pack_id)
+            if cat_entry and cat_entry.get("kind") == "framework":
+                pack_entry = cat_entry
+                pack_entry["version_features"] = {}
+
+        if pack_entry:
             v_check = check_version_compatibility(fw_version, pack_entry.get("version_features"))
             pack_entry["version_guidance"] = v_check["active_guidance_tier"]
             pack_entry["compatible_features"] = v_check["compatible_features"]
@@ -157,8 +165,15 @@ class KnowledgeRouter:
         # Check primary styling
         if primary_styling and primary_styling in styling_name_map:
             pack_id = styling_name_map[primary_styling]
+            entry = None
             if pack_id in STYLING_PACKS:
                 entry = dict(STYLING_PACKS[pack_id])
+            else:
+                cat_entry = self.resolver.locate_catalog_entry(pack_id)
+                if cat_entry and cat_entry.get("kind") == "styling":
+                    entry = cat_entry
+            
+            if entry:
                 entry["reason"] = f"Primary styling system '{primary_styling}' active in repository."
                 selected_styling_packs.append(entry)
                 rationale.append(f"Selected primary styling pack '{pack_id}'.")
@@ -166,8 +181,15 @@ class KnowledgeRouter:
         # Check secondary styling (supports multi-styling composition, e.g. Tailwind + CSS Modules)
         if secondary_styling and secondary_styling in styling_name_map and secondary_styling != primary_styling:
             pack_id = styling_name_map[secondary_styling]
+            entry = None
             if pack_id in STYLING_PACKS:
                 entry = dict(STYLING_PACKS[pack_id])
+            else:
+                cat_entry = self.resolver.locate_catalog_entry(pack_id)
+                if cat_entry and cat_entry.get("kind") == "styling":
+                    entry = cat_entry
+            
+            if entry:
                 entry["priority"] = "medium"
                 entry["reason"] = f"Secondary styling system '{secondary_styling}' detected in repository."
                 selected_styling_packs.append(entry)
@@ -181,10 +203,19 @@ class KnowledgeRouter:
             shadcn_pack["reason"] = "shadcn/ui component library active in repository."
             selected_ui_library_packs.append(shadcn_pack)
             rationale.append("Selected UI library pack 'ui_library.shadcn_ui'.")
-        elif ui_lib_name and f"styling.{ui_lib_name}" in STYLING_PACKS:
-            lib_pack = dict(STYLING_PACKS[f"styling.{ui_lib_name}"])
-            lib_pack["reason"] = f"UI library '{ui_lib_name}' active in repository."
-            selected_ui_library_packs.append(lib_pack)
+        elif ui_lib_name:
+            lib_pack_id = f"styling.{ui_lib_name}"
+            if lib_pack_id in STYLING_PACKS:
+                lib_pack = dict(STYLING_PACKS[lib_pack_id])
+            else:
+                cat_entry = self.resolver.locate_catalog_entry(lib_pack_id)
+                if cat_entry and cat_entry.get("kind") in ("styling", "ui_library"):
+                    lib_pack = cat_entry
+                else:
+                    lib_pack = None
+            if lib_pack:
+                lib_pack["reason"] = f"UI library '{ui_lib_name}' active in repository."
+                selected_ui_library_packs.append(lib_pack)
 
         # 5. Preservation Context & Invariants
         preservation_context: dict[str, Any] = {

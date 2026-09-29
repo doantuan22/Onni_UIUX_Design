@@ -46,6 +46,8 @@ __all__ = [
     "run_runtime_validation", "build_critic_report", "evaluate_runtime_result",
     "build_repair_plan", "run_targeted_repair", "recapture_evidence",
     "check_understanding",
+    # P3 DO / P4 CHECK
+    "check_execution_gate", "guard_edits", "verify_implementation",
 ]
 
 API_VERSION = 1
@@ -443,6 +445,45 @@ def compare_plan_to_changes(plan: dict, actual_changes: list | dict) -> dict:
     except Exception as exc:
         raise _tool_error(exc) from exc
 
+
+def check_execution_gate(plan: dict) -> dict:
+    """P3 gate: may this Modification Plan be executed? (PlanningGate PASS and every contract present)."""
+    from uiux.engine.executor.execution_gate import check_execution_gate as _gate
+
+    try:
+        return dict(_gate(plan))
+    except Exception as exc:
+        raise _tool_error(exc) from exc
+
+
+def guard_edits(plan: dict, edits: list, framework: str | None = None) -> dict:
+    """P3 controlled execution: run proposed edits through scope lock, preservation, business-logic and framework guards.
+
+    Nothing is written; the host agent applies only the edits reported in ``ledger`` and must send any ``deviations``
+    back to planning. Returns the Implementation Report (``ready_for_p4`` only when every chunk is applied cleanly).
+    """
+    from uiux.engine.executor.executor import ChunkExecutor
+
+    try:
+        fw = framework or (plan.get("repository") or {}).get("framework") or "generic"
+        return dict(ChunkExecutor(plan, framework=str(fw)).execute_plan(edits=list(edits)))
+    except Exception as exc:
+        raise _tool_error(exc) from exc
+
+
+def verify_implementation(implementation_report: dict, session: dict, plan: dict | None = None,
+                          verification_contract: dict | None = None, decisions: list | None = None) -> dict:
+    """P4 verification: gates, evidence sufficiency, correctness and preservation checks, root-cause repair routing."""
+    from uiux.engine.verification.engine import VerificationEngine, contract_from_plan
+
+    try:
+        data = dict(session)
+        if plan is not None:
+            data.setdefault("modification_plan", plan)
+        contract = verification_contract if verification_contract is not None else contract_from_plan(plan or {})
+        return dict(VerificationEngine(data).verify(implementation_report, contract, list(decisions or [])))
+    except Exception as exc:
+        raise _tool_error(exc) from exc
 
 
 # --------------------------------------------------------------------------- knowledge
@@ -885,6 +926,9 @@ _DISPATCH = {
     "build_knowledge_plan": build_knowledge_plan,
     "plan_modification": plan_modification,
     "build_validation_handoff": build_validation_handoff,
+    "check_execution_gate": check_execution_gate,
+    "guard_edits": guard_edits,
+    "verify_implementation": verify_implementation,
 }
 
 

@@ -33,7 +33,7 @@
   "knowledge": {
     "registry": "knowledge/domains/registry.json",
     "index": "knowledge/domains/INDEX.md",
-    "collections": ["styles", "layouts", "screens", "motion", "interactions", "effects", "recipes", "graphics", "technologies", "components"]
+    "collections": ["styles", "layouts", "screens", "motion", "interactions", "effects", "recipes", "graphics", "technologies", "components", "domains", "frameworks"]
   },
   "tools": {"registry": "uiux/core/tools.json"},
   "evals": {

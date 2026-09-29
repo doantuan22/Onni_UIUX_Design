@@ -3,7 +3,9 @@
  "generated_by": "python scripts/knowledge_lib.py index",
  "collections": {
   "components": 13,
+  "domains": 1,
   "effects": 26,
+  "frameworks": 1,
   "graphics": 4,
   "interactions": 26,
   "layouts": 37,
@@ -14,6 +16,26 @@
   "technologies": 12
  },
  "entries": [
+  {
+   "id": "component.button",
+   "kind": "component",
+   "collection": "components",
+   "category": "foundation",
+   "name": "Button Component Engineering Guide",
+   "file": "knowledge/visual-language/components/buttons.md",
+   "line": 2,
+   "summary": ""
+  },
+  {
+   "id": "domain.ecommerce",
+   "kind": "domain",
+   "collection": "domains",
+   "category": "domain",
+   "name": "E-Commerce UI Engineering Pack",
+   "file": "knowledge/domain-packs/ecommerce.md",
+   "line": 2,
+   "summary": ""
+  },
   {
    "id": "effect.backdrop-blur",
    "kind": "effect",
@@ -273,6 +295,16 @@
    "file": "knowledge/domains/effects/light-and-color.md",
    "line": 73,
    "summary": "Reveal texture or edges near the pointer to make surfaces feel responsive."
+  },
+  {
+   "id": "framework.react-tailwind",
+   "kind": "framework",
+   "collection": "frameworks",
+   "category": "framework",
+   "name": "React + Tailwind CSS Engineering Pack",
+   "file": "knowledge/frameworks/react-tailwind.md",
+   "line": 2,
+   "summary": ""
   },
   {
    "id": "graphics.interactive-illustration",
@@ -2511,16 +2543,6 @@
    "category": "grammar",
    "name": "Badges and status grammar",
    "file": "knowledge/visual-language/components/badges-status.md",
-   "line": 1,
-   "summary": ""
-  },
-  {
-   "id": "component.buttons",
-   "kind": "component",
-   "collection": "components",
-   "category": "grammar",
-   "name": "Button grammar",
-   "file": "knowledge/visual-language/components/buttons.md",
    "line": 1,
    "summary": ""
   },

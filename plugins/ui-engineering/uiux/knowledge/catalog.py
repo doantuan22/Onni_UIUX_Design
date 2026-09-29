@@ -30,7 +30,7 @@ COMPONENTS_PATH = config.get()["paths"]["components"]
 COLLECTIONS = {
     "style": "styles", "layout": "layouts", "screen": "screens", "motion": "motion", "interaction": "interactions",
     "effect": "effects", "recipe": "recipes", "graphics": "graphics", "technology": "technologies",
-    "component": "components",
+    "component": "components", "domain": "domains", "framework": "frameworks",
 }
 
 # Controlled vocabularies used by the Capability Resolver. Extend deliberately; see docs/design-knowledge-system.md.
@@ -59,7 +59,7 @@ COST = {"none", "low", "medium", "high", "very-high"}
 TIERS = {"primitive", "M1", "M2", "M3", "M4", "M5"}
 SERVES = {"feedback", "state-change", "orientation", "continuity", "hierarchy", "attention", "storytelling",
           "delight", "brand-expression"}
-KINDS = {"style", "layout", "screen", "motion", "interaction", "effect", "recipe", "technology", "graphics"}
+KINDS = {"style", "layout", "screen", "motion", "interaction", "effect", "recipe", "technology", "graphics", "component", "domain", "framework"}
 
 BASE_FIELDS = ("id", "name", "kind", "category")
 SCHEMAS: dict[str, tuple[str, ...]] = {
@@ -89,6 +89,15 @@ SCHEMAS: dict[str, tuple[str, ...]] = {
                    "fallback", "accessibility", "responsive", "lifecycle"),
     "graphics": ("purpose", "when_to_use", "when_not_to_use", "technology", "cost", "fallback", "accessibility",
                  "responsive", "lifecycle"),
+    "component": (), # Handled flexibly to allow incremental upgrades
+    "domain": (), 
+    "framework": (),
+}
+
+# Optional Canonical Fields (P1)
+CANONICAL_OPTIONAL = {
+    "when", "avoid_when", "goal", "principles", "anatomy", "variants", "selection_rules", 
+    "design_guidance", "responsive", "accessibility", "implementation", "anti_patterns", "validation"
 }
 NESTED_REQUIRED = {
     "motion": {"performance": ("cost", "notes"), "technology": ("preferred", "alternatives")},
@@ -107,6 +116,7 @@ REFERENCES: dict[str, dict[str, set[str]]] = {
     "recipe": {"styles": {"style"}, "layouts": {"layout"}, "effects": {"effect"}, "motion": {"motion"},
                "interactions": {"interaction"}, "technology": {"technology"}},
     "graphics": {"technology": {"technology"}},
+    "component": {}, "domain": {}, "framework": {}
 }
 TECH_REFERENCES = {"motion", "effect", "interaction"}  # technology.preferred / alternatives
 
@@ -273,6 +283,14 @@ def validate(entries: dict[str, dict]) -> list[str]:
         for field in BASE_FIELDS + SCHEMAS[kind]:
             if field not in data:
                 errors.append(f"{where}: missing field {field}")
+        
+        # Validate structured canonical block if present
+        if "applies_to" in data and not isinstance(data["applies_to"], dict):
+            errors.append(f"{where}: applies_to must be a mapping")
+        if "related" in data and not isinstance(data["related"], dict):
+            errors.append(f"{where}: related must be a mapping")
+        if "metadata" in data and not isinstance(data["metadata"], dict):
+            errors.append(f"{where}: metadata must be a mapping")
         for field, subfields in NESTED_REQUIRED.get(kind, {}).items():
             value = data.get(field)
             if not isinstance(value, dict):
@@ -377,6 +395,11 @@ def component_documents(root: Path = ROOT) -> list[dict]:
         if path.name == "README.md":
             continue
         text = path.read_text(encoding="utf-8")
+        
+        # Skip if it's already a YAML catalog entry (has ```yaml with id: component.)
+        if "```yaml\n" in text and "id: component." in text:
+            continue
+            
         title = next((ln[2:].strip() for ln in text.splitlines() if ln.startswith("# ")), path.stem)
         docs.append({"id": f"component.{path.stem}", "kind": "component", "collection": "components",
                      "category": "grammar", "name": title, "file": path.relative_to(root).as_posix(), "line": 1,

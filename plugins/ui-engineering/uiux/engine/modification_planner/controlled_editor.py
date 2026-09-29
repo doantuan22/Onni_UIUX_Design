@@ -1,5 +1,8 @@
 """Controlled Editing Engine: Enforces plan boundaries and detects plan drift.
 
+Role: post-hoc audit of edits that already happened (``compare_plan_to_changes``). Write-time enforcement lives in
+``uiux.engine.executor`` (``guard_edits``); the two are complementary and both stay supported.
+
 Enforces:
 - Edits are restricted strictly to allowed_files and allowed_components.
 - Unexpected files halt execution immediately.

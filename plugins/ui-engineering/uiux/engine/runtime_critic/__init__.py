@@ -1,5 +1,8 @@
 """Runtime Critic Engine – Phase 7.
 
+Stays the runtime evidence critic and repair loop. ``uiux.engine.verification`` (``verify_implementation``) sits in front of
+it: it gates on the P3 report and the plan's evidence contract, reuses this package's session model, and routes repairs.
+
 Core concept:
   Modification Plan  →  Controlled Editing  →  Change Manifest
        ↓

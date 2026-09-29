@@ -21,7 +21,7 @@
       "description": "Query the knowledge registry (styles, layouts, screens, motion, interactions, effects, recipes, graphics, technologies, components) without knowing file locations.",
       "entrypoint": "uiux.api:retrieve_knowledge",
       "cli": "python scripts/uiux_cli.py call retrieve_knowledge --params '{\"collection\": \"styles\"}'",
-      "input": {"type": "object", "properties": {"collection": {"type": ["string", "null"], "enum": ["styles", "layouts", "screens", "motion", "interactions", "effects", "recipes", "graphics", "technologies", "components", null]}, "kind": {"type": ["string", "null"]}, "category": {"type": ["string", "null"]}, "ids": {"type": ["array", "null"], "items": {"type": "string"}}, "text": {"type": ["string", "null"]}, "include_content": {"type": "boolean", "default": false}}, "additionalProperties": false},
+      "input": {"type": "object", "properties": {"collection": {"type": ["string", "null"], "enum": ["styles", "layouts", "screens", "motion", "interactions", "effects", "recipes", "graphics", "technologies", "components", "domains", "frameworks", null]}, "kind": {"type": ["string", "null"]}, "category": {"type": ["string", "null"]}, "ids": {"type": ["array", "null"], "items": {"type": "string"}}, "text": {"type": ["string", "null"]}, "include_content": {"type": "boolean", "default": false}}, "additionalProperties": false},
       "output": {"type": "object", "required": ["count", "entries"], "description": "{count, entries: [{id, kind, collection, category, name, file, line, summary, content?}]}"},
       "dependencies": {"python": ">=3.9", "packages": []},
       "runtime_requirements": [],
@@ -516,6 +516,195 @@
       "runtime_requirements": [],
       "side_effects": "none",
       "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+    },
+    {
+      "id": "check_execution_gate",
+      "visibility": "public",
+      "description": "P3 gate: decide whether a Modification Plan may be executed (PlanningGate PASS, affected files, execution chunks and verification contract present).",
+      "entrypoint": "uiux.api:check_execution_gate",
+      "cli": "python scripts/uiux_cli.py call check_execution_gate --params '{\"plan\": {...}}'",
+      "input": {
+        "type": "object",
+        "required": [
+          "plan"
+        ],
+        "properties": {
+          "plan": {
+            "type": "object",
+            "description": "Modification Plan dict from plan_modification"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "required": [
+          "status",
+          "reason"
+        ],
+        "description": "Execution gate report (PASS or BLOCKED)"
+      },
+      "dependencies": {
+        "python": ">=3.9",
+        "packages": []
+      },
+      "runtime_requirements": [],
+      "side_effects": "none",
+      "annotations": {
+        "read_only": true,
+        "writes_to": "none",
+        "may_start_process": false,
+        "deterministic": true,
+        "network_access": false,
+        "filesystem_read": [
+          "package"
+        ],
+        "requires_node": false,
+        "requires_browser": false,
+        "long_running": false
+      }
+    },
+    {
+      "id": "guard_edits",
+      "visibility": "public",
+      "description": "P3 controlled execution: run proposed edits through scope lock, preservation, business-logic and framework guards without writing files, and return the ledger, deviations and Implementation Report.",
+      "entrypoint": "uiux.api:guard_edits",
+      "cli": "python scripts/uiux_cli.py call guard_edits --params '{\"plan\": {...}, \"edits\": [...]}'",
+      "input": {
+        "type": "object",
+        "required": [
+          "plan",
+          "edits"
+        ],
+        "properties": {
+          "plan": {
+            "type": "object",
+            "description": "Approved Modification Plan dict"
+          },
+          "edits": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "Proposed edits: chunk_id, target_file, target_component, operation, reason, new_content"
+          },
+          "framework": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Framework override (default: plan repository framework)"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "required": [
+          "plan_id",
+          "status",
+          "ready_for_p4",
+          "deviations",
+          "ledger"
+        ],
+        "description": "Implementation Report with change ledger"
+      },
+      "dependencies": {
+        "python": ">=3.9",
+        "packages": []
+      },
+      "runtime_requirements": [],
+      "side_effects": "none",
+      "annotations": {
+        "read_only": true,
+        "writes_to": "none",
+        "may_start_process": false,
+        "deterministic": true,
+        "network_access": false,
+        "filesystem_read": [
+          "package"
+        ],
+        "requires_node": false,
+        "requires_browser": false,
+        "long_running": false
+      }
+    },
+    {
+      "id": "verify_implementation",
+      "visibility": "public",
+      "description": "P4 verification: gate on the Implementation Report, check evidence sufficiency against the plan verification contract, check correctness and preservation, and route repairs to the responsible phase.",
+      "entrypoint": "uiux.api:verify_implementation",
+      "cli": "python scripts/uiux_cli.py call verify_implementation --params '{\"implementation_report\": {...}, \"session\": {...}}'",
+      "input": {
+        "type": "object",
+        "required": [
+          "implementation_report",
+          "session"
+        ],
+        "properties": {
+          "implementation_report": {
+            "type": "object",
+            "description": "Report returned by guard_edits"
+          },
+          "session": {
+            "type": "object",
+            "description": "Runtime validation session data (after_evidence, change_manifest, ...)"
+          },
+          "plan": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Modification Plan; supplies the preservation profile and verification contract"
+          },
+          "verification_contract": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Explicit contract overriding the one derived from the plan"
+          },
+          "decisions": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "object"
+            },
+            "description": "Design decisions to evaluate"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "required": [
+          "status",
+          "repair",
+          "final_gate"
+        ],
+        "description": "Final verification report"
+      },
+      "dependencies": {
+        "python": ">=3.9",
+        "packages": []
+      },
+      "runtime_requirements": [],
+      "side_effects": "none",
+      "annotations": {
+        "read_only": true,
+        "writes_to": "none",
+        "may_start_process": false,
+        "deterministic": true,
+        "network_access": false,
+        "filesystem_read": [
+          "package"
+        ],
+        "requires_node": false,
+        "requires_browser": false,
+        "long_running": false
+      }
     }
   ]
 }
