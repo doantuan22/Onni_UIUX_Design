@@ -7,3 +7,7 @@ Run manually by giving an agent one scenario plus its fixture, then record a res
 To add a scenario, copy the required YAML-shaped fields in an existing scenario, assign a unique `E##` ID, name its fixture, expected route/context/artifacts, forbidden behavior, and observable success/failure conditions. Record `agent`, `model`, and `version` only as result metadata, not a leaderboard.
 
 Design quality evals E65–E80 judge the rendered outcome rather than agent behavior; see [quality/README.md](quality/README.md). Resolver behavior is pinned by the profiles in `resolver-scenarios/` and `python tests/test_knowledge.py` (schema, references, retrieval, scenario expectations, diversity). The benchmark preparation is in [docs/benchmark-protocol.md](../../../development/docs/benchmark-protocol.md).
+
+## Verification trust acceptance cases
+
+Tier 2 verification-trust cases are covered by `tests/test_verification_trust.py` and `tests/test_agent_experience.py`; they are deterministic contract/evidence tests, not design-quality benchmarks or scores. Coverage includes browser-missing static fallback, static preservation violation, detected build failure, invalid runtime evidence, runtime without visual proof, forged manifest verdict rejection, NO_FAKE_PASS, COMPLETED with NOT_RUN, capability ceiling versus achieved trust, and claim-language limits. The current browser runner has no canonical interaction evidence artifact, so interaction-required tasks remain partial.

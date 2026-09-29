@@ -263,6 +263,7 @@ class TaskOrchestrator:
         s["request_context"]["ui_context_ref"] = store.save(s["task_id"], "ui-context", context)
         s["artifact_refs"]["ui_context"] = s["request_context"]["ui_context_ref"]
         s["request_context"]["file_snapshot"] = self._snapshot(store.project)
+        s["request_context"]["token_snapshot"] = self._snapshot_tokens(store.project)
         s["internal_state"] = "SEE_COMPLETE"
         s["phase_history"].append({"phase": "SEE", "status": "COMPLETED", "at": _now()})
         s["current_phase"] = "KNOW"
@@ -347,6 +348,7 @@ class TaskOrchestrator:
                 "Provide the missing planning context." if missing else "Review the planning gate and resolve its blocker.", ["user_message"] if missing else [])
             return {"summary": "Planning is blocked; no implementation phase ran.", "action": action,
                     "extra": {"code": "INSUFFICIENT_CONTEXT" if missing else "EXECUTION_BLOCKED", "cause": "; ".join(plan.get("status_reasons", [])), "missing": missing}}
+        s["request_context"]["source_baseline"] = self._planned_source_snapshot(store.project, plan)
         s["current_phase"] = "DO"
         store.save_session(s)
         s["phase_summary"] = "Modification plan passed its planning gate; scope, preservation rules, and verification contract are saved."
@@ -424,32 +426,30 @@ class TaskOrchestrator:
         if evidence:
             s["artifact_refs"]["runtime_evidence"] = store.save(s["task_id"], "runtime-evidence", evidence)
             s["request_context"]["after_evidence_ref"] = s["artifact_refs"]["runtime_evidence"]
-        if not evidence and runtime_state != "READY":
-            status = "PARTIAL" if runtime_state else "BLOCKED"
-            impact = "Browser-based responsive, interaction, accessibility and screenshot verification cannot run without the target project's Playwright package and browser."
-            report = {"status": status, "code": "VERIFICATION_BLOCKED", "summary": impact,
-                "runtime_state": runtime_state or "UNKNOWN", "issues": [], "repair_requests": [], "limitations": [impact]}
-            ref = store.save(s["task_id"], "verification-report", report)
-            s["artifact_refs"]["verification_report"] = ref
-            s["phase_history"].append({"phase": "CHECK", "status": status, "at": _now()})
-            s["public_status"] = status
-            s["internal_state"] = "PARTIAL" if status == "PARTIAL" else "BLOCKED"
-            s["current_phase"] = "CHECK"
-            s["last_error"] = {"code": "VERIFICATION_BLOCKED", "cause": impact}
-            s["updated_at"] = _now()
-            store.save_session(s)
-            return {"summary": impact, "action": self._action("FIX_ENVIRONMENT", s["task_id"], "Make the target browser runtime available and provide rendered evidence, then resume CHECK.", []),
-                    "extra": {"code": "VERIFICATION_BLOCKED", "cause": impact, "artifact_refs": {"verification_report": ref}}}
-        if evidence:
-            contract = store.load_ref(s["artifact_refs"].get("verification_contract")) or {}
-            verification = verify_implementation(implementation, {"after_evidence": evidence,
-                "before_evidence": s["request_context"].get("before_evidence"), "modification_plan": plan},
-                plan=plan, verification_contract=contract)
-        else:
-            verification = {"status": "BLOCKED", "final_gate": "BLOCKED", "warnings": [
-                "Runtime package is ready, but no rendered evidence has been captured for the planned routes/viewports."], "repair": {"routes": []}}
+        contract = store.load_ref(s["artifact_refs"].get("verification_contract")) or {}
+        verification = verify_implementation(implementation, {"after_evidence": evidence or {},
+            "before_evidence": s["request_context"].get("before_evidence"), "modification_plan": plan,
+            "project_root": str(store.project), "actual_changed_files": implementation.get("files_modified", []),
+            "token_baseline": s["request_context"].get("token_snapshot"),
+            "source_baseline": s["request_context"].get("source_baseline", {}),
+            "runtime_detection": runtime,
+            "ui_context": store.load_ref(s["artifact_refs"].get("ui_context")) or {}},
+            plan=plan, verification_contract=contract)
+        from uiux.engine.verification.trust import validate_verification_result
+        validation_errors = validate_verification_result({**verification, "public_task_status": "COMPLETED"
+            if verification.get("verification_status") in {"PASS", "PASS_WITH_WARNINGS"} else "PARTIAL"})
+        if validation_errors:
+            verification["verification_status"] = "PARTIAL"
+            verification["status"] = "PARTIAL"
+            verification["trust_level"] = verification.get("trust_level", "UNVERIFIED")
+            verification["limitations"] = list(dict.fromkeys(list(verification.get("limitations", [])) +
+                ["NO_FAKE_PASS validation failed: " + "; ".join(validation_errors)]))
+            verification["validation_errors"] = validation_errors
         ref = store.save(s["task_id"], "verification-report", verification)
         s["artifact_refs"]["verification_report"] = ref
+        s["execution_status"] = verification.get("execution_status", implementation.get("status", "UNKNOWN"))
+        s["verification_status"] = verification.get("verification_status", verification.get("status", "BLOCKED"))
+        s["trust_level"] = verification.get("trust_level", "UNVERIFIED")
         repair = self._repair_route(verification)
         if repair:
             target, cause = repair
@@ -463,24 +463,35 @@ class TaskOrchestrator:
             return {"summary": f"CHECK found {cause}; the task is routed to {target} for repair.",
                     "action": self._action("CALL_AGAIN", s["task_id"], f"Continue in {target} for the routed repair.", []),
                     "extra": {"artifact_refs": {"verification_report": ref}, "repair_root_cause": cause}}
-        state = verification.get("final_gate", verification.get("status", "BLOCKED"))
-        if state in {"PASS", "COMPLETED", "PASS_WITH_WARNINGS"}:
+        state = verification.get("verification_status", verification.get("status", "BLOCKED"))
+        if state in {"PASS", "PASS_WITH_WARNINGS"}:
             s["phase_history"].append({"phase": "CHECK", "status": "COMPLETED", "at": _now()})
             s["current_phase"] = "DONE"
             s["internal_state"] = "COMPLETED"
             s["public_status"] = "COMPLETED"
             s["updated_at"] = _now()
             store.save_session(s)
-            return {"summary": "P4 verification passed for the available evidence.", "action": self._action("DONE", s["task_id"], "UI task completed.", []),
-                    "extra": {"artifact_refs": {"verification_report": ref}}}
-        s["phase_history"].append({"phase": "CHECK", "status": "PARTIAL", "at": _now()})
-        s["public_status"] = "PARTIAL"
-        s["internal_state"] = "PARTIAL"
+            return {"summary": verification.get("summary") or f"Required verification passed at {s['trust_level']} trust.",
+                    "action": self._action("DONE", s["task_id"], "Required verification passed.", []),
+                    "extra": {"artifact_refs": {"verification_report": ref}, "execution_status": s["execution_status"],
+                              "verification_status": s["verification_status"], "trust_level": s["trust_level"]}}
+        status = state if state in {"PARTIAL", "BLOCKED", "FAIL"} else "BLOCKED"
+        s["phase_history"].append({"phase": "CHECK", "status": status, "at": _now()})
+        s["public_status"] = "PARTIAL" if status in {"PARTIAL", "BLOCKED"} and s["execution_status"] == "COMPLETED" else status
+        s["internal_state"] = s["public_status"]
+        s["current_phase"] = "CHECK"
+        s["last_error"] = {"code": "VERIFICATION_PARTIAL" if s["public_status"] == "PARTIAL" else "VERIFICATION_FAILED",
+                            "cause": "; ".join(verification.get("limitations", [])) or verification.get("summary", "Verification did not pass.")}
         s["updated_at"] = _now()
         store.save_session(s)
-        return {"summary": "CHECK could not verify the implementation against a complete rendered evidence set.",
-                "action": self._action("FIX_ENVIRONMENT", s["task_id"], "Provide the missing runtime evidence and resume CHECK.", []),
-                "extra": {"code": "VERIFICATION_BLOCKED", "cause": "; ".join(verification.get("warnings", [])), "artifact_refs": {"verification_report": ref}}}
+        summary = verification.get("summary") or "Implementation completed, but verification evidence is incomplete."
+        action = self._action("FIX_ENVIRONMENT", s["task_id"],
+            "Use doctor to inspect missing verification capabilities; provide runtime evidence if stronger verification is required.", []) if status in {"PARTIAL", "BLOCKED"} else self._action("CALL_AGAIN", s["task_id"], "Resolve the reported verification issue and continue its repair route.", [])
+        return {"summary": summary, "action": action,
+                "extra": {"code": "VERIFICATION_PARTIAL" if status in {"PARTIAL", "BLOCKED"} else "VERIFICATION_FAILED",
+                          "cause": s["last_error"]["cause"], "artifact_refs": {"verification_report": ref},
+                          "execution_status": s["execution_status"], "verification_status": s["verification_status"],
+                          "trust_level": s["trust_level"]}}
 
     def _repair_route(self, report: dict[str, Any]) -> tuple[str, str] | None:
         repair = report.get("repair") or {}
@@ -513,7 +524,11 @@ class TaskOrchestrator:
         if not candidates:
             return None
         try:
-            return json.loads(max(candidates, key=lambda item: item[0])[1].read_text(encoding="utf-8"))
+            manifest_path = max(candidates, key=lambda item: item[0])[1]
+            value = json.loads(manifest_path.read_text(encoding="utf-8"))
+            value["manifest_path"] = str(manifest_path)
+            value["evidence_dir"] = str(manifest_path.parent)
+            return value
         except (OSError, ValueError):
             return None
 
@@ -530,6 +545,46 @@ class TaskOrchestrator:
                     result[rel] = hashlib.sha256(path.read_bytes()).hexdigest()
                 except OSError:
                     continue
+        return result
+
+    def _snapshot_tokens(self, root: Path) -> dict[str, str]:
+        """Capture named design-token declarations for P4 static preservation comparison."""
+        result: dict[str, str] = {}
+        token_pattern = re.compile(r"(--(?:color|brand|primary|bg)-[\w-]+)\s*:\s*([^;{}]+)", re.I)
+        for base, dirs, files in os.walk(root):
+            dirs[:] = [d for d in dirs if (d not in SKIP_DIRS and not d.startswith(".")) or d == ".github"]
+            for name in files:
+                path = Path(base) / name
+                if path.suffix.lower() not in {".css", ".scss", ".less", ".html", ".vue", ".tsx", ".jsx", ".ts", ".js"}:
+                    continue
+                try:
+                    if path.stat().st_size > 2_000_000:
+                        continue
+                    result.update({key: value.strip() for key, value in token_pattern.findall(path.read_text(encoding="utf-8"))})
+                except (OSError, UnicodeError):
+                    continue
+        return result
+
+    def _planned_source_snapshot(self, root: Path, plan: dict[str, Any]) -> dict[str, str]:
+        """Keep bounded pre-DO content for import/config/preservation comparisons in CHECK."""
+        paths: set[str] = set()
+        for name in ("affected_surface", "impact"):
+            block = plan.get(name, {})
+            if isinstance(block, dict):
+                for field in ("files", "allowed_files", "planned_files", "affected_files"):
+                    paths.update(value.replace("\\", "/").lstrip("./") for value in block.get(field, []) if isinstance(value, str))
+        for change in plan.get("changes", []):
+            if isinstance(change, dict):
+                paths.update(value.replace("\\", "/").lstrip("./") for value in change.get("affected_files", []) if isinstance(value, str))
+        result: dict[str, str] = {}
+        for rel in sorted(paths):
+            path = (root / rel).resolve()
+            try:
+                path.relative_to(root.resolve())
+                if path.is_file() and path.stat().st_size <= 500_000:
+                    result[rel] = path.read_text(encoding="utf-8")
+            except (OSError, UnicodeError, ValueError):
+                continue
         return result
 
     def _changed_files(self, root: Path, baseline: dict[str, str], plan: dict[str, Any]) -> list[dict[str, Any]]:
@@ -568,7 +623,8 @@ class TaskOrchestrator:
         return missing
 
     def _action(self, kind: str, task_id: str, message: str, required: list[str]) -> dict[str, Any]:
-        return {"type": kind, "tool": "run_ui_task" if kind != "DONE" else None, "task_id": task_id,
+        tool = "doctor" if kind == "FIX_ENVIRONMENT" else "run_ui_task" if kind != "DONE" else None
+        return {"type": kind, "tool": tool, "task_id": task_id,
                 "message": message, "required_input": list(required)}
 
     def _recoverable(self, task_id: str | None, phase: str, status: str, code: str, summary: str,
@@ -585,6 +641,10 @@ class TaskOrchestrator:
         value: dict[str, Any] = {"task_id": s.get("task_id"), "status": s.get("public_status", "RUNNING"),
             "phase": completed_phase, "summary": summary[:600], "next_action": action,
             "warnings": [], "artifact_refs": dict(s.get("artifact_refs", {}))}
+        if s.get("execution_status") is not None:
+            value["execution_status"] = s["execution_status"]
+            value["verification_status"] = s.get("verification_status", "NOT_RUN")
+            value["trust_level"] = s.get("trust_level", "UNVERIFIED")
         if extra:
             extra = dict(extra)
             if isinstance(extra.get("artifact_refs"), dict):

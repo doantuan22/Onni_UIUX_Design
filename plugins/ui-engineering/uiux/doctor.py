@@ -12,9 +12,11 @@ def diagnose(project: str = ".") -> dict[str, Any]:
     from uiux.core import resources
     from uiux.api import capability_map, self_test
     from uiux.runtime.capabilities import command_version, detect
+    from uiux.engine.verification.strategy import detect_verification_capabilities
 
     root = Path(project).expanduser().resolve()
     runtime = detect(str(root))
+    verification_caps = detect_verification_capabilities(root, runtime_detection=runtime)
     health = self_test()
     capabilities: dict[str, dict[str, Any]] = {}
 
@@ -98,6 +100,23 @@ def diagnose(project: str = ".") -> dict[str, Any]:
         next_actions.append({"capability": item["capability"], "action": item["impact"], "automatic_install": False})
     summary = "UI task workflow is ready with the detected project capabilities." if not limitations else \
         f"Core UI workflow is available; {len(limitations)} capability limitation(s) affect optional runtime or storage checks."
+    verification_capabilities = {name.upper(): dict(value) for name, value in verification_caps.items() if isinstance(value, dict)}
+    maximum_trust_level = verification_caps["maximum_trust_level"]
+    verification_limitations = [lim for value in verification_capabilities.values() for lim in value.get("limitations", [])]
+    if verification_limitations:
+        summary += " Verification ceiling: " + maximum_trust_level + "."
+    static_summary = "Current environment can verify source structure"
+    if verification_caps["build_validation"]["status"] == "AVAILABLE":
+        static_summary += " and detected build validity"
+    else:
+        static_summary += "; no supported build command was detected"
+    verification_summary = (static_summary + ", but cannot verify rendered responsive behavior, visual intent, or browser interactions."
+        if verification_caps["runtime_dom"]["status"] != "AVAILABLE" else
+        "Current environment has browser runtime capability; task-specific evidence and contract determine the trust actually achieved.")
     return {"overall_status": overall, "summary": summary, "capabilities": capabilities,
+            "verification_capabilities": verification_capabilities,
+            "maximum_trust_level": maximum_trust_level, "trust_ceiling": maximum_trust_level,
+            "verification_summary": verification_summary,
+            "verification_limitations": list(dict.fromkeys(verification_limitations)),
             "limitations": limitations, "next_actions": next_actions, "self_test": health,
             "project": str(root)}

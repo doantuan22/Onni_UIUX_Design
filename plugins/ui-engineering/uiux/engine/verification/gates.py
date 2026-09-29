@@ -35,14 +35,16 @@ def run_verification_gate(implementation_report: dict[str, Any], verification_co
 def run_evidence_sufficiency_gate(
     evidence: dict[str, Any], 
     verification_contract: dict[str, Any],
-    has_baseline: bool = False
+    has_baseline: bool = False,
+    runtime_available: bool | None = None,
 ) -> dict[str, Any]:
     """Check if the captured evidence fulfills the P2 VerificationContract."""
     if not evidence or not evidence.get("captures"):
         return {
             "status": "FAIL",
             "reason": "No evidence captures provided.",
-            "missing_evidence": "captures"
+            "missing_evidence": "captures",
+            "reason_code": "MISSING_REQUIRED_EVIDENCE" if runtime_available is not False else "CAPABILITY_UNAVAILABLE",
         }
         
     captured_viewports = {cap.get("viewport") for cap in evidence.get("captures", []) if cap.get("status") == "CAPTURED"}
@@ -56,7 +58,8 @@ def run_evidence_sufficiency_gate(
         return {
             "status": "FAIL",
             "reason": f"Missing required viewports: {missing_viewports}",
-            "missing_evidence": "viewport"
+            "missing_evidence": "viewport",
+            "reason_code": "MISSING_REQUIRED_EVIDENCE",
         }
         
     missing_routes = required_routes - captured_routes
@@ -64,14 +67,16 @@ def run_evidence_sufficiency_gate(
         return {
             "status": "FAIL",
             "reason": f"Missing required routes: {missing_routes}",
-            "missing_evidence": "route"
+            "missing_evidence": "route",
+            "reason_code": "MISSING_REQUIRED_EVIDENCE",
         }
         
     if verification_contract.get("requires_baseline", False) and not has_baseline:
         return {
             "status": "FAIL",
             "reason": "VerificationContract requires baseline comparison, but no baseline is available.",
-            "missing_evidence": "baseline"
+            "missing_evidence": "baseline",
+            "reason_code": "MISSING_REQUIRED_EVIDENCE",
         }
         
-    return {"status": "PASS"}
+    return {"status": "PASS", "reason_code": None, "missing_evidence": None}

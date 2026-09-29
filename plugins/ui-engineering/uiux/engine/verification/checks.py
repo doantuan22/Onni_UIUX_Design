@@ -113,14 +113,14 @@ def verify_preservation(session: Any, plan: dict[str, Any]) -> list[Verification
 def verify_design_intent(decisions: list[dict[str, Any]], session: Any) -> list[dict[str, Any]]:
     """Check if the Design Decisions were actually fulfilled."""
     results = []
-    # Simplified logic: if no regressions and correctness passes, we assume intent passes for now.
-    # In a full multimodal implementation, this uses vision models.
+    # Intent is not inferred from the absence of regressions. A visual critic must
+    # provide a separately evidence-backed verdict before any decision can pass.
     for decision in decisions:
         results.append({
             "decision_id": decision.get("id", "unknown"),
             "expected": decision.get("intent", "unknown intent"),
-            "actual": "Rendered UI matches intent (heuristic)",
-            "result": "PASS",
-            "evidence": ["screenshot_after"]
+            "actual": "Not evaluated by an evidence-backed visual critic.",
+            "result": "UNCERTAIN",
+            "evidence": []
         })
     return results

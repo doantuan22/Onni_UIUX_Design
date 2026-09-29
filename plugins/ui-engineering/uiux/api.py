@@ -524,11 +524,39 @@ def verify_implementation(implementation_report: dict, session: dict, plan: dict
                           verbosity: str = "full") -> dict:
     """P4 verification: gates, evidence sufficiency, correctness and preservation checks, root-cause repair routing."""
     from uiux.engine.verification.engine import VerificationEngine, contract_from_plan
+    from uiux.engine.verification.strategy import detect_verification_capabilities
+    from uiux.runtime.capabilities import detect as detect_environment
+    from uiux.runtime.evidence import validate_runtime_directory, validate_accessibility_directory
 
     try:
         data = dict(session)
         if plan is not None:
             data.setdefault("modification_plan", plan)
+        project_root = data.get("project_root") or data.get("repo_path")
+        runtime_detection = data.get("runtime_detection") or detect_environment(project_root or ".")
+        data["runtime_detection"] = runtime_detection
+        data["verification_capabilities"] = detect_verification_capabilities(project_root, implementation_report, runtime_detection)
+        after = data.get("after_evidence") or {}
+        evidence_dir = after.get("evidence_dir") if isinstance(after, dict) else None
+        manifest_path = after.get("manifest_path") if isinstance(after, dict) else None
+        if manifest_path:
+            evidence_dir = Path(str(manifest_path)).expanduser().resolve().parent
+        data["runtime_evidence_validation"] = validate_runtime_directory(evidence_dir) if evidence_dir else None
+        # A runtime manifest may carry arbitrary extra JSON. Only feed P4 derived signals
+        # from validators for canonical artifacts; never trust manifest-supplied verdicts.
+        if isinstance(after, dict):
+            after = dict(after)
+            for untrusted in ("visual_critic", "interactions", "accessibility", "interaction_results", "accessibility_scans", "console_errors"):
+                after.pop(untrusted, None)
+            accessibility_dir = Path(str(evidence_dir)).resolve() / "accessibility" if evidence_dir else None
+            a11y = validate_accessibility_directory(accessibility_dir,
+                session_id=(data["runtime_evidence_validation"] or {}).get("session_id")) if accessibility_dir and accessibility_dir.is_dir() else None
+            if a11y and a11y.get("status") == "VALID":
+                after["accessibility_scans"] = a11y["scans"]
+                after["accessibility"] = {"status": "PASS" if all(not scan["violations"] for scan in a11y["scans"])
+                    else "FAIL", "evidence_refs": [scan["evidence_ref"] for scan in a11y["scans"]]}
+            data["after_evidence"] = after
+            data["accessibility_evidence_validation"] = a11y
         contract = verification_contract if verification_contract is not None else contract_from_plan(plan or {})
         return _project_output(dict(VerificationEngine(data).verify(implementation_report, contract, list(decisions or []))), verbosity)
     except Exception as exc:
@@ -949,11 +977,18 @@ def self_test() -> dict:
                     "PLAYWRIGHT_IMPORT_FAILURE")
         return "PASS", "Node.js available; Playwright readiness is per target project (detect_runtime, capability_map)"
 
+    def no_fake_pass_check():
+        from uiux.engine.verification.status_audit import audit_status_semantics
+        result = audit_status_semantics(root)
+        if result["status"] != "PASS":
+            return "FAIL", "; ".join(result["findings"]), "INTERNAL_ERROR"
+        return "PASS", f"Verification status and evidence provenance audit passed ({len(result['scanned_files'])} canonical builders)."
+
     checks = [_run_check(check_id, run) for check_id, run in (
         ("version", version_check), ("manifest", manifest_check), ("tool_registry", tools_check),
         ("public_api", api_check), ("knowledge_registry", knowledge_check), ("capability_map", capability_check),
         ("error_contract", error_contract_check), ("runtime_detection", runtime_check),
-        ("optional_runtime", optional_runtime_check))]
+        ("optional_runtime", optional_runtime_check), ("no_fake_pass", no_fake_pass_check))]
     return {"status": "FAIL" if any(c["status"] == "FAIL" for c in checks) else "PASS", "version": __version__,
             "checks": checks}
 

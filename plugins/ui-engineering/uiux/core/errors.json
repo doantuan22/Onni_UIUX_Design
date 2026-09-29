@@ -320,6 +320,57 @@
         "result"
       ],
       "remediation": "Inspect the task artifact and retry after resolving the internal failure; enable UIUX_DEBUG for diagnostics."
+    },
+    "LIVE_INTERACTION_EXECUTOR_UNAVAILABLE": {
+      "category": "dependency",
+      "scope": [
+        "runtime-report"
+      ],
+      "remediation": "The current runner only checks fixture selectors. Use a runtime with a real browser action executor before claiming interaction verification."
+    }
+  },
+  "errors": {
+    "VERIFICATION_PARTIAL": {
+      "category": "dependency",
+      "scope": [
+        "result"
+      ],
+      "remediation": "Inspect limitations and verification_levels_unavailable. Use doctor to diagnose missing capabilities; resume the same task after supplying required evidence."
+    },
+    "VERIFICATION_FAILED": {
+      "category": "validation",
+      "scope": [
+        "result"
+      ],
+      "remediation": "Inspect evidence-backed issues and repair_routes, fix the reported implementation or plan issue, then rerun CHECK."
+    },
+    "EVIDENCE_INVALID": {
+      "category": "validation",
+      "scope": [
+        "result"
+      ],
+      "remediation": "Supply runtime evidence with a valid manifest, execution report, and captured files; the existing evidence validator reports the failed checks."
+    },
+    "NO_FAKE_PASS": {
+      "category": "validation",
+      "scope": [
+        "result"
+      ],
+      "remediation": "A verified claim or PASS result lacks required evidence provenance or completed checks. Correct the report builder and rerun verification."
+    },
+    "BUILD_VALIDATION_FAILED": {
+      "category": "validation",
+      "scope": [
+        "result"
+      ],
+      "remediation": "Review the configured build/typecheck/lint/test command output and repair the reported project failure; no dependencies are installed automatically."
+    },
+    "LIVE_INTERACTION_EXECUTOR_UNAVAILABLE": {
+      "category": "dependency",
+      "scope": [
+        "runtime-report"
+      ],
+      "remediation": "The current runner only checks fixture selectors. Use a runtime with a real browser action executor before claiming interaction verification."
     }
   }
 }

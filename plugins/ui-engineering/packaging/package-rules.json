@@ -93,7 +93,12 @@
     "scripts/validate_accessibility_evidence.py",
     "AGENT-USAGE.md",
     "uiux/task_orchestrator.py",
-    "uiux/doctor.py"
+    "uiux/doctor.py",
+    "VERIFICATION-TRUST.md",
+    "uiux/engine/verification/static.py",
+    "uiux/engine/verification/strategy.py",
+    "uiux/engine/verification/trust.py",
+    "uiux/engine/verification/status_audit.py"
   ],
   "must_exclude_prefixes": [
     "dist/",

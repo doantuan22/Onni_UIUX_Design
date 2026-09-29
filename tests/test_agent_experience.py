@@ -83,8 +83,7 @@ class AgentToolTests(unittest.TestCase):
                  patch("uiux.api.map_ui_structure", return_value={"schema_version": 1, "routes": [], "shell": {}, "components": [], "tokens": {}, "summary": {}}), \
                  patch("uiux.api.build_knowledge_plan", return_value=KNOWLEDGE), \
                  patch("uiux.api.plan_modification", return_value=plan), \
-                 patch("uiux.api.detect_runtime", return_value={"playwright": {"runtime_state": {"state": "READY"}}}), \
-                 patch("uiux.api.verify_implementation", return_value={"status": "PASS", "final_gate": "PASS", "repair": {"routes": []}}):
+                 patch("uiux.api.detect_runtime", return_value={"playwright": {"runtime_state": {"state": "NOT_DECLARED"}}}):
                 first = api.run_ui_task(request="Improve checkout UI on mobile while keeping brand colors", repo_path=temp)
                 self.assertEqual((first["phase"], first["status"]), ("SEE", "RUNNING"))
                 second = api.run_ui_task(task_id=first["task_id"], repo_path=temp)
@@ -96,6 +95,9 @@ class AgentToolTests(unittest.TestCase):
                 self.assertEqual((fourth["phase"], fourth["status"]), ("DO", "RUNNING"))
                 fifth = api.run_ui_task(task_id=first["task_id"], repo_path=temp)
                 self.assertEqual((fifth["phase"], fifth["status"]), ("CHECK", "PARTIAL"))
+                self.assertEqual((fifth["execution_status"], fifth["verification_status"], fifth["trust_level"]),
+                                 ("COMPLETED", "PARTIAL", "STATICALLY_VERIFIED"))
+                self.assertIn("Rendered UI has not been verified.", " ".join(fifth["phase_artifacts"]["verification_report"]["limitations"]) if "phase_artifacts" in fifth else " ".join(fifth.get("warnings", [])))
                 self.assertEqual(fifth["next_action"]["type"], "FIX_ENVIRONMENT")
                 self.assertIn("implementation_report", fifth["artifact_refs"], fifth)
                 self.assertTrue(fifth["artifact_refs"]["implementation_report"].endswith("implementation-report.json"))
@@ -129,12 +131,31 @@ class AgentToolTests(unittest.TestCase):
                 evidence_dir.mkdir(parents=True)
                 viewports = plan["verification"]["viewports"]
                 routes = plan["verification"].get("required_routes") or plan["verification"].get("pages") or ["/"]
-                captures = [{"route": route, "viewport": viewport, "status": "CAPTURED"}
-                            for route in routes for viewport in viewports]
-                (evidence_dir / "manifest.json").write_text(json.dumps({"status": "COMPLETED", "captures": captures}), encoding="utf-8")
+                viewport_dimensions = {"desktop_1440": (1440, 900), "tablet_768": (768, 1024), "mobile_375": (375, 812)}
+                captures = []
+                for route in routes:
+                    for viewport in viewports:
+                        width, height = viewport_dimensions[viewport]
+                        filename = f"{len(captures)}.png"
+                        (evidence_dir / filename).write_bytes(b"test screenshot evidence")
+                        captures.append({"id": f"{route}:{viewport}:1", "route": route, "page_id": route,
+                            "viewport": viewport, "width": width, "height": height, "iteration": 1,
+                            "status": "CAPTURED", "file": filename})
+                manifest = {"schema_version": 1, "session_id": "agent-test", "strategy": "playwright", "base_url": "http://127.0.0.1:4173",
+                    "iteration": 1, "status": "COMPLETED", "captures": captures,
+                    "visual_critic": {"status": "PASS", "evidence_refs": ["visual:critic-report"]},
+                    "interactions": {"status": "PASS", "evidence_refs": ["interaction:checkout"]},
+                    "accessibility": {"status": "PASS", "evidence_refs": ["accessibility:checkout"]}}
+                (evidence_dir / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+                (evidence_dir / "execution-report.json").write_text(json.dumps({"schema_version": 1, "session_id": "agent-test",
+                    "status": "COMPLETED", "captures_completed": len(captures), "captures_expected": len(captures)}), encoding="utf-8")
                 fifth = api.run_ui_task(task_id=first["task_id"], repo_path=temp)
+            # Manifest-supplied verdicts are untrusted; the current runner has no
+            # canonical interaction artifact, so this must remain incomplete.
             self.assertEqual((fifth["phase"], fifth["status"], fifth["next_action"]["type"]),
-                             ("CHECK", "COMPLETED", "DONE"))
+                             ("CHECK", "PARTIAL", "FIX_ENVIRONMENT"))
+            self.assertEqual((fifth["execution_status"], fifth["verification_status"], fifth["trust_level"]),
+                             ("COMPLETED", "PARTIAL", "RUNTIME_VERIFIED"))
             self.assertEqual(len([first, second, third, fourth, fifth]), 5)
 
     def test_standard_and_full_projection_add_details(self):

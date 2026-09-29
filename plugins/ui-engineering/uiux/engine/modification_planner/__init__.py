@@ -104,7 +104,24 @@ def evaluate_plan_permissions(plan: dict[str, Any]) -> dict[str, Any]:
 
 def build_validation_handoff(plan: dict[str, Any]) -> dict[str, Any]:
     """Extract the validation handoff contract from an approved Modification Plan."""
-    return dict(plan.get("validation", {}))
+    handoff = dict(plan.get("validation", {}))
+    verification = plan.get("verification", {})
+    if isinstance(verification, dict):
+        scenario_specs = list(handoff.get("scenarios", []))
+        for scenario in verification.get("scenarios", []):
+            if isinstance(scenario, dict) and scenario not in scenario_specs:
+                scenario_specs.append(scenario)
+        handoff.update({
+            "pages": list(verification.get("pages", handoff.get("pages", []))),
+            "viewports": list(verification.get("viewports", handoff.get("viewports", []))),
+            "scenarios": scenario_specs,
+            "preservation_checks": list(verification.get("preservation_checks", handoff.get("preservation_checks", []))),
+            "accessibility_checks": list(verification.get("accessibility_checks", handoff.get("accessibility_checks", []))),
+            "check_steps": list(verification.get("check_steps", handoff.get("check_steps", []))),
+            "required_viewports": list(verification.get("viewports", handoff.get("required_viewports", []))),
+            "required_routes": list(verification.get("required_routes", verification.get("pages", handoff.get("required_routes", [])))),
+        })
+    return handoff
 
 
 def compare_plan_to_changes(

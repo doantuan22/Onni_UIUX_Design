@@ -29,20 +29,22 @@ class PipelineToolTests(unittest.TestCase):
         self.assertEqual(api.call_tool("check_execution_gate", {"plan": make_plan()})["status"], "PASS")
         self.assertEqual(api.call_tool("check_execution_gate", {"plan": make_plan(repo_profile={})})["status"], "BLOCKED")
 
-    def test_full_chain_passes(self) -> None:
+    def test_full_chain_without_target_evidence_is_partial(self) -> None:
         plan = make_plan()
         report = api.call_tool("guard_edits", {"plan": plan, "edits": clean_edits(plan)})
         self.assertTrue(report["ready_for_p4"])
         result = api.call_tool("verify_implementation", {
             "implementation_report": report, "plan": plan, "session": session(plan["verification"]["viewports"])})
-        self.assertEqual(result["status"], "PASS")
+        self.assertEqual(result["verification_status"], "PARTIAL")
+        self.assertEqual(result["trust_level"], "UNVERIFIED")
         self.assertEqual(result["accessibility"]["status"], "NOT_EVALUATED")
 
-    def test_missing_viewport_evidence_blocks_verification(self) -> None:
+    def test_missing_viewport_evidence_is_partial(self) -> None:
         plan = make_plan()
         report = api.guard_edits(plan, clean_edits(plan))
         result = api.verify_implementation(report, session(plan["verification"]["viewports"][:1]), plan=plan)
-        self.assertEqual(result["status"], "BLOCKED")
+        self.assertEqual(result["verification_status"], "PARTIAL")
+        self.assertTrue(result["limitations"])
 
     def test_deviated_execution_blocks_verification(self) -> None:
         plan = make_plan()

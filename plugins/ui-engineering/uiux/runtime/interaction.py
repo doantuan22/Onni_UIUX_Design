@@ -251,12 +251,15 @@ def execute_interaction_scenario(
             "browser_runtime_status": f"BLOCKED_{playwright_state}",
         }
 
-    # If runtime is READY, live execution would proceed via browser runner
+    # This module has no live Playwright action executor. Fixture checks only
+    # prove selector presence and must never be reported as executed interactions.
     fixture_res = verify_target_fixture_selectors(proj, scenario)
     return {
-        "status": "PASS",
-        "exit_code": 0,
-        "strategy": "playwright_live",
+        "status": "BLOCKED",
+        "exit_code": 2,
+        "error_code": "LIVE_INTERACTION_EXECUTOR_UNAVAILABLE",
+        "message": "Playwright is available, but this runner only validates fixture selectors and does not execute browser actions.",
+        "strategy": "fixture_selector_validation_only",
         "fixture_verification": fixture_res,
         "browser_runtime_status": "READY",
     }

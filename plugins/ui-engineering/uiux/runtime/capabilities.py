@@ -173,7 +173,9 @@ def detect(project: Path | str = ".", url: str | None = None, browser: str = "ch
                             "confidence": "confirmed" if manager[0] else "unknown"},
         "project": {"package_json": (root / "package.json").is_file(), "framework": framework(package, root),
                     "dev_command": scripts.get("dev") or scripts.get("start"), "build_command": scripts.get("build"),
-                    "test_command": scripts.get("test")},
+                    "test_command": scripts.get("test"),
+                    "validation_commands": [name for name in ("build", "typecheck", "lint", "test")
+                        if manager[0] and isinstance(scripts.get(name), str) and scripts[name].strip()]},
         "playwright": {"package_present": {"status": "AVAILABLE" if playwright else "NOT_AVAILABLE", "confidence": "confirmed"},
                        "config_present": {"status": "AVAILABLE" if configs else "NOT_AVAILABLE", "files": configs, "confidence": "confirmed"},
                        "browser_ready": {"status": "UNKNOWN", "confidence": "unknown"},

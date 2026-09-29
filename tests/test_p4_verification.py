@@ -28,8 +28,11 @@ class VerificationEngineTests(unittest.TestCase):
     def verify(self, data, report=REPORT):
         return VerificationEngine(data).verify(report, CONTRACT, DECISIONS)
 
-    def test_missing_viewport_evidence_blocks(self) -> None:
-        self.assertEqual(self.verify(session(["desktop_1440"]))["status"], "BLOCKED")
+    def test_missing_viewport_evidence_is_partial(self) -> None:
+        result = self.verify(session(["desktop_1440"]))
+        self.assertEqual(result["verification_status"], "PARTIAL")
+        self.assertEqual(result["trust_level"], "UNVERIFIED")
+        self.assertTrue(result["limitations"])
 
     def test_locked_palette_change_routes_to_p3(self) -> None:
         result = self.verify(session(["desktop_1440", "mobile_375"], ["primary_color"]))
@@ -37,10 +40,11 @@ class VerificationEngineTests(unittest.TestCase):
         self.assertEqual(result["status"], "FAIL")
         self.assertEqual((route["route_to"], route["root_cause"]), ("P3", "IMPLEMENTATION_ERROR"))
 
-    def test_clean_run_passes(self) -> None:
+    def test_unproven_capture_records_partial_not_verified(self) -> None:
         result = self.verify(session(["desktop_1440", "mobile_375"], []))
-        self.assertEqual(result["status"], "PASS")
-        self.assertFalse(result["repair"]["required"])
+        self.assertEqual(result["verification_status"], "PARTIAL")
+        self.assertEqual(result["trust_level"], "UNVERIFIED")
+        self.assertIn("without valid manifest/report/file provenance", " ".join(result["limitations"]))
 
     def test_unready_implementation_report_blocks(self) -> None:
         result = self.verify(session(["desktop_1440", "mobile_375"], []), {**REPORT, "ready_for_p4": False})

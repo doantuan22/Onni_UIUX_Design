@@ -220,6 +220,14 @@ class PrePhase8HardeningTests(unittest.TestCase):
         self.assertEqual(res["reason"], "UNRESOLVED_SELECTOR")
         self.assertEqual(len(res["unresolved_selectors"]), 1)
 
+    def test_interaction_runner_does_not_claim_live_pass_without_action_executor(self):
+        scenario = {"id": "scenario_target_b_live", "actions": [{"action": "click", "selector": "#menu-toggle-btn"}]}
+        ready = {"playwright": {"runtime_state": {"state": "READY"}}}
+        with mock.patch("uiux.runtime.interaction.capabilities.detect", return_value=ready):
+            result = execute_interaction_scenario(scenario, self.target_b, "http://localhost")
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertEqual(result["error_code"], "LIVE_INTERACTION_EXECUTOR_UNAVAILABLE")
+
     # --- P1.7: Manifest Path Validation in Self Test ---
     def test_self_test_verifies_manifest_paths(self):
         """self_test verifies all declared manifest resources exist."""

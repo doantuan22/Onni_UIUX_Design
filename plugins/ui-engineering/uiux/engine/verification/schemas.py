@@ -17,7 +17,7 @@ RootCauseType = Literal[
 
 SeverityLevel = Literal["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"]
 
-VerificationStatus = Literal["PASS", "PASS_WITH_WARNINGS", "PARTIAL", "FAIL", "BLOCKED"]
+VerificationStatus = Literal["NOT_RUN", "PASS", "PASS_WITH_WARNINGS", "PARTIAL", "FAIL", "BLOCKED"]
 
 class VerificationIssue(TypedDict):
     id: str
@@ -87,4 +87,56 @@ class FinalVerificationReport(TypedDict):
     repair: dict[str, Any] # Contains RepairRequest items
     warnings: list[str]
     limitations: list[str]
-    final_gate: Literal["PASS", "FAIL", "BLOCKED"]
+    final_gate: VerificationStatus
+    execution_status: NotRequired[str]
+    verification_status: NotRequired[VerificationStatus]
+    trust_level: NotRequired[Literal["UNVERIFIED", "STATICALLY_VERIFIED", "RUNTIME_VERIFIED", "MULTIMODAL_VERIFIED"]]
+    trust_achieved: NotRequired[str]
+    trust_ceiling: NotRequired[str]
+    evidence_refs: NotRequired[list[str]]
+    verified_claims: NotRequired[list[dict[str, Any]]]
+    unverified_claims: NotRequired[list[dict[str, Any]]]
+    verification_levels_completed: NotRequired[list[str]]
+    verification_levels_unavailable: NotRequired[list[dict[str, str]]]
+    evidence_summary: NotRequired[str]
+    static_verification: NotRequired[dict[str, Any]]
+    trust_report: NotRequired[dict[str, Any]]
+
+
+class BuildValidationEntry(TypedDict):
+    command: str
+    status: Literal["PASS", "FAIL", "BLOCKED"]
+    exit_code: int | None
+    summary: str
+    evidence_ref: str
+
+
+class BuildValidationReport(TypedDict):
+    status: Literal["PASS", "FAIL", "BLOCKED", "NOT_RUN"]
+    commands: list[BuildValidationEntry]
+
+
+class StaticVerificationReport(TypedDict):
+    status: VerificationStatus
+    source_diff: dict[str, Any]
+    structure: dict[str, Any]
+    preservation: dict[str, Any]
+    framework: dict[str, Any]
+    responsive_signals: dict[str, Any]
+    build: BuildValidationReport
+    issues: list[VerificationIssue]
+    evidence_refs: list[str]
+    limitations: list[str]
+
+
+class TrustReport(TypedDict):
+    execution_status: str
+    verification_status: VerificationStatus
+    trust_achieved: Literal["UNVERIFIED", "STATICALLY_VERIFIED", "RUNTIME_VERIFIED", "MULTIMODAL_VERIFIED"]
+    trust_ceiling: Literal["UNVERIFIED", "STATICALLY_VERIFIED", "RUNTIME_VERIFIED", "MULTIMODAL_VERIFIED"]
+    verification_levels_completed: list[str]
+    verification_levels_unavailable: list[dict[str, str]]
+    verified_claims: list[dict[str, Any]]
+    unverified_claims: list[dict[str, Any]]
+    evidence_summary: str
+    limitations: list[str]

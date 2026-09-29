@@ -33,6 +33,15 @@ class RuntimeValidationSession:
         after_evidence: dict[str, Any] | None = None,
         workflow: str = "existing-ui",
         session_id: str | None = None,
+        token_baseline: dict[str, str] | None = None,
+        project_root: str | None = None,
+        actual_changed_files: list[str] | None = None,
+        ui_context: dict[str, Any] | None = None,
+        source_baseline: dict[str, str] | None = None,
+        runtime_detection: dict[str, Any] | None = None,
+        verification_capabilities: dict[str, Any] | None = None,
+        runtime_evidence_validation: dict[str, Any] | None = None,
+        accessibility_evidence_validation: dict[str, Any] | None = None,
     ) -> None:
         self.session_id = session_id or f"session_{uuid.uuid4().hex[:12]}"
         self.modification_plan: dict[str, Any] = modification_plan if isinstance(modification_plan, dict) else {}
@@ -40,6 +49,15 @@ class RuntimeValidationSession:
         self.before_evidence: dict[str, Any] = before_evidence if isinstance(before_evidence, dict) else {}
         self.after_evidence: dict[str, Any] = after_evidence if isinstance(after_evidence, dict) else {}
         self.workflow = workflow
+        self.token_baseline = token_baseline if isinstance(token_baseline, dict) else None
+        self.source_baseline = source_baseline if isinstance(source_baseline, dict) else {}
+        self.runtime_detection = runtime_detection if isinstance(runtime_detection, dict) else {}
+        self.verification_capabilities = verification_capabilities if isinstance(verification_capabilities, dict) else {}
+        self.runtime_evidence_validation = runtime_evidence_validation if isinstance(runtime_evidence_validation, dict) else None
+        self.accessibility_evidence_validation = accessibility_evidence_validation if isinstance(accessibility_evidence_validation, dict) else None
+        self.project_root = project_root
+        self.actual_changed_files = actual_changed_files if isinstance(actual_changed_files, list) else []
+        self.ui_context = ui_context if isinstance(ui_context, dict) else {}
 
         # Derived from modification_plan
         self.plan_id: str = self.modification_plan.get("plan_id", "")
@@ -60,6 +78,15 @@ class RuntimeValidationSession:
             after_evidence=data.get("after_evidence"),
             workflow=data.get("workflow", "existing-ui"),
             session_id=data.get("session_id"),
+            token_baseline=data.get("token_baseline"),
+            project_root=data.get("project_root") or data.get("repo_path"),
+            actual_changed_files=data.get("actual_changed_files"),
+            ui_context=data.get("ui_context"),
+            source_baseline=data.get("source_baseline"),
+            runtime_detection=data.get("runtime_detection"),
+            verification_capabilities=data.get("verification_capabilities"),
+            runtime_evidence_validation=data.get("runtime_evidence_validation"),
+            accessibility_evidence_validation=data.get("accessibility_evidence_validation"),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -67,6 +94,15 @@ class RuntimeValidationSession:
             "session_id": self.session_id,
             "plan_id": self.plan_id,
             "workflow": self.workflow,
+            "token_baseline": self.token_baseline,
+            "project_root": self.project_root,
+            "actual_changed_files": self.actual_changed_files,
+            "ui_context": self.ui_context,
+            "source_baseline": self.source_baseline,
+            "runtime_detection": self.runtime_detection,
+            "verification_capabilities": self.verification_capabilities,
+            "runtime_evidence_validation": self.runtime_evidence_validation,
+            "accessibility_evidence_validation": self.accessibility_evidence_validation,
             "modification_plan": self.modification_plan,
             "change_manifest": self.change_manifest,
             "before_evidence": self.before_evidence,
