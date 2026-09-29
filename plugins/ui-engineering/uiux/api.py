@@ -47,7 +47,7 @@ __all__ = [
     "build_repair_plan", "run_targeted_repair", "recapture_evidence",
     "check_understanding",
     # P3 DO / P4 CHECK
-    "check_execution_gate", "guard_edits", "verify_implementation",
+    "check_execution_gate", "guard_edits", "verify_implementation", "run_ui_task", "doctor",
 ]
 
 API_VERSION = 1
@@ -115,6 +115,30 @@ def layer_of(relative_path: str) -> str | None:
     return layer["id"] if layer else None
 
 
+def _project_output(value: dict, verbosity: str = "full") -> dict:
+    """Shared size projection for legacy high-level tools; full preserves the original contract."""
+    if verbosity not in {"compact", "standard", "full"}:
+        raise ToolError("verbosity must be compact, standard, or full", "INVALID_ARGUMENT")
+    if verbosity == "full" or not isinstance(value, dict):
+        return value
+    heavy = {"repo_profile", "existing_ui_profile", "ui_map", "knowledge_plan", "selected_knowledge",
+             "modification_plan", "plan", "implementation_report", "ledger", "verification_report", "evidence",
+             "component_graph", "routes", "components", "sections", "entries"}
+    summary: dict = {}
+    omitted: dict = {}
+    for key, item in value.items():
+        if key not in heavy:
+            summary[key] = item
+        else:
+            count = len(item) if isinstance(item, (list, dict)) else None
+            omitted[key] = {"omitted": True, "item_count": count}
+            if verbosity == "standard":
+                summary[key + "_summary"] = {"item_count": count}
+    summary["verbosity"] = verbosity
+    summary["omitted_fields"] = omitted
+    return summary
+
+
 # --------------------------------------------------------------------------- engine
 def resolve_capabilities(profile: dict) -> dict:
     from uiux.engine import capability_resolver
@@ -136,12 +160,33 @@ def resolve_technology(capabilities: list[str], existing_dependencies: list[str]
         raise _tool_error(exc) from exc
 
 
-def orchestrate_ui(request: dict) -> dict:
+def orchestrate_ui(request: dict, verbosity: str = "full") -> dict:
     """Route UI workflows, enforce preservation policies, and resolve required capabilities."""
-    from uiux.engine import orchestrator
+    from uiux.task_orchestrator import orchestrate_ui as _orchestrate_ui
 
     try:
-        return orchestrator.orchestrate(request)
+        return _project_output(_orchestrate_ui(request), verbosity)
+    except Exception as exc:
+        raise _tool_error(exc) from exc
+
+
+def run_ui_task(task_id: str | None = None, request: str | None = None, repo_path: str | None = None,
+                user_message: str | None = None, verbosity: str = "compact") -> dict:
+    """Advance one phase of a persisted P0-P4 UI task; see AGENT-USAGE.md for the resume contract."""
+    from uiux.task_orchestrator import run_ui_task as _run
+
+    try:
+        return _run(task_id=task_id, request=request, repo_path=repo_path, user_message=user_message, verbosity=verbosity)
+    except Exception as exc:
+        raise _tool_error(exc) from exc
+
+
+def doctor(project: str = ".") -> dict:
+    """Read-only user-facing capability matrix with impacts and next actions."""
+    from uiux.doctor import diagnose
+
+    try:
+        return diagnose(project)
     except Exception as exc:
         raise _tool_error(exc) from exc
 
@@ -156,12 +201,12 @@ def detect_ui_state(repo_context: dict | None = None) -> dict:
         raise _tool_error(exc) from exc
 
 
-def analyze_repository(project: str = ".", options: dict | None = None) -> dict:
+def analyze_repository(project: str = ".", options: dict | None = None, verbosity: str = "full") -> dict:
     """Run full Repo & Framework Intelligence to produce a normalized repo_profile."""
     from uiux.engine import repo_intelligence
 
     try:
-        return repo_intelligence.analyze_repository(project, options)
+        return _project_output(repo_intelligence.analyze_repository(project, options), verbosity)
     except Exception as exc:
         raise _tool_error(exc) from exc
 
@@ -182,12 +227,13 @@ def analyze_existing_ui(
     project: str = ".",
     repo_profile: dict | None = None,
     options: dict | None = None,
+    verbosity: str = "full",
 ) -> dict:
     """Analyze an existing UI codebase for visual identity, layout, component consistency, and UX flows."""
     from uiux.engine import existing_ui
 
     try:
-        return existing_ui.analyze_existing_ui(project=project, repo_profile=repo_profile, options=options)
+        return _project_output(existing_ui.analyze_existing_ui(project=project, repo_profile=repo_profile, options=options), verbosity)
     except Exception as exc:
         raise _tool_error(exc) from exc
 
@@ -205,7 +251,7 @@ def check_understanding(
         raise _tool_error(exc) from exc
 
 
-def map_ui_structure(project: str = ".", options: dict | None = None) -> dict:
+def map_ui_structure(project: str = ".", options: dict | None = None, verbosity: str = "full") -> dict:
     """Map the frontend structure: routes, layout shell, ordered page sections with roles, content inventory,
     layout pattern, motion and default-banlist signals, components and tokens in use."""
     from uiux.engine import ui_map
@@ -214,7 +260,7 @@ def map_ui_structure(project: str = ".", options: dict | None = None) -> dict:
         result = ui_map.build_ui_map(project, options)
         if (options or {}).get("markdown"):
             result["markdown"] = ui_map.render_markdown(result)
-        return result
+        return _project_output(result, verbosity)
     except Exception as exc:
         raise _tool_error(exc) from exc
 
@@ -296,12 +342,12 @@ def evaluate_preservation(
         raise _tool_error(exc) from exc
 
 
-def route_knowledge(request: dict | None = None) -> dict:
+def route_knowledge(request: dict | None = None, verbosity: str = "full") -> dict:
     """Route required knowledge packs, skills, preservation invariants, and runtime validation."""
     from uiux.engine import knowledge_router
 
     try:
-        return knowledge_router.route_knowledge(request)
+        return _project_output(knowledge_router.route_knowledge(request), verbosity)
     except Exception as exc:
         raise _tool_error(exc) from exc
 
@@ -385,12 +431,13 @@ def plan_modification(
     requested_scope: str = "global",
     task_intent: str | None = None,
     plan_only: bool = False,
+    verbosity: str = "full",
 ) -> dict:
     """Generate a machine-readable Modification Plan for UI tasks."""
     from uiux.engine import modification_planner
 
     try:
-        return modification_planner.plan_modification(
+        result = modification_planner.plan_modification(
             user_request=user_request,
             workflow=workflow,
             repo_profile=repo_profile,
@@ -402,6 +449,7 @@ def plan_modification(
             task_intent=task_intent,
             plan_only=plan_only,
         )
+        return _project_output(result, verbosity)
     except Exception as exc:
         raise _tool_error(exc) from exc
 
@@ -456,7 +504,7 @@ def check_execution_gate(plan: dict) -> dict:
         raise _tool_error(exc) from exc
 
 
-def guard_edits(plan: dict, edits: list, framework: str | None = None) -> dict:
+def guard_edits(plan: dict, edits: list, framework: str | None = None, verbosity: str = "full") -> dict:
     """P3 controlled execution: run proposed edits through scope lock, preservation, business-logic and framework guards.
 
     Nothing is written; the host agent applies only the edits reported in ``ledger`` and must send any ``deviations``
@@ -466,13 +514,14 @@ def guard_edits(plan: dict, edits: list, framework: str | None = None) -> dict:
 
     try:
         fw = framework or (plan.get("repository") or {}).get("framework") or "generic"
-        return dict(ChunkExecutor(plan, framework=str(fw)).execute_plan(edits=list(edits)))
+        return _project_output(dict(ChunkExecutor(plan, framework=str(fw)).execute_plan(edits=list(edits))), verbosity)
     except Exception as exc:
         raise _tool_error(exc) from exc
 
 
 def verify_implementation(implementation_report: dict, session: dict, plan: dict | None = None,
-                          verification_contract: dict | None = None, decisions: list | None = None) -> dict:
+                          verification_contract: dict | None = None, decisions: list | None = None,
+                          verbosity: str = "full") -> dict:
     """P4 verification: gates, evidence sufficiency, correctness and preservation checks, root-cause repair routing."""
     from uiux.engine.verification.engine import VerificationEngine, contract_from_plan
 
@@ -481,7 +530,7 @@ def verify_implementation(implementation_report: dict, session: dict, plan: dict
         if plan is not None:
             data.setdefault("modification_plan", plan)
         contract = verification_contract if verification_contract is not None else contract_from_plan(plan or {})
-        return dict(VerificationEngine(data).verify(implementation_report, contract, list(decisions or [])))
+        return _project_output(dict(VerificationEngine(data).verify(implementation_report, contract, list(decisions or []))), verbosity)
     except Exception as exc:
         raise _tool_error(exc) from exc
 
@@ -929,6 +978,8 @@ _DISPATCH = {
     "check_execution_gate": check_execution_gate,
     "guard_edits": guard_edits,
     "verify_implementation": verify_implementation,
+    "run_ui_task": run_ui_task,
+    "doctor": doctor,
 }
 
 
@@ -962,9 +1013,25 @@ def call_tool(tool_id: str, params: dict | None = None) -> dict:
 
     try:
         return _call(tool_id, params)
-    except ToolError:
-        raise
     except UiuxError as exc:
+        if tool_id == "run_ui_task" and exc.code in {
+            "MISSING_REQUIRED_ARGUMENT", "UNEXPECTED_ARGUMENT", "INVALID_ARGUMENT_TYPE", "INVALID_ARGUMENT"
+        }:
+            values = params if isinstance(params, dict) else {}
+            field = str(exc.details.get("argument") or (exc.details.get("missing") or exc.details.get("unexpected") or ["request"])[0])
+            field = field.removeprefix("run_ui_task.")
+            required_input = [field.split(".", 1)[0]]
+            expected = exc.details.get("expected") or exc.details.get("allowed") or "value allowed by the run_ui_task input schema"
+            return {
+                "task_id": values.get("task_id"), "status": "NEEDS_INPUT", "phase": "SEE",
+                "summary": "The run_ui_task input does not match its schema.",
+                "next_action": {"type": "PROVIDE_INPUT", "tool": "run_ui_task", "task_id": values.get("task_id"),
+                                "message": f"Correct {field} and retry run_ui_task.", "required_input": required_input},
+                "warnings": [], "artifact_refs": {}, "code": "SCHEMA_VALIDATION_ERROR", "cause": exc.message,
+                "missing": list(exc.details.get("missing", [])), "field": field, "expected": expected,
+                "received": values.get(field.split(".", 1)[0]),
+                "example": {"request": "Improve the checkout UI on mobile", "verbosity": "compact"},
+            }
         if exc.code == "INTERNAL_ERROR":
             raise
         raise _tool_error(exc) from exc

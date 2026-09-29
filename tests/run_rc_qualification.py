@@ -147,7 +147,7 @@ class ReleaseCandidateQualificationTests(unittest.TestCase):
     # RC-09: Public Tool Parity
     # -------------------------------------------------------------------------
     def test_rc_09_public_tool_parity(self) -> None:
-        """All 31 public tools are present in tools registry and API."""
+        """All 33 public tools are present in tools registry and API."""
         r_tools = subprocess.run(
             [sys.executable, "-m", "uiux.cli", "tools"],
             cwd=str(self.consumer_ws),
@@ -164,7 +164,7 @@ class ReleaseCandidateQualificationTests(unittest.TestCase):
             "detect_runtime", "diff_ui_maps", "evaluate_runtime_result", "map_ui_structure", "orchestrate_ui",
             "plan_modification", "recapture_evidence", "resolve_capabilities",
             "resolve_technology", "retrieve_knowledge", "route_knowledge",
-            "run_evals", "run_runtime", "run_runtime_validation",
+            "doctor", "run_evals", "run_runtime", "run_runtime_validation", "run_ui_task",
             "run_targeted_repair", "score_visual_critique", "self_test", "suggest_recipes", "validate_skill",
         }
         self.assertEqual(tool_ids, expected)

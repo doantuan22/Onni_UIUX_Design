@@ -27,12 +27,13 @@ This document tracks verified integration statuses across AI coding hosts and ex
 
 ## 3. Tool Parity Guarantee
 
-All supported adapters expose the identical set of 31 public tools declared in `uiux/core/tools.json`:
+All supported adapters expose the identical set of 33 public tools declared in `uiux/core/tools.json`:
 - `resolve_capabilities`, `retrieve_knowledge`, `resolve_technology`, `analyze_design_quality`, `detect_runtime`
 - `run_runtime`, `accessibility_scan`, `run_evals`, `validate_skill`, `capability_map`
 - `run_runtime_validation`, `build_critic_report`, `evaluate_runtime_result`, `build_repair_plan`, `run_targeted_repair`
 - `recapture_evidence`, `self_test`, `orchestrate_ui`, `analyze_repository`, `analyze_existing_ui`
 - `map_ui_structure`, `diff_ui_maps`, `suggest_recipes`, `score_visual_critique`, `route_knowledge`
+- `doctor`, `run_ui_task`
 - `build_knowledge_plan`, `plan_modification`, `build_validation_handoff`
 - `check_execution_gate`, `guard_edits`, `verify_implementation`
 

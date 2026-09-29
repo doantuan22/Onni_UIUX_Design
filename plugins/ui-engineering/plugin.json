@@ -27,7 +27,8 @@
     "design-quality-analysis",
     "browser-runtime-evidence",
     "accessibility-runtime",
-    "eval-execution"
+    "eval-execution",
+    "agent-task-orchestration"
   ],
   "capability_map": {"registry": "uiux/core/capabilities.json"},
   "knowledge": {

@@ -8,12 +8,12 @@
       "description": "Turn a design requirement profile into a ranked capability plan (style, layouts, screens, motion, interactions, effects, technology, recipe anchor, retrieval list) with WHY / WHY NOT.",
       "entrypoint": "uiux.api:resolve_capabilities",
       "cli": "python scripts/resolve_capabilities.py --profile <file.json> [--format md]",
-      "input": {"type": "object", "required": ["profile"], "properties": {"profile": {"type": "object", "description": "Capability profile; fields and vocabularies in skills/capability-resolver/resolver.md#profile"}}, "additionalProperties": false},
-      "output": {"type": "object", "description": "Capability plan: style, layouts, screens, motion, interactions, effects, technology, recipe, guards, retrieval"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","required":["profile"],"properties":{"profile":{"type":"object","description":"Arbitrary map: design capability profile. Fields and vocabularies are documented in skills/capability-resolver/resolver.md#profile. Example: {\"density\":\"comfortable\"}."}},"additionalProperties":false},
+      "output": {"type":"object","description":"Capability plan: style, layouts, screens, motion, interactions, effects, technology, recipe, guards, retrieval"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "retrieve_knowledge",
@@ -21,12 +21,12 @@
       "description": "Query the knowledge registry (styles, layouts, screens, motion, interactions, effects, recipes, graphics, technologies, components) without knowing file locations.",
       "entrypoint": "uiux.api:retrieve_knowledge",
       "cli": "python scripts/uiux_cli.py call retrieve_knowledge --params '{\"collection\": \"styles\"}'",
-      "input": {"type": "object", "properties": {"collection": {"type": ["string", "null"], "enum": ["styles", "layouts", "screens", "motion", "interactions", "effects", "recipes", "graphics", "technologies", "components", "domains", "frameworks", null]}, "kind": {"type": ["string", "null"]}, "category": {"type": ["string", "null"]}, "ids": {"type": ["array", "null"], "items": {"type": "string"}}, "text": {"type": ["string", "null"]}, "include_content": {"type": "boolean", "default": false}}, "additionalProperties": false},
-      "output": {"type": "object", "required": ["count", "entries"], "description": "{count, entries: [{id, kind, collection, category, name, file, line, summary, content?}]}"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{"collection":{"type":["string","null"],"enum":["styles","layouts","screens","motion","interactions","effects","recipes","graphics","technologies","components","domains","frameworks",null]},"kind":{"type":["string","null"]},"category":{"type":["string","null"]},"ids":{"type":["array","null"],"items":{"type":"string"}},"text":{"type":["string","null"]},"include_content":{"type":"boolean","default":false}},"additionalProperties":false},
+      "output": {"type":"object","required":["count","entries"],"description":"{count, entries: [{id, kind, collection, category, name, file, line, summary, content?}]}"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "resolve_technology",
@@ -34,12 +34,12 @@
       "description": "Choose the simplest technology for capability ids: installed dependency, native platform, authorized library, native fallback, or degrade.",
       "entrypoint": "uiux.api:resolve_technology",
       "cli": "python scripts/uiux_cli.py call resolve_technology --params '{\"capabilities\": [\"motion.m4-pinned-section\"]}'",
-      "input": {"type": "object", "required": ["capabilities"], "properties": {"capabilities": {"type": "array", "items": {"type": "string"}, "description": "Capability ids, e.g. motion.m4-pinned-section"}, "existing_dependencies": {"type": ["array", "null"], "items": {"type": "string"}}, "allow_new_dependencies": {"type": ["boolean", "null"], "description": "null = dependency_policy.allow_new_dependencies from config"}, "allow_motion_library": {"type": ["boolean", "null"], "description": "ELEVATE/REIMAGINE: sanction one motion library (motion/framer-motion or gsap) when no native option is preferred"}}, "additionalProperties": false},
-      "output": {"type": "object", "required": ["assignments", "technologies", "existing_reused", "new_dependencies", "degraded"], "description": "{assignments, technologies, existing_reused, new_dependencies, degraded}"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","required":["capabilities"],"properties":{"capabilities":{"type":"array","items":{"type":"string"},"description":"Capability ids, e.g. motion.m4-pinned-section"},"existing_dependencies":{"type":["array","null"],"items":{"type":"string"}},"allow_new_dependencies":{"type":["boolean","null"],"description":"null = dependency_policy.allow_new_dependencies from config"},"allow_motion_library":{"type":["boolean","null"],"description":"ELEVATE/REIMAGINE: sanction one motion library (motion/framer-motion or gsap) when no native option is preferred"}},"additionalProperties":false},
+      "output": {"type":"object","required":["assignments","technologies","existing_reused","new_dependencies","degraded"],"description":"{assignments, technologies, existing_reused, new_dependencies, degraded}"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none; new dependencies are only recorded, never installed",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "analyze_design_quality",
@@ -47,12 +47,12 @@
       "description": "Static (and optional runtime-probe) evidence for design quality evals E65-E80.",
       "entrypoint": "uiux.api:analyze_design_quality",
       "cli": "python scripts/analyze_design_quality.py <project> [--manifest <manifest.json>] [--visual-intensity N] [--format md]",
-      "input": {"type": "object", "required": ["project"], "properties": {"project": {"type": "string", "description": "Target project directory"}, "manifests": {"type": ["array", "null"], "items": {"type": "string"}, "description": "Runtime probe manifest paths"}, "visual_intensity": {"type": "integer", "default": 3, "description": "1..5"}}, "additionalProperties": false},
-      "output": {"type": "object", "required": ["signals", "runtime", "evals", "limitations"], "description": "{signals, runtime, evals: {E65..E80: {status, reasons}}, limitations}"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","required":["project"],"properties":{"project":{"type":"string","description":"Target project directory"},"manifests":{"type":["array","null"],"items":{"type":"string"},"description":"Runtime probe manifest paths"},"visual_intensity":{"type":"integer","default":3,"description":"1..5"}},"additionalProperties":false},
+      "output": {"type":"object","required":["signals","runtime","evals","limitations"],"description":"{signals, runtime, evals: {E65..E80: {status, reasons}}, limitations}"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none (read-only scan of the project)",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package", "target-project"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package","target-project"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "detect_runtime",
@@ -60,12 +60,12 @@
       "description": "Read-only capability detection for a target project, including Playwright readiness (NOT_DECLARED, DECLARED_NOT_INSTALLED, PACKAGE_AVAILABLE_BROWSER_MISSING, READY).",
       "entrypoint": "uiux.api:detect_runtime",
       "cli": "python scripts/detect_capabilities.py <project> [--url URL]",
-      "input": {"type": "object", "properties": {"project": {"type": "string", "default": "."}, "url": {"type": ["string", "null"]}, "browser": {"type": "string", "default": "chromium"}}, "additionalProperties": false},
-      "output": {"type": "object", "required": ["detector", "runtime", "playwright", "accessibility"], "description": "Capability report (runtime, package_manager, project, playwright.runtime_state, browser, accessibility, design_runtime, application)"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{"project":{"type":"string","default":"."},"url":{"type":["string","null"]},"browser":{"type":"string","default":"chromium"}},"additionalProperties":false},
+      "output": {"type":"object","required":["detector","runtime","playwright","accessibility"],"description":"Capability report (runtime, package_manager, project, playwright.runtime_state, browser, accessibility, design_runtime, application)"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": ["node (optional; version probe only)"],
       "side_effects": "none (read-only; runs `node --version`/`python --version`, optional HTTP GET to a given URL)",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": true, "deterministic": false, "network_access": true, "filesystem_read": ["target-project", "browser-cache"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":true,"deterministic":false,"network_access":true,"filesystem_read":["target-project","browser-cache"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "run_runtime",
@@ -73,12 +73,12 @@
       "description": "Capture rendered evidence with the project's own Playwright (screenshots, optional motion probe and reduced-motion capture). Blocks honestly when the runtime is not ready.",
       "entrypoint": "uiux.api:run_runtime",
       "cli": "python scripts/run_browser_execution.py --input <request.json> --project <dir> [--dry-run] [--allow-start]",
-      "input": {"type": "object", "required": ["request", "project"], "properties": {"request": {"type": "object", "description": "execution/runtime/runtime-input.md"}, "project": {"type": "string"}, "dry_run": {"type": "boolean", "default": false}, "allow_start": {"type": "boolean", "default": false, "description": "Allow starting the explicit argv start.command of the request"}}, "additionalProperties": false},
-      "output": {"type": "object", "required": ["exit_code", "summary"], "description": "{exit_code, summary: {status, report?, manifest?}} with statuses COMPLETED, PARTIAL, FAILED, BLOCKED, DRY_RUN, INVALID_INPUT"},
-      "dependencies": {"python": ">=3.9", "packages": []},
-      "runtime_requirements": ["node", "project-local playwright or @playwright/test (optional; BLOCKED when absent)", "installed Playwright browser build (optional; BLOCKED when absent)"],
+      "input": {"type":"object","required":["request","project"],"properties":{"request":{"type":"object","description":"Arbitrary map: runtime input following execution/runtime/runtime-input.md. Expected keys include session_id, base_url, routes, viewports and optional start; example: {\"session_id\":\"s1\",\"base_url\":\"http://localhost:3000\",\"routes\":[{\"page_id\":\"home\",\"route\":\"/\"}]}."},"project":{"type":"string"},"dry_run":{"type":"boolean","default":false},"allow_start":{"type":"boolean","default":false,"description":"Allow starting the explicit argv start.command of the request"}},"additionalProperties":false},
+      "output": {"type":"object","required":["exit_code","summary"],"description":"{exit_code, summary: {status, report?, manifest?}} with statuses COMPLETED, PARTIAL, FAILED, BLOCKED, DRY_RUN, INVALID_INPUT"},
+      "dependencies": {"python":">=3.9","packages":[]},
+      "runtime_requirements": ["node","project-local playwright or @playwright/test (optional; BLOCKED when absent)","installed Playwright browser build (optional; BLOCKED when absent)"],
       "side_effects": "writes evidence under <project>/.evidence/<session>; starts a server only with allow_start and an explicit argv command; never installs",
-      "annotations": {"read_only": false, "writes_to": "target-project", "may_start_process": true, "deterministic": false, "network_access": true, "filesystem_read": ["package", "target-project", "browser-cache"], "requires_node": true, "requires_browser": true, "long_running": true}
+      "annotations": {"read_only":false,"writes_to":"target-project","may_start_process":true,"deterministic":false,"network_access":true,"filesystem_read":["package","target-project","browser-cache"],"requires_node":true,"requires_browser":true,"long_running":true}
     },
     {
       "id": "accessibility_scan",
@@ -86,12 +86,12 @@
       "description": "Run axe with the project's own Playwright and axe package against an already running application. Gated on playwright.runtime_state like run_runtime; blocks honestly (PLAYWRIGHT_IMPORT_FAILURE, PLAYWRIGHT_BROWSER_UNAVAILABLE, AXE_NOT_AVAILABLE, READINESS_TIMEOUT) and never installs, downloads or starts anything.",
       "entrypoint": "uiux.api:accessibility_scan",
       "cli": "python scripts/run_accessibility_scan.py --input <request.json> --project <dir> [--dry-run]",
-      "input": {"type": "object", "required": ["request", "project"], "properties": {"request": {"type": "object", "description": "{session_id, base_url, routes, viewports?, iteration?, rules?, timeout_ms?, output_dir?}"}, "project": {"type": "string"}, "dry_run": {"type": "boolean", "default": false}}, "additionalProperties": false},
-      "output": {"type": "object", "required": ["exit_code", "summary"], "description": "{exit_code, summary: {status, manifest?, runtime_state?, error_code?}} with statuses COMPLETED, PARTIAL, FAILED, BLOCKED, DRY_RUN, INVALID_INPUT; exit codes 0 completed/dry-run, 2 blocked, 3 invalid input, 4 partial/failed"},
-      "dependencies": {"python": ">=3.9", "packages": []},
-      "runtime_requirements": ["node", "project-local playwright or @playwright/test (optional; BLOCKED when absent)", "installed Playwright browser build (optional; BLOCKED when absent)", "@axe-core/playwright or axe-core declared by the project (optional; BLOCKED when absent)"],
+      "input": {"type":"object","required":["request","project"],"properties":{"request":{"type":"object","description":"Arbitrary map: accessibility request with session_id, base_url, routes[{page_id,route}], optional viewports, iteration, rules, timeout_ms and output_dir."},"project":{"type":"string"},"dry_run":{"type":"boolean","default":false}},"additionalProperties":false},
+      "output": {"type":"object","required":["exit_code","summary"],"description":"{exit_code, summary: {status, manifest?, runtime_state?, error_code?}} with statuses COMPLETED, PARTIAL, FAILED, BLOCKED, DRY_RUN, INVALID_INPUT; exit codes 0 completed/dry-run, 2 blocked, 3 invalid input, 4 partial/failed"},
+      "dependencies": {"python":">=3.9","packages":[]},
+      "runtime_requirements": ["node","project-local playwright or @playwright/test (optional; BLOCKED when absent)","installed Playwright browser build (optional; BLOCKED when absent)","@axe-core/playwright or axe-core declared by the project (optional; BLOCKED when absent)"],
       "side_effects": "writes accessibility evidence under <project>/<output_dir>/<session>/accessibility (default .evidence); runs node for the axe helper; never installs, downloads browsers or starts a server",
-      "annotations": {"read_only": false, "writes_to": "target-project", "may_start_process": true, "deterministic": false, "network_access": true, "filesystem_read": ["package", "target-project", "browser-cache"], "requires_node": true, "requires_browser": true, "long_running": true}
+      "annotations": {"read_only":false,"writes_to":"target-project","may_start_process":true,"deterministic":false,"network_access":true,"filesystem_read":["package","target-project","browser-cache"],"requires_node":true,"requires_browser":true,"long_running":true}
     },
     {
       "id": "run_evals",
@@ -99,12 +99,12 @@
       "description": "Run automated eval suites (structure, knowledge, resolver, quality-fixtures) and list agent-run scenarios (scenarios suite, status MANUAL).",
       "entrypoint": "uiux.api:run_evals",
       "cli": "python scripts/uiux_cli.py call run_evals --params '{\"suites\": [\"knowledge\", \"resolver\"]}'",
-      "input": {"type": "object", "properties": {"suites": {"type": ["array", "null"], "items": {"type": "string", "enum": ["structure", "knowledge", "resolver", "quality-fixtures", "scenarios"]}, "description": "Default: the automated suites"}, "scenario_ids": {"type": ["array", "null"], "items": {"type": "string"}}}, "additionalProperties": false},
-      "output": {"type": "object", "required": ["status", "suites"], "description": "{status, suites: {<suite>: {status, ...}}}"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{"suites":{"type":["array","null"],"items":{"type":"string","enum":["structure","knowledge","resolver","quality-fixtures","scenarios"]},"description":"Default: the automated suites"},"scenario_ids":{"type":["array","null"],"items":{"type":"string"}}},"additionalProperties":false},
+      "output": {"type":"object","required":["status","suites"],"description":"{status, suites: {<suite>: {status, ...}}}"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "validate_skill",
@@ -112,12 +112,12 @@
       "description": "Whole-skill structural validation: required files, links, scenario IDs, contracts, knowledge catalogs, plugin-ready metadata.",
       "entrypoint": "uiux.api:validate_skill",
       "cli": "python scripts/validate_skill.py [root]",
-      "input": {"type": "object", "properties": {}, "additionalProperties": false},
-      "output": {"type": "object", "required": ["status", "errors"], "description": "{status, errors}"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{},"additionalProperties":false},
+      "output": {"type":"object","required":["status","errors"],"description":"{status, errors}"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "capability_map",
@@ -125,12 +125,12 @@
       "description": "Discover what this package can do: every manifest capability with its tools and instruction entrypoints, registered tools, knowledge collections, eval suites and optional runtime features. Static unless `project` is given, which adds runtime availability for that project (read-only detection).",
       "entrypoint": "uiux.api:capability_map",
       "cli": "python scripts/uiux_cli.py call capability_map --params '{\"project\": \".\"}'",
-      "input": {"type": "object", "properties": {"project": {"type": ["string", "null"], "description": "Target project; when given, runtime-dependent capabilities report availability"}}, "additionalProperties": false},
-      "output": {"type": "object", "required": ["version", "capabilities", "tools", "knowledge", "evals", "runtime"], "description": "{version, capabilities: {<id>: {kind: static|runtime-dependent, tools, instructions, availability}}, tools, knowledge, evals, runtime}"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{"project":{"type":["string","null"],"description":"Target project; when given, runtime-dependent capabilities report availability"}},"additionalProperties":false},
+      "output": {"type":"object","required":["version","capabilities","tools","knowledge","evals","runtime"],"description":"{version, capabilities: {<id>: {kind: static|runtime-dependent, tools, instructions, availability}}, tools, knowledge, evals, runtime}"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none; with `project`, the read-only runtime detection of detect_runtime",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": true, "deterministic": false, "network_access": false, "filesystem_read": ["package", "target-project", "browser-cache"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":true,"deterministic":false,"network_access":false,"filesystem_read":["package","target-project","browser-cache"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "run_runtime_validation",
@@ -138,24 +138,12 @@
       "description": "Phase 7 – Run a complete runtime validation session (critique + repair loop). Accepts a modification plan, change manifest, before/after evidence. Returns a critic_report with overall_status (pass/warn/fail/blocked), categorised issues (visual_regression, preservation_violation, responsive_failure, interaction_failure, accessibility_regression, runtime_error, plan_drift, missing_required_state), pre-existing vs new regression classification, repair recommendations, and repair history.",
       "entrypoint": "uiux.api:run_runtime_validation",
       "cli": "python scripts/uiux_cli.py call run_runtime_validation --params '{...}'",
-      "input": {
-        "type": "object",
-        "properties": {
-          "modification_plan": {"type": ["object", "null"], "description": "Phase 6 ModificationPlan dict."},
-          "change_manifest": {"type": ["object", "null"], "description": "Phase 6 ChangeManifest dict."},
-          "before_evidence": {"type": ["object", "null"], "description": "Runtime evidence captured before editing."},
-          "after_evidence": {"type": ["object", "null"], "description": "Runtime evidence captured after editing."},
-          "workflow": {"type": "string", "enum": ["greenfield", "existing-ui"], "default": "existing-ui"},
-          "validate_only": {"type": "boolean", "default": false, "description": "If true, no repair attempts are made."},
-          "max_repair_iterations": {"type": "integer", "default": 3, "description": "Maximum repair loop iterations."}
-        },
-        "additionalProperties": false
-      },
-      "output": {"type": "object", "required": ["schema_version", "report_id", "overall_status", "issues"], "description": "critic_report: {schema_version, report_id, session_id, plan_id, workflow, overall_status, summary, issues, repair_recommendation, repair_history}"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{"modification_plan":{"type":["object","null"],"description":"Canonical artifact object: ModificationPlan produced by P2 plan_modification."},"change_manifest":{"type":["object","null"],"description":"Canonical artifact object: actual-change manifest derived from the P3 implementation ledger."},"before_evidence":{"type":["object","null"],"description":"Canonical artifact object: evidence captured before edits by run_runtime/accessibility_scan."},"after_evidence":{"type":["object","null"],"description":"Canonical artifact object: evidence captured after edits by run_runtime/accessibility_scan."},"workflow":{"type":"string","enum":["greenfield","existing-ui"],"default":"existing-ui"},"validate_only":{"type":"boolean","default":false,"description":"If true, no repair attempts are made."},"max_repair_iterations":{"type":"integer","default":3,"description":"Maximum repair loop iterations."}},"additionalProperties":false},
+      "output": {"type":"object","required":["schema_version","report_id","overall_status","issues"],"description":"critic_report: {schema_version, report_id, session_id, plan_id, workflow, overall_status, summary, issues, repair_recommendation, repair_history}"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none (pure analysis; does not write evidence or apply repairs)",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "build_critic_report",
@@ -163,18 +151,12 @@
       "description": "Phase 7 – Build a critic report from a pre-assembled session data dict (use when you already have all session components). Returns critic_report.",
       "entrypoint": "uiux.api:build_critic_report",
       "cli": "python scripts/uiux_cli.py call build_critic_report --params '{\"session_data\": {...}}'",
-      "input": {
-        "type": "object",
-        "properties": {
-          "session_data": {"type": ["object", "null"], "description": "Dict with modification_plan, change_manifest, before_evidence, after_evidence, workflow, session_id."}
-        },
-        "additionalProperties": false
-      },
-      "output": {"type": "object", "required": ["schema_version", "report_id", "overall_status", "issues"], "description": "critic_report"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{"session_data":{"type":["object","null"],"description":"Arbitrary map: P4 runtime session containing modification_plan, change_manifest, before_evidence, after_evidence, workflow and session_id."}},"additionalProperties":false},
+      "output": {"type":"object","required":["schema_version","report_id","overall_status","issues"],"description":"critic_report"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "evaluate_runtime_result",
@@ -182,18 +164,12 @@
       "description": "Phase 7 – Evaluate a critic_report for overall pass/fail/blocked status. Returns authorized_to_proceed flag and key metrics.",
       "entrypoint": "uiux.api:evaluate_runtime_result",
       "cli": "python scripts/uiux_cli.py call evaluate_runtime_result --params '{\"critic_report\": {...}}'",
-      "input": {
-        "type": "object",
-        "properties": {
-          "critic_report": {"type": ["object", "null"], "description": "A critic_report produced by run_runtime_validation."}
-        },
-        "additionalProperties": false
-      },
-      "output": {"type": "object", "required": ["authorized_to_proceed", "overall_status"], "description": "{authorized_to_proceed, overall_status, critical_issue_count, repair_required, blocked}"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{"critic_report":{"type":["object","null"],"description":"Canonical artifact object: critic report produced by P4 build_critic_report or run_runtime_validation."}},"additionalProperties":false},
+      "output": {"type":"object","required":["authorized_to_proceed","overall_status"],"description":"{authorized_to_proceed, overall_status, critical_issue_count, repair_required, blocked}"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "build_repair_plan",
@@ -201,19 +177,12 @@
       "description": "Phase 7 – Build a targeted repair plan from a critic report. All repair actions are validated against Phase 6 blast radius. PRESERVATION_VIOLATION and PLAN_DRIFT issues are never auto-repairable.",
       "entrypoint": "uiux.api:build_repair_plan",
       "cli": "python scripts/uiux_cli.py call build_repair_plan --params '{\"critic_report\": {...}, \"modification_plan\": {...}}'",
-      "input": {
-        "type": "object",
-        "properties": {
-          "critic_report": {"type": ["object", "null"], "description": "A critic_report from run_runtime_validation."},
-          "modification_plan": {"type": ["object", "null"], "description": "The original Phase 6 ModificationPlan."}
-        },
-        "additionalProperties": false
-      },
-      "output": {"type": "object", "required": ["schema_version", "repair_id", "repair_status", "repair_actions"], "description": "repair_plan: {repair_id, repair_status, repair_actions, blocked_actions, blast_radius_constraint}"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{"critic_report":{"type":["object","null"],"description":"Canonical artifact object: P4 critic report; repair actions are scoped by the ModificationPlan."},"modification_plan":{"type":["object","null"],"description":"Canonical artifact object: ModificationPlan produced by P2 plan_modification."}},"additionalProperties":false},
+      "output": {"type":"object","required":["schema_version","repair_id","repair_status","repair_actions"],"description":"repair_plan: {repair_id, repair_status, repair_actions, blocked_actions, blast_radius_constraint}"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "run_targeted_repair",
@@ -221,19 +190,12 @@
       "description": "Phase 7 – Execute a targeted repair plan through Phase 6 Controlled Editing scope gate. Repairs bounded to original blast radius. Scope violations are blocked.",
       "entrypoint": "uiux.api:run_targeted_repair",
       "cli": "python scripts/uiux_cli.py call run_targeted_repair --params '{\"repair_plan\": {...}, \"modification_plan\": {...}}'",
-      "input": {
-        "type": "object",
-        "properties": {
-          "repair_plan": {"type": ["object", "null"], "description": "A repair_plan from build_repair_plan."},
-          "modification_plan": {"type": ["object", "null"], "description": "The original Phase 6 ModificationPlan."}
-        },
-        "additionalProperties": false
-      },
-      "output": {"type": "object", "required": ["status"], "description": "{status, repair_id, actions_executed, validation_required}"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{"repair_plan":{"type":["object","null"],"description":"Canonical artifact object: repair plan produced by P4 build_repair_plan."},"modification_plan":{"type":["object","null"],"description":"Canonical artifact object: ModificationPlan produced by P2 plan_modification."}},"additionalProperties":false},
+      "output": {"type":"object","required":["status"],"description":"{status, repair_id, actions_executed, validation_required}"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none (plan-level; actual code edits performed by agent via controlled editor)",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "recapture_evidence",
@@ -241,20 +203,12 @@
       "description": "Phase 7 – Compute the minimal targeted evidence recapture surface after a repair. Never full-site for local component fixes. Returns recapture_plan with pages, viewports, scenarios, provenance.",
       "entrypoint": "uiux.api:recapture_evidence",
       "cli": "python scripts/uiux_cli.py call recapture_evidence --params '{\"repair_result\": {...}, \"modification_plan\": {...}}'",
-      "input": {
-        "type": "object",
-        "properties": {
-          "repair_result": {"type": ["object", "null"], "description": "A repair result from run_targeted_repair."},
-          "modification_plan": {"type": ["object", "null"], "description": "The original Phase 6 ModificationPlan."},
-          "before_evidence": {"type": ["object", "null"], "description": "Optional baseline evidence for provenance."}
-        },
-        "additionalProperties": false
-      },
-      "output": {"type": "object", "required": ["recapture_pages", "recapture_viewports", "is_full_site"], "description": "recapture_plan: {recapture_pages, recapture_viewports, recapture_scenarios, is_full_site, rationale, provenance}"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{"repair_result":{"type":["object","null"],"description":"Canonical artifact object: repair result produced by P4 run_targeted_repair."},"modification_plan":{"type":["object","null"],"description":"Canonical artifact object: ModificationPlan produced by P2 plan_modification."},"before_evidence":{"type":["object","null"],"description":"Canonical artifact map: optional baseline evidence from run_runtime/accessibility_scan."}},"additionalProperties":false},
+      "output": {"type":"object","required":["recapture_pages","recapture_viewports","is_full_site"],"description":"recapture_plan: {recapture_pages, recapture_viewports, recapture_scenarios, is_full_site, rationale, provenance}"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "self_test",
@@ -262,12 +216,12 @@
       "description": "Fast health check of the installed package: version consistency, manifest, tool/knowledge/error registries, public API entrypoints, capability map, error contract and runtime detection. A missing optional runtime is reported as BLOCKED, not as a failure.",
       "entrypoint": "uiux.api:self_test",
       "cli": "python scripts/uiux_cli.py call self_test",
-      "input": {"type": "object", "properties": {}, "additionalProperties": false},
-      "output": {"type": "object", "required": ["status", "version", "checks"], "description": "{status: PASS|FAIL, version, checks: [{id, status: PASS|FAIL|BLOCKED, message, error_code?}]}"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{},"additionalProperties":false},
+      "output": {"type":"object","required":["status","version","checks"],"description":"{status: PASS|FAIL, version, checks: [{id, status: PASS|FAIL|BLOCKED, message, error_code?}]}"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none (reads the package; runtime detection runs `node --version`); never installs, downloads or writes",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": true, "deterministic": false, "network_access": false, "filesystem_read": ["package", "browser-cache"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":true,"deterministic":false,"network_access":false,"filesystem_read":["package","browser-cache"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "orchestrate_ui",
@@ -275,19 +229,12 @@
       "description": "Route UI workflows, enforce preservation policies, and resolve required capabilities and change levels (L1/L2/L3).",
       "entrypoint": "uiux.api:orchestrate_ui",
       "cli": "python scripts/uiux_cli.py call orchestrate_ui --params '{\"request\": {\"user_goal\": \"...\"}}'",
-      "input": {
-        "type": "object",
-        "required": ["request"],
-        "properties": {
-          "request": {"type": "object", "description": "UI orchestration request with user_goal, task_intent, requested_scope, repo_context, etc."}
-        },
-        "additionalProperties": false
-      },
-      "output": {"type": "object", "required": ["workflow", "ui_state", "confidence", "design_freedom", "preservation_required", "next_action"], "description": "Orchestration decision and routing plan"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","required":["request"],"properties":{"request":{"type":"object","description":"Arbitrary map: legacy orchestration request; common keys: user_request, user_intent, repo_context, requested_scope, explicit_constraints, explicit_permissions."},"verbosity":{"type":"string","enum":["compact","standard","full"],"default":"full","description":"Output projection. Defaults to full to preserve the legacy output contract."}},"additionalProperties":false},
+      "output": {"type":"object","required":["workflow","ui_state","confidence","design_freedom","preservation_required","next_action"],"description":"Orchestration decision and routing plan"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "analyze_repository",
@@ -295,19 +242,12 @@
       "description": "Run full Repo & Framework Intelligence to produce a normalized repo_profile (framework, styling, routes, components, tokens, UI state).",
       "entrypoint": "uiux.api:analyze_repository",
       "cli": "python scripts/uiux_cli.py call analyze_repository --params '{\"project\": \".\"}'",
-      "input": {
-        "type": "object",
-        "properties": {
-          "project": {"type": "string", "default": "."},
-          "options": {"type": ["object", "null"], "description": "Optional analysis configuration"}
-        },
-        "additionalProperties": false
-      },
-      "output": {"type": "object", "required": ["schema_version", "framework", "styling_system"], "description": "Normalized repository and framework profile"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{"project":{"type":"string","default":"."},"options":{"type":["object","null"],"description":"Optional analysis configuration"},"verbosity":{"type":"string","enum":["compact","standard","full"],"default":"full","description":"Output projection. Defaults to full to preserve the legacy output contract."}},"additionalProperties":false},
+      "output": {"type":"object","required":["schema_version","framework","styling_system"],"description":"Normalized repository and framework profile"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none (read-only scan of the project)",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package", "target-project"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package","target-project"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "analyze_existing_ui",
@@ -315,20 +255,12 @@
       "description": "Analyze an existing UI codebase for visual identity, layout hierarchy, component consistency, UX flows, responsive health, and design system maturity.",
       "entrypoint": "uiux.api:analyze_existing_ui",
       "cli": "python scripts/uiux_cli.py call analyze_existing_ui --params '{\"project\": \".\"}'",
-      "input": {
-        "type": "object",
-        "properties": {
-          "project": {"type": "string", "default": "."},
-          "repo_profile": {"type": ["object", "null"], "description": "Optional precomputed repo_profile"},
-          "options": {"type": ["object", "null"], "description": "Optional analysis options"}
-        },
-        "additionalProperties": false
-      },
-      "output": {"type": "object", "required": ["schema_version", "identity", "layout", "components"], "description": "Existing UI analysis profile"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{"project":{"type":"string","default":"."},"repo_profile":{"type":["object","null"],"description":"Optional precomputed repo_profile"},"options":{"type":["object","null"],"description":"Optional analysis options"},"verbosity":{"type":"string","enum":["compact","standard","full"],"default":"full","description":"Output projection. Defaults to full to preserve the legacy output contract."}},"additionalProperties":false},
+      "output": {"type":"object","required":["schema_version","identity","layout","components"],"description":"Existing UI analysis profile"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none (read-only scan of the project)",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package", "target-project"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package","target-project"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "map_ui_structure",
@@ -336,19 +268,12 @@
       "description": "Map the frontend structure of a project: routes, the layout shell around the page slot, ordered page sections with role (hero, features, pricing, ...), content inventory (headings, actions, media, fields), layout pattern and signature, motion, default-banlist signals and generic density, components and tokens in use. Focus: React/Next.js + Tailwind; Vue, Svelte, Astro and HTML templates with less precision. Save the result as .uiux/ui-map.json before an Elevate change.",
       "entrypoint": "uiux.api:map_ui_structure",
       "cli": "python scripts/uiux_cli.py call map_ui_structure --params '{\"project\": \".\", \"options\": {\"markdown\": true}}'",
-      "input": {
-        "type": "object",
-        "properties": {
-          "project": {"type": "string", "default": "."},
-          "options": {"type": ["object", "null"], "description": "routes (list of paths), max_routes (30), max_depth (4, component expansion), detail ('full'|'summary'), markdown (bool: add a CURRENT-UX-MAP section inventory), files/file_contents/package_json (in-memory project)"}
-        },
-        "additionalProperties": false
-      },
-      "output": {"type": "object", "required": ["schema_version", "routes", "shell", "components", "tokens", "summary"], "description": "UI map: {schema_version, framework, styling, shell, routes[{path, file, layouts, sections[{id, order, role, pattern, layout_signature, content, fingerprint, motion, banlist}], page_banlist, generic_density, fingerprint}], components, tokens{declared, used}, summary, limits}"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{"project":{"type":"string","default":"."},"options":{"type":["object","null"],"description":"routes (list of paths), max_routes (30), max_depth (4, component expansion), detail ('full'|'summary'), markdown (bool: add a CURRENT-UX-MAP section inventory), files/file_contents/package_json (in-memory project)"},"verbosity":{"type":"string","enum":["compact","standard","full"],"default":"full","description":"Output projection. Defaults to full to preserve the legacy output contract."}},"additionalProperties":false},
+      "output": {"type":"object","required":["schema_version","routes","shell","components","tokens","summary"],"description":"UI map: {schema_version, framework, styling, shell, routes[{path, file, layouts, sections[{id, order, role, pattern, layout_signature, content, fingerprint, motion, banlist}], page_banlist, generic_density, fingerprint}], components, tokens{declared, used}, summary, limits}"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none (read-only static scan of the project)",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package", "target-project"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package","target-project"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "diff_ui_maps",
@@ -356,20 +281,12 @@
       "description": "Compare a before and an after UI map (map_ui_structure): routes and content items removed or added, sections re-composed per route, banlist signals resolved, introduced or remaining, and whether the Elevate bar is met (content preserved and at least half of the matched sections re-composed).",
       "entrypoint": "uiux.api:diff_ui_maps",
       "cli": "python scripts/uiux_cli.py call diff_ui_maps --params '{\"before\": {...}, \"after\": {...}}'",
-      "input": {
-        "type": "object",
-        "required": ["before", "after"],
-        "properties": {
-          "before": {"type": "object", "description": "UI map captured before the change"},
-          "after": {"type": "object", "description": "UI map captured after the change"}
-        },
-        "additionalProperties": false
-      },
-      "output": {"type": "object", "required": ["routes", "content_preserved", "recomposition_ratio", "elevate_bar"], "description": "{routes_removed, routes_added, routes[{path, content_removed, content_added, sections_recomposed, recomposition_ratio, pattern_changes, banlist_resolved, banlist_introduced, banlist_remaining}], content_preserved, recomposition_ratio, elevate_bar}"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","required":["before","after"],"properties":{"before":{"type":"object","description":"Canonical artifact map: UI map produced by P0 map_ui_structure before editing."},"after":{"type":"object","description":"Canonical artifact map: UI map produced by P0 map_ui_structure after editing."}},"additionalProperties":false},
+      "output": {"type":"object","required":["routes","content_preserved","recomposition_ratio","elevate_bar"],"description":"{routes_removed, routes_added, routes[{path, content_removed, content_added, sections_recomposed, recomposition_ratio, pattern_changes, banlist_resolved, banlist_introduced, banlist_remaining}], content_preserved, recomposition_ratio, elevate_bar}"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "suggest_recipes",
@@ -377,24 +294,12 @@
       "description": "Rank the React + Tailwind / Next.js code recipes (knowledge/code-recipes) for each section of a UI map from map_ui_structure, or for given roles: fits by section role and by the default-banlist signals each recipe replaces, plus token, motion and surface recipes with their dependency status (available, needs_install with the command to propose, or css_fallback). Never installs anything.",
       "entrypoint": "uiux.api:suggest_recipes",
       "cli": "python scripts/uiux_cli.py call suggest_recipes --params '{\"roles\": [\"hero\", \"features\"], \"banlist\": [\"centered-hero\"]}'",
-      "input": {
-        "type": "object",
-        "properties": {
-          "ui_map": {"type": ["object", "null"], "description": "Result of map_ui_structure"},
-          "roles": {"type": ["array", "null"], "items": {"type": "string"}, "description": "Section roles when no ui_map is given"},
-          "banlist": {"type": ["array", "null"], "items": {"type": "string"}, "description": "Signal ids when no ui_map is given"},
-          "allow_motion_library": {"type": "boolean", "default": false, "description": "From orchestrate_ui (Elevate/Reimagine): one motion library may be proposed"},
-          "existing_dependencies": {"type": ["array", "null"], "items": {"type": "string"}, "description": "Package names already installed in the project"},
-          "include_code": {"type": "boolean", "default": false, "description": "Include each suggested recipe's source"},
-          "limit": {"type": "integer", "default": 2, "description": "Candidates per section"}
-        },
-        "additionalProperties": false
-      },
-      "output": {"type": "object", "required": ["tokens", "sections", "motion", "unmatched_sections", "notes"], "description": "{stacks, tokens[], sections[{route, section_id, role, banlist, candidates[{id, file, score, why, status}]}], motion[], unmatched_sections[], motion_library, notes[]}"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{"ui_map":{"type":["object","null"],"description":"Result of map_ui_structure"},"roles":{"type":["array","null"],"items":{"type":"string"},"description":"Section roles when no ui_map is given"},"banlist":{"type":["array","null"],"items":{"type":"string"},"description":"Signal ids when no ui_map is given"},"allow_motion_library":{"type":"boolean","default":false,"description":"From orchestrate_ui (Elevate/Reimagine): one motion library may be proposed"},"existing_dependencies":{"type":["array","null"],"items":{"type":"string"},"description":"Package names already installed in the project"},"include_code":{"type":"boolean","default":false,"description":"Include each suggested recipe's source"},"limit":{"type":"integer","default":2,"description":"Candidates per section"}},"additionalProperties":false},
+      "output": {"type":"object","required":["tokens","sections","motion","unmatched_sections","notes"],"description":"{stacks, tokens[], sections[{route, section_id, role, banlist, candidates[{id, file, score, why, status}]}], motion[], unmatched_sections[], motion_library, notes[]}"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "score_visual_critique",
@@ -402,27 +307,12 @@
       "description": "Score a visual change for the critique loop (review/visual-critique.md): validates the independent critic's rubric JSON for the after (and before) state, computes the weighted score, applies measured gates from diff_ui_maps, run_runtime capture probes (layout_probe, motion_probe) and accessibility scans, and returns pass, iterate (with next_focus) or stop, plus a VISUAL-CRITIQUE markdown section.",
       "entrypoint": "uiux.api:score_visual_critique",
       "cli": "python scripts/uiux_cli.py call score_visual_critique --params '{\"after\": {...}, \"before\": {...}, \"ui_map_diff\": {...}}'",
-      "input": {
-        "type": "object",
-        "required": ["after"],
-        "properties": {
-          "after": {"type": "object", "description": "Critic JSON for the after state (scores for all 8 rubric dimensions, issues)"},
-          "before": {"type": ["object", "null"], "description": "Critic JSON for the before state"},
-          "ui_map_diff": {"type": ["object", "null"], "description": "Result of diff_ui_maps"},
-          "captures": {"type": ["array", "null"], "items": {"type": "object"}, "description": "Capture entries from run_runtime manifests (with layout_probe / motion_probe)"},
-          "accessibility_scans": {"type": ["array", "null"], "items": {"type": "object"}, "description": "Scan entries from the accessibility_scan manifest (violations, impacts)"},
-          "ambition": {"type": "string", "default": "elevate", "description": "refine | elevate | reimagine (orchestrate_ui)"},
-          "iteration": {"type": "integer", "default": 1},
-          "max_iterations": {"type": "integer", "default": 3, "description": "First score plus at most two iterations"},
-          "previous_score": {"type": ["number", "null"], "description": "Weighted after-score of the previous iteration (no-progress detection)"}
-        },
-        "additionalProperties": false
-      },
-      "output": {"type": "object", "required": ["verdict", "score", "dimensions", "criteria", "gates", "issues", "next_focus", "markdown"], "description": "{verdict: pass|iterate|stop, reason, score{after, before, delta, progress}, dimensions, criteria, gates, issues, next_focus, markdown}"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","required":["after"],"properties":{"after":{"type":"object","description":"Arbitrary map: critic report containing scores for all eight rubric dimensions and optional issues; see review/visual-critique.md."},"before":{"type":["object","null"],"description":"Critic JSON for the before state"},"ui_map_diff":{"type":["object","null"],"description":"Result of diff_ui_maps"},"captures":{"type":["array","null"],"items":{"type":"object","description":"Runtime capture record produced by run_runtime.","properties":{"route":{"type":"string","description":"Page route captured by run_runtime."},"viewport":{"type":"string","description":"Viewport identifier from the runtime manifest."},"status":{"type":"string","description":"Capture status, normally CAPTURED."},"layout_probe":{"type":["object","null"],"description":"Arbitrary map: measured layout probe results."},"motion_probe":{"type":["object","null"],"description":"Arbitrary map: measured motion probe results."},"reduced_motion":{"type":["string","null"],"description":"Reduced-motion preference used for this capture."}}},"description":"Capture entries from run_runtime manifests (with layout_probe / motion_probe)"},"accessibility_scans":{"type":["array","null"],"items":{"type":"object","description":"Accessibility scan record produced by accessibility_scan.","properties":{"route":{"type":"string","description":"Page route scanned."},"viewport":{"type":"string","description":"Viewport identifier."},"status":{"type":"string","description":"Scan status."},"violations":{"type":["array","integer","null"],"items":{"type":"object","description":"Arbitrary map: axe violation record."},"description":"Axe violation count or list of violation records."}}},"description":"Scan entries from the accessibility_scan manifest (violations, impacts)"},"ambition":{"type":"string","default":"elevate","description":"refine | elevate | reimagine (orchestrate_ui)"},"iteration":{"type":"integer","default":1},"max_iterations":{"type":"integer","default":3,"description":"First score plus at most two iterations"},"previous_score":{"type":["number","null"],"description":"Weighted after-score of the previous iteration (no-progress detection)"}},"additionalProperties":false},
+      "output": {"type":"object","required":["verdict","score","dimensions","criteria","gates","issues","next_focus","markdown"],"description":"{verdict: pass|iterate|stop, reason, score{after, before, delta, progress}, dimensions, criteria, gates, issues, next_focus, markdown}"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "route_knowledge",
@@ -430,18 +320,12 @@
       "description": "Route required knowledge packs, skills, preservation invariants, and runtime validation from task intent and repo profile.",
       "entrypoint": "uiux.api:route_knowledge",
       "cli": "python scripts/uiux_cli.py call route_knowledge --params '{\"request\": {...}}'",
-      "input": {
-        "type": "object",
-        "properties": {
-          "request": {"type": ["object", "null"], "description": "Knowledge routing request with repo_profile, task_intent, etc."}
-        },
-        "additionalProperties": false
-      },
-      "output": {"type": "object", "required": ["schema_version", "workflow", "selected_packs", "context_budget"], "description": "Knowledge load plan"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{"request":{"type":["object","null"],"description":"Arbitrary knowledge request map; prefer run_ui_task for normal work. Low-level inputs include repo_profile (P0 analyze_repository), existing_ui_profile (P0 analyze_existing_ui), preservation_profile (P0 build_preservation_profile), user_request and requested_scope.","properties":{}},"verbosity":{"type":"string","enum":["compact","standard","full"],"default":"full","description":"Output projection. Defaults to full to preserve the legacy output contract."}},"additionalProperties":false},
+      "output": {"type":"object","required":["schema_version","workflow","selected_packs","context_budget"],"description":"Knowledge load plan"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "build_knowledge_plan",
@@ -449,25 +333,12 @@
       "description": "Build a comprehensive machine-readable Knowledge Load Plan tailored to framework, styling, domain, and preservation requirements.",
       "entrypoint": "uiux.api:build_knowledge_plan",
       "cli": "python scripts/uiux_cli.py call build_knowledge_plan --params '{...}'",
-      "input": {
-        "type": "object",
-        "properties": {
-          "repo_profile": {"type": ["object", "null"], "description": "Repository profile dict"},
-          "existing_ui_profile": {"type": ["object", "null"], "description": "Existing UI profile dict"},
-          "preservation_profile": {"type": ["object", "null"], "description": "Preservation profile dict"},
-          "task_intent": {"type": ["string", "null"], "description": "Normalized task intent"},
-          "user_request": {"type": "string", "default": "", "description": "Original user prompt"},
-          "workflow": {"type": "string", "default": "existing-ui", "description": "Workflow mode"},
-          "requested_scope": {"type": "string", "default": "global", "description": "Requested edit scope"},
-          "explicit_constraints": {"type": ["object", "null"], "description": "Explicit constraints"}
-        },
-        "additionalProperties": false
-      },
-      "output": {"type": "object", "required": ["schema_version", "workflow", "selected_packs", "context_budget"], "description": "Knowledge load plan"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{"repo_profile":{"type":["object","null"],"description":"Canonical repository profile produced by P0 analyze_repository; do not construct manually."},"existing_ui_profile":{"type":["object","null"],"description":"Canonical existing UI profile produced by P0 analyze_existing_ui; nullable for greenfield."},"preservation_profile":{"type":["object","null"],"description":"Canonical preservation profile produced by P0 build_preservation_profile; do not construct manually."},"task_intent":{"type":["string","null"],"description":"Normalized task intent"},"user_request":{"type":"string","default":"","description":"Original user prompt"},"workflow":{"type":"string","default":"existing-ui","description":"Workflow mode"},"requested_scope":{"type":"string","default":"global","description":"Requested edit scope"},"explicit_constraints":{"type":["object","null"],"description":"Explicit constraints"}},"additionalProperties":false},
+      "output": {"type":"object","required":["schema_version","workflow","selected_packs","context_budget"],"description":"Knowledge load plan"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "plan_modification",
@@ -475,27 +346,12 @@
       "description": "Generate a machine-readable Modification Plan for UI tasks: blast radius, change classification (L1/L2/L3), steps, checkpoints, and validation handoff.",
       "entrypoint": "uiux.api:plan_modification",
       "cli": "python scripts/uiux_cli.py call plan_modification --params '{...}'",
-      "input": {
-        "type": "object",
-        "properties": {
-          "user_request": {"type": "string", "default": "", "description": "User prompt"},
-          "workflow": {"type": "string", "default": "existing-ui", "description": "Workflow mode"},
-          "repo_profile": {"type": ["object", "null"], "description": "Repository profile"},
-          "existing_ui_profile": {"type": ["object", "null"], "description": "Existing UI profile"},
-          "preservation_profile": {"type": ["object", "null"], "description": "Preservation profile"},
-          "knowledge_plan": {"type": ["object", "null"], "description": "Knowledge plan"},
-          "explicit_constraints": {"type": ["object", "null"], "description": "Explicit constraints"},
-          "requested_scope": {"type": "string", "default": "global", "description": "Requested scope"},
-          "task_intent": {"type": ["string", "null"], "description": "Task intent"},
-          "plan_only": {"type": "boolean", "default": false, "description": "Plan only without execution"}
-        },
-        "additionalProperties": false
-      },
-      "output": {"type": "object", "required": ["schema_version", "plan_id", "workflow", "request", "blast_radius", "change_classification", "steps", "validation"], "description": "Modification Plan dict"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","properties":{"user_request":{"type":"string","default":"","description":"User prompt"},"workflow":{"type":"string","default":"existing-ui","description":"Workflow mode"},"repo_profile":{"type":["object","null"],"description":"Canonical repository profile produced by P0 analyze_repository; do not construct manually."},"existing_ui_profile":{"type":["object","null"],"description":"Canonical existing UI profile produced by P0 analyze_existing_ui; nullable for greenfield."},"preservation_profile":{"type":["object","null"],"description":"Canonical preservation profile produced by P0 build_preservation_profile; do not construct manually."},"knowledge_plan":{"type":["object","null"],"description":"Canonical knowledge plan produced by P1 build_knowledge_plan; do not construct manually."},"explicit_constraints":{"type":["object","null"],"description":"Arbitrary user-approved constraints map passed unchanged to P2. Do not use it to fabricate permissions.","properties":{}},"requested_scope":{"type":"string","default":"global","description":"Requested scope"},"task_intent":{"type":["string","null"],"description":"Task intent"},"plan_only":{"type":"boolean","default":false,"description":"Plan only without execution"},"verbosity":{"type":"string","enum":["compact","standard","full"],"default":"full","description":"Output projection. Defaults to full to preserve the legacy output contract."}},"additionalProperties":false},
+      "output": {"type":"object","required":["schema_version","plan_id","workflow","request","blast_radius","change_classification","steps","validation"],"description":"Modification Plan dict"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "build_validation_handoff",
@@ -503,19 +359,12 @@
       "description": "Extract the validation handoff contract from an approved Modification Plan.",
       "entrypoint": "uiux.api:build_validation_handoff",
       "cli": "python scripts/uiux_cli.py call build_validation_handoff --params '{\"plan\": {...}}'",
-      "input": {
-        "type": "object",
-        "required": ["plan"],
-        "properties": {
-          "plan": {"type": "object", "description": "Approved Modification Plan dict"}
-        },
-        "additionalProperties": false
-      },
-      "output": {"type": "object", "required": ["required_checks", "affected_viewports", "interactions", "accessibility", "preservation"], "description": "Validation handoff contract dict"},
-      "dependencies": {"python": ">=3.9", "packages": []},
+      "input": {"type":"object","required":["plan"],"properties":{"plan":{"type":"object","description":"Canonical artifact object: ModificationPlan produced by P2 plan_modification. Do not construct manually."}},"additionalProperties":false},
+      "output": {"type":"object","required":["required_checks","affected_viewports","interactions","accessibility","preservation"],"description":"Validation handoff contract dict"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {"read_only": true, "writes_to": "none", "may_start_process": false, "deterministic": true, "network_access": false, "filesystem_read": ["package"], "requires_node": false, "requires_browser": false, "long_running": false}
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "check_execution_gate",
@@ -523,46 +372,12 @@
       "description": "P3 gate: decide whether a Modification Plan may be executed (PlanningGate PASS, affected files, execution chunks and verification contract present).",
       "entrypoint": "uiux.api:check_execution_gate",
       "cli": "python scripts/uiux_cli.py call check_execution_gate --params '{\"plan\": {...}}'",
-      "input": {
-        "type": "object",
-        "required": [
-          "plan"
-        ],
-        "properties": {
-          "plan": {
-            "type": "object",
-            "description": "Modification Plan dict from plan_modification"
-          }
-        },
-        "additionalProperties": false
-      },
-      "output": {
-        "type": "object",
-        "required": [
-          "status",
-          "reason"
-        ],
-        "description": "Execution gate report (PASS or BLOCKED)"
-      },
-      "dependencies": {
-        "python": ">=3.9",
-        "packages": []
-      },
+      "input": {"type":"object","required":["plan"],"properties":{"plan":{"type":"object","description":"Canonical artifact object: ModificationPlan produced by P2 plan_modification. Do not construct manually."}},"additionalProperties":false},
+      "output": {"type":"object","required":["status","reason"],"description":"Execution gate report (PASS or BLOCKED)"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {
-        "read_only": true,
-        "writes_to": "none",
-        "may_start_process": false,
-        "deterministic": true,
-        "network_access": false,
-        "filesystem_read": [
-          "package"
-        ],
-        "requires_node": false,
-        "requires_browser": false,
-        "long_running": false
-      }
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "guard_edits",
@@ -570,64 +385,12 @@
       "description": "P3 controlled execution: run proposed edits through scope lock, preservation, business-logic and framework guards without writing files, and return the ledger, deviations and Implementation Report.",
       "entrypoint": "uiux.api:guard_edits",
       "cli": "python scripts/uiux_cli.py call guard_edits --params '{\"plan\": {...}, \"edits\": [...]}'",
-      "input": {
-        "type": "object",
-        "required": [
-          "plan",
-          "edits"
-        ],
-        "properties": {
-          "plan": {
-            "type": "object",
-            "description": "Approved Modification Plan dict"
-          },
-          "edits": {
-            "type": "array",
-            "items": {
-              "type": "object"
-            },
-            "description": "Proposed edits: chunk_id, target_file, target_component, operation, reason, new_content"
-          },
-          "framework": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Framework override (default: plan repository framework)"
-          }
-        },
-        "additionalProperties": false
-      },
-      "output": {
-        "type": "object",
-        "required": [
-          "plan_id",
-          "status",
-          "ready_for_p4",
-          "deviations",
-          "ledger"
-        ],
-        "description": "Implementation Report with change ledger"
-      },
-      "dependencies": {
-        "python": ">=3.9",
-        "packages": []
-      },
+      "input": {"type":"object","required":["plan","edits"],"properties":{"plan":{"type":"object","description":"Canonical artifact object: ModificationPlan produced by P2 plan_modification. Do not construct manually."},"edits":{"type":"array","items":{"type":"object","required":["chunk_id","target_file","target_component","operation","reason","new_content"],"properties":{"chunk_id":{"type":"string","description":"Execution chunk id from the P2 ModificationPlan."},"target_file":{"type":"string","description":"Repository-relative file path listed in the P2 ModificationPlan affected files."},"operation":{"type":"string","enum":["modify","create","delete"],"description":"Planned file operation."},"target_component":{"type":"string","description":"Component id/name authorized by the P2 plan."},"planned_change_id":{"type":["string","null"],"description":"Optional P2 planned change identifier; when omitted, P3 derives its legacy ledger id."},"reason":{"type":"string","description":"Why this edit is needed to satisfy the approved P2 plan."},"new_content":{"type":"string","description":"Proposed resulting file content validated by P3; this tool records a ledger and does not write the file."},"change_level":{"type":"string","enum":["L1","L2","L3"],"default":"L1","description":"Change budget level authorized by P2."}},"additionalProperties":false,"description":"One proposed edit checked against the P2 ModificationPlan; it does not write project files."},"description":"Proposed edits: chunk_id, target_file, target_component, operation, reason, new_content"},"framework":{"type":["string","null"],"description":"Framework override (default: plan repository framework)"},"verbosity":{"type":"string","enum":["compact","standard","full"],"default":"full","description":"Output projection. Defaults to full to preserve the legacy output contract."}},"additionalProperties":false},
+      "output": {"type":"object","required":["plan_id","status","ready_for_p4","deviations","ledger"],"description":"Implementation Report with change ledger"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {
-        "read_only": true,
-        "writes_to": "none",
-        "may_start_process": false,
-        "deterministic": true,
-        "network_access": false,
-        "filesystem_read": [
-          "package"
-        ],
-        "requires_node": false,
-        "requires_browser": false,
-        "long_running": false
-      }
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
     },
     {
       "id": "verify_implementation",
@@ -635,76 +398,38 @@
       "description": "P4 verification: gate on the Implementation Report, check evidence sufficiency against the plan verification contract, check correctness and preservation, and route repairs to the responsible phase.",
       "entrypoint": "uiux.api:verify_implementation",
       "cli": "python scripts/uiux_cli.py call verify_implementation --params '{\"implementation_report\": {...}, \"session\": {...}}'",
-      "input": {
-        "type": "object",
-        "required": [
-          "implementation_report",
-          "session"
-        ],
-        "properties": {
-          "implementation_report": {
-            "type": "object",
-            "description": "Report returned by guard_edits"
-          },
-          "session": {
-            "type": "object",
-            "description": "Runtime validation session data (after_evidence, change_manifest, ...)"
-          },
-          "plan": {
-            "type": [
-              "object",
-              "null"
-            ],
-            "description": "Modification Plan; supplies the preservation profile and verification contract"
-          },
-          "verification_contract": {
-            "type": [
-              "object",
-              "null"
-            ],
-            "description": "Explicit contract overriding the one derived from the plan"
-          },
-          "decisions": {
-            "type": [
-              "array",
-              "null"
-            ],
-            "items": {
-              "type": "object"
-            },
-            "description": "Design decisions to evaluate"
-          }
-        },
-        "additionalProperties": false
-      },
-      "output": {
-        "type": "object",
-        "required": [
-          "status",
-          "repair",
-          "final_gate"
-        ],
-        "description": "Final verification report"
-      },
-      "dependencies": {
-        "python": ">=3.9",
-        "packages": []
-      },
+      "input": {"type":"object","required":["implementation_report","session"],"properties":{"implementation_report":{"type":"object","description":"Canonical artifact object: ImplementationReport produced by P3 guard_edits; do not construct manually."},"session":{"type":"object","description":"Arbitrary map: P4 session containing after_evidence and optional before_evidence/change_manifest; evidence is produced by run_runtime/accessibility_scan or equivalent runtime capture."},"plan":{"type":["object","null"],"description":"Modification Plan; supplies the preservation profile and verification contract"},"verification_contract":{"type":["object","null"],"description":"Explicit contract overriding the one derived from the plan"},"decisions":{"type":["array","null"],"items":{"type":"object","description":"P2 design decision record.","properties":{"id":{"type":"string","description":"P2 design decision id."},"target":{"type":"string","description":"Page, component or surface governed by the decision."},"expected":{"type":"string","description":"Expected implementation outcome."}}},"description":"Design decisions to evaluate"},"verbosity":{"type":"string","enum":["compact","standard","full"],"default":"full","description":"Output projection. Defaults to full to preserve the legacy output contract."}},"additionalProperties":false},
+      "output": {"type":"object","required":["status","repair","final_gate"],"description":"Final verification report"},
+      "dependencies": {"python":">=3.9","packages":[]},
       "runtime_requirements": [],
       "side_effects": "none",
-      "annotations": {
-        "read_only": true,
-        "writes_to": "none",
-        "may_start_process": false,
-        "deterministic": true,
-        "network_access": false,
-        "filesystem_read": [
-          "package"
-        ],
-        "requires_node": false,
-        "requires_browser": false,
-        "long_running": false
-      }
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":false,"deterministic":true,"network_access":false,"filesystem_read":["package"],"requires_node":false,"requires_browser":false,"long_running":false}
+    },
+    {
+      "id": "run_ui_task",
+      "visibility": "public",
+      "description": "DEFAULT for normal UI tasks. Advances exactly one SEE?KNOW?THINK?DO?CHECK phase per call and persists handoffs in the target project?s existing .evidence storage. Repeatedly call it using the returned task_id and next_action until status is COMPLETED, PARTIAL, BLOCKED, or FAILED. Use for end-to-end UI work; do not use it to invoke a single low-level diagnostic. Example: run_ui_task(request=\"Improve checkout UI on mobile while keeping the brand colors\"). Common blocked state: P0 context is insufficient, P2 requires permission, P3 finds a deviation, or P4 runtime evidence is unavailable.",
+      "entrypoint": "uiux.api:run_ui_task",
+      "cli": "python scripts/uiux_cli.py call run_ui_task --params @request.json",
+      "input": {"type":"object","properties":{"task_id":{"type":["string","null"],"description":"Persisted task id returned by the first run_ui_task call; omit/null only when starting a new task."},"request":{"type":["string","null"],"description":"Required on the first call. Original UI request; omit on continuation."},"repo_path":{"type":["string","null"],"description":"Target project root. Defaults to the current project/workspace; continuation can omit when called from that project."},"user_message":{"type":["string","null"],"description":"Only supply when next_action requests missing input or explicit permission. Never fabricate permission."},"verbosity":{"type":"string","enum":["compact","standard","full"],"default":"compact","description":"compact returns envelope and refs; standard adds key summaries; full includes current canonical phase artifacts."}},"additionalProperties":false},
+      "output": {"type":"object","required":["task_id","status","phase","summary","next_action","warnings","artifact_refs"],"description":"Task envelope. next_action={type:CALL_AGAIN|PROVIDE_INPUT|GRANT_PERMISSION|FIX_ENVIRONMENT|DONE,tool,task_id,message,required_input}. Artifacts are referenced by project-relative paths."},
+      "dependencies": {"python":">=3.9","packages":[]},
+      "runtime_requirements": [],
+      "side_effects": "Writes task state and phase artifacts under <project>/.evidence/uiux-tasks/<task_id>; never installs dependencies or edits source files.",
+      "annotations": {"read_only":false,"writes_to":"target-project","may_start_process":false,"deterministic":false,"network_access":false,"filesystem_read":["package","target-project"],"requires_node":false,"requires_browser":false,"long_running":false}
+    },
+    {
+      "id": "doctor",
+      "visibility": "public",
+      "description": "Read-only user-facing capability matrix for plugin health, P0?P4, project package manager, Node, Playwright/browser runtime and evidence storage. Use before a UI task or when a phase is blocked; not a test runner or installer. Example: doctor(project=\".\"). Common blocked state: a core phase, plugin registry, evidence storage or optional browser capability is unavailable.",
+      "entrypoint": "uiux.api:doctor",
+      "cli": "python scripts/uiux_cli.py doctor --project .",
+      "input": {"type":"object","properties":{"project":{"type":"string","default":".","description":"Target project directory."}},"additionalProperties":false},
+      "output": {"type":"object","required":["overall_status","summary","capabilities","limitations","next_actions"],"description":"Capability matrix with per-capability status, impact and actions; includes reused self_test report."},
+      "dependencies": {"python":">=3.9","packages":[]},
+      "runtime_requirements": [],
+      "side_effects": "none (read-only; does not install dependencies, download browsers, or start processes)",
+      "annotations": {"read_only":true,"writes_to":"none","may_start_process":true,"deterministic":false,"network_access":false,"filesystem_read":["package","target-project","browser-cache"],"requires_node":false,"requires_browser":false,"long_running":false}
     }
   ]
 }

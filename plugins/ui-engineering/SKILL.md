@@ -5,6 +5,10 @@ description: Orchestrate a two-phase web UI/UX delivery workflow with structure 
 
 # UI/UX Workflow Engine
 
+## Default agent entrypoint
+
+For normal UI tasks, use the public `run_ui_task` tool and follow its `next_action`, reusing `task_id` until a terminal result. Do not manually connect P0-P4 artifacts. Read [AGENT-USAGE.md](AGENT-USAGE.md) for the short call loop. Low-level tools remain available for debugging and explicitly advanced workflows. Use `doctor` / `uiux doctor` for a read-only capability report.
+
 ## Purpose and role
 
 Act as the workflow controller for web UI/UX work. Establish the project state, select a valid entry point, and preserve the boundary between UX structure and visual/frontend delivery. Phase 1 defines the complete structural handoff; Phase 2 remains out of scope for structural decisions.

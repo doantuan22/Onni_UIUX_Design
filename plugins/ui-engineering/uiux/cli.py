@@ -53,6 +53,8 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("version")
     sub.add_parser("tools")
     sub.add_parser("architecture")
+    doctor = sub.add_parser("doctor", help="Read-only capability report for a target project")
+    doctor.add_argument("--project", default=".", help="Target project directory (default: current directory)")
     call = sub.add_parser(
         "call",
         help="Invoke a tool by ID",
@@ -78,6 +80,8 @@ def main(argv: list[str] | None = None) -> int:
             result = {"tools": api.list_tools()}
         elif args.command == "architecture":
             result = api.describe_architecture()
+        elif args.command == "doctor":
+            result = api.doctor(args.project)
         else:
             result = api.call_tool(args.tool, _params(args.params))
     except api.UiuxError as exc:

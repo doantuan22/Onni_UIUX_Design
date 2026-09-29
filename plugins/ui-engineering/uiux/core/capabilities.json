@@ -12,6 +12,7 @@
     "design-quality-analysis": {"tools": ["analyze_design_quality"], "instructions": ["evals/quality/README.md"]},
     "browser-runtime-evidence": {"tools": ["detect_runtime", "run_runtime", "score_visual_critique"], "instructions": ["execution/README.md"]},
     "accessibility-runtime": {"tools": ["accessibility_scan"], "instructions": ["execution/accessibility/README.md"]},
-    "eval-execution": {"tools": ["run_evals", "validate_skill"], "instructions": ["evals/README.md"]}
+    "eval-execution": {"tools": ["run_evals", "validate_skill"], "instructions": ["evals/README.md"]},
+    "agent-task-orchestration": {"tools": ["run_ui_task", "doctor"], "instructions": ["AGENT-USAGE.md", "SKILL.md"]}
   }
 }

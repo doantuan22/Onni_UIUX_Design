@@ -32,10 +32,12 @@ class FileEditor:
         operation: str,
         reason: str,
         new_content: str,
-        change_level: str = "L1"
+        change_level: str = "L1",
+        planned_change_id: str | None = None,
     ) -> dict[str, Any]:
         """Validate an edit against every gate and ledger it. The host agent performs the actual file write."""
-        result = self._check_edit(chunk_id, target_file, target_component, operation, reason, new_content, change_level)
+        result = self._check_edit(chunk_id, target_file, target_component, operation, reason, new_content, change_level,
+                                 planned_change_id)
         if not result["success"]:
             self.deviations.append(result["deviation"])
             self.rejected_chunks.add(chunk_id)
@@ -50,6 +52,7 @@ class FileEditor:
         reason: str,
         new_content: str,
         change_level: str,
+        planned_change_id: str | None,
     ) -> dict[str, Any]:
         
         # 1. Scope Lock Check
@@ -99,7 +102,7 @@ class FileEditor:
         # 6. Record Ledger Entry
         entry: ChangeLedgerEntry = {
             "change_id": f"chg_{time.time()}",
-            "plan_change_id": f"plan_chg_{target_component}",
+            "plan_change_id": planned_change_id or f"plan_chg_{target_component}",
             "chunk_id": chunk_id,
             "file": target_file,
             "component": target_component,

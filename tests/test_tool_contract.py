@@ -57,7 +57,7 @@ class RegistryTests(unittest.TestCase):
 
     def test_annotations(self) -> None:
         writers = {t["id"] for t in TOOLS if not t["annotations"]["read_only"]}
-        self.assertEqual(writers, {"run_runtime", "accessibility_scan"})
+        self.assertEqual(writers, {"run_runtime", "accessibility_scan", "run_ui_task"})
         for tool in TOOLS:
             notes = tool["annotations"]
             with self.subTest(tool=tool["id"]):

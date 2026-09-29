@@ -264,6 +264,62 @@
         "envelope"
       ],
       "remediation": "Report the issue; re-run with UIUX_DEBUG=1 to print the traceback to stderr."
+    },
+    "INSUFFICIENT_CONTEXT": {
+      "category": "validation",
+      "scope": [
+        "result"
+      ],
+      "remediation": "Provide each field listed in missing, then call run_ui_task with the same task_id."
+    },
+    "NEEDS_PERMISSION": {
+      "category": "validation",
+      "scope": [
+        "result"
+      ],
+      "remediation": "Ask the user for explicit authorization; pass only their answer as user_message."
+    },
+    "PLAN_DEVIATION": {
+      "category": "validation",
+      "scope": [
+        "result"
+      ],
+      "remediation": "The change exceeded the approved P2 plan; run_ui_task routes back to THINK for re-planning."
+    },
+    "EXECUTION_BLOCKED": {
+      "category": "runtime",
+      "scope": [
+        "result"
+      ],
+      "remediation": "Resolve the P3 execution gate or complete the approved implementation chunks, then resume run_ui_task."
+    },
+    "VERIFICATION_BLOCKED": {
+      "category": "dependency",
+      "scope": [
+        "result"
+      ],
+      "remediation": "Provide the target project runtime and required rendered evidence; the plugin never installs or downloads them."
+    },
+    "MISSING_CAPABILITY": {
+      "category": "dependency",
+      "scope": [
+        "result"
+      ],
+      "remediation": "Use doctor to inspect the missing capability and follow its next_actions."
+    },
+    "SCHEMA_VALIDATION_ERROR": {
+      "category": "validation",
+      "scope": [
+        "result"
+      ],
+      "remediation": "Correct the named field to match expected and retry the tool call."
+    },
+    "INTERNAL_FAILURE": {
+      "category": "internal",
+      "scope": [
+        "result"
+      ],
+      "remediation": "Inspect the task artifact and retry after resolving the internal failure; enable UIUX_DEBUG for diagnostics."
     }
   }
 }
