@@ -72,7 +72,7 @@ def run_target_benchmark(
         }
 
         # Stage 2: Orchestrate UI
-        orch_req = {"task": task, "user_request": task, "repo_profile": repo_profile}
+        orch_req = {"user_request": task, "repo_context": {"workspace_root": str(target), "files": repo_profile.get("files", [])}}
         if workflow:
             orch_req["workflow"] = workflow
         orch_res = api.orchestrate_ui(request=orch_req)
@@ -106,8 +106,9 @@ def run_target_benchmark(
             task_intent=orch_res.get("intent"),
         )
         report["stages"]["plan_modification"] = {
-            "status": "PASS",
+            "status": "PASS" if plan_res.get("steps") or plan_res.get("execution_chunks") else "INCOMPLETE",
             "step_count": len(plan_res.get("steps", [])),
+            "execution_chunk_count": len(plan_res.get("execution_chunks", [])),
             "affected_files": plan_res.get("affected_files", []),
         }
 
@@ -150,12 +151,16 @@ def run_target_benchmark(
         report["authorized_to_proceed"] = eval_res.get("authorized_to_proceed", False)
 
         # Final Classification
-        if not requires_runtime:
+        plan_complete = report["stages"]["plan_modification"]["status"] == "PASS"
+        if mock_browser_evidence is not None:
+            report["status"] = "SIMULATED_EVIDENCE_TEST_ONLY"
+            report["runtime_classification"] = "SIMULATED_EVIDENCE_ONLY"
+        elif not plan_complete:
+            report["status"] = "BLOCKED_INSUFFICIENT_PLAN"
+            report["runtime_classification"] = "BLOCKED_EMPTY_MODIFICATION_PLAN"
+        elif not requires_runtime:
             report["status"] = "INTEGRATION_VERIFIED"
             report["runtime_classification"] = "RUNTIME_NOT_REQUIRED"
-        elif browser_ready and mock_browser_evidence:
-            report["status"] = "BROWSER_E2E_VERIFIED"
-            report["runtime_classification"] = "REAL_BROWSER_EXECUTED"
         elif not browser_ready:
             report["status"] = "BLOCKED_BROWSER_RUNTIME"
             report["runtime_classification"] = f"BLOCKED_{playwright_state}"

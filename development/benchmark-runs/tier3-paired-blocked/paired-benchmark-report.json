@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "benchmark_id": "uiux-tier3-reasoning-2026-09",
+  "created_at_utc": "2026-09-29T17:41:37.679114+00:00",
+  "status": "BLOCKED",
+  "score_status": "NOT_SCORED",
+  "paired_arms_compared": false,
+  "contract": {
+    "same_fixture_copy": true,
+    "same_request": true,
+    "same_environment": true,
+    "same_time_budget_seconds": 1800,
+    "repetitions_per_arm": 3,
+    "baseline_arm": "AI with no UI/UX plugin context",
+    "plugin_arm": "AI with this plugin and its P0-P4 contracts"
+  },
+  "results": [
+    {
+      "case_id": "landing-static",
+      "status": "BLOCKED_MISSING_FIXTURE",
+      "archetype": "landing_page",
+      "framework": "static_html_css",
+      "detail": "A complete fixture directory for this case is unavailable."
+    },
+    {
+      "case_id": "dashboard-react-tailwind",
+      "status": "BLOCKED_MISSING_FIXTURE",
+      "archetype": "dashboard",
+      "framework": "react_tailwind",
+      "detail": "A complete fixture directory for this case is unavailable."
+    },
+    {
+      "case_id": "ecommerce-spring-thymeleaf",
+      "status": "BLOCKED_MISSING_FIXTURE",
+      "archetype": "ecommerce",
+      "framework": "spring_boot_thymeleaf_bootstrap",
+      "detail": "A complete fixture directory for this case is unavailable."
+    },
+    {
+      "case_id": "multistep-form-react-tailwind",
+      "status": "BLOCKED_MISSING_FIXTURE",
+      "archetype": "multistep_form",
+      "framework": "react_tailwind",
+      "detail": "A complete fixture directory for this case is unavailable."
+    }
+  ]
+}

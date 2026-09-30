@@ -1,0 +1,344 @@
+{
+  "schema_version": 1,
+  "run_id": "tier3-plugin-pipeline-smoke-2026-09-30",
+  "recorded_at_utc": "2026-09-29T17:39:43.318158+00:00",
+  "run_type": "real_plugin_pipeline_smoke",
+  "paired_arms_compared": false,
+  "score_status": "NOT_SCORED",
+  "evidence_note": "Actual local plugin pipeline calls only; no AI baseline/plugin code-generation arms, no screenshots, and no mock evidence were supplied.",
+  "results": [
+    {
+      "fixture": "target-a-static",
+      "task": "Create a responsive landing page hero and card layout with contact form",
+      "result": {
+        "target": "D:\\Onni_UIUX_Design\\development\\fixtures\\targets\\target-a-static",
+        "task": "Create a responsive landing page hero and card layout with contact form",
+        "stages": {
+          "analyze_repository": {
+            "status": "PASS",
+            "framework": {
+              "name": "static_html",
+              "version": null,
+              "confidence": 0.85,
+              "evidence": [
+                "Found 1 static HTML entry files without framework dependencies",
+                "Found standalone CSS files",
+                "Found vanilla JS files"
+              ],
+              "conflicting_signals": []
+            },
+            "styling": null,
+            "component_count": 7
+          },
+          "orchestrate_ui": {
+            "status": "PASS",
+            "workflow": "existing-ui",
+            "intent": null,
+            "ui_state": "PARTIAL_UI"
+          },
+          "build_knowledge_plan": {
+            "status": "PASS",
+            "framework_pack": null,
+            "selected_knowledge_count": 6
+          },
+          "plan_modification": {
+            "status": "PASS",
+            "step_count": 0,
+            "execution_chunk_count": 3,
+            "affected_files": []
+          },
+          "build_validation_handoff": {
+            "status": "PASS",
+            "requires_runtime": true,
+            "viewports": [
+              "desktop_1440",
+              "tablet_768",
+              "mobile_375"
+            ]
+          },
+          "detect_runtime": {
+            "status": "PASS",
+            "playwright_state": "NOT_DECLARED",
+            "browser_ready": false
+          },
+          "runtime_critic": {
+            "status": "blocked",
+            "authorized_to_proceed": false,
+            "issues": [
+              {
+                "issue_id": "issue_2f81e8c2",
+                "category": "insufficient_evidence",
+                "severity": "CRITICAL",
+                "status": "new_regression",
+                "description": "Runtime evidence is required by the validation plan, but no browser captures or runtime evidence were provided.",
+                "page": "/",
+                "viewport": "desktop_1440",
+                "scenario": "default",
+                "affected_file": null,
+                "affected_component": null,
+                "evidence": "Validation handoff requires runtime execution, but after_evidence contains no captures.",
+                "expected": "Valid runtime evidence captures for all affected routes and viewports.",
+                "actual": "No runtime evidence available.",
+                "likely_cause": "Browser runtime unavailable, execution skipped, or evidence not provided.",
+                "repairable": false,
+                "repair_scope": "execute runtime capture before proceeding",
+                "permission_required": null
+              }
+            ]
+          }
+        },
+        "status": "BLOCKED_BROWSER_RUNTIME",
+        "authorized_to_proceed": false,
+        "runtime_classification": "BLOCKED_NOT_DECLARED"
+      }
+    },
+    {
+      "fixture": "target-b-react",
+      "task": "Build cloud workload dashboard with sidebar drawer, search filter, and loading skeleton",
+      "result": {
+        "target": "D:\\Onni_UIUX_Design\\development\\fixtures\\targets\\target-b-react",
+        "task": "Build cloud workload dashboard with sidebar drawer, search filter, and loading skeleton",
+        "stages": {
+          "analyze_repository": {
+            "status": "PASS",
+            "framework": {
+              "name": "react",
+              "version": "^18.2.0",
+              "confidence": 0.75,
+              "evidence": [
+                "package.json declares 'react': ^18.2.0"
+              ],
+              "conflicting_signals": []
+            },
+            "styling": null,
+            "component_count": 7
+          },
+          "orchestrate_ui": {
+            "status": "PASS",
+            "workflow": "existing-ui",
+            "intent": null,
+            "ui_state": "PARTIAL_UI"
+          },
+          "build_knowledge_plan": {
+            "status": "PASS",
+            "framework_pack": null,
+            "selected_knowledge_count": 18
+          },
+          "plan_modification": {
+            "status": "PASS",
+            "step_count": 0,
+            "execution_chunk_count": 3,
+            "affected_files": []
+          },
+          "build_validation_handoff": {
+            "status": "PASS",
+            "requires_runtime": true,
+            "viewports": [
+              "desktop_1440"
+            ]
+          },
+          "detect_runtime": {
+            "status": "PASS",
+            "playwright_state": "NOT_DECLARED",
+            "browser_ready": false
+          },
+          "runtime_critic": {
+            "status": "blocked",
+            "authorized_to_proceed": false,
+            "issues": [
+              {
+                "issue_id": "issue_ce4664aa",
+                "category": "insufficient_evidence",
+                "severity": "CRITICAL",
+                "status": "new_regression",
+                "description": "Runtime evidence is required by the validation plan, but no browser captures or runtime evidence were provided.",
+                "page": "/",
+                "viewport": "desktop_1440",
+                "scenario": "default",
+                "affected_file": null,
+                "affected_component": null,
+                "evidence": "Validation handoff requires runtime execution, but after_evidence contains no captures.",
+                "expected": "Valid runtime evidence captures for all affected routes and viewports.",
+                "actual": "No runtime evidence available.",
+                "likely_cause": "Browser runtime unavailable, execution skipped, or evidence not provided.",
+                "repairable": false,
+                "repair_scope": "execute runtime capture before proceeding",
+                "permission_required": null
+              }
+            ]
+          }
+        },
+        "status": "BLOCKED_BROWSER_RUNTIME",
+        "authorized_to_proceed": false,
+        "runtime_classification": "BLOCKED_NOT_DECLARED"
+      }
+    },
+    {
+      "fixture": "target-c-next-tailwind",
+      "task": "Improve the pricing page responsive layout while preserving current framework",
+      "result": {
+        "target": "D:\\Onni_UIUX_Design\\development\\fixtures\\targets\\target-c-next-tailwind",
+        "task": "Improve the pricing page responsive layout while preserving current framework",
+        "stages": {
+          "analyze_repository": {
+            "status": "PASS",
+            "framework": {
+              "name": "nextjs",
+              "version": "15.0.0",
+              "confidence": 0.9,
+              "evidence": [
+                "package.json declares 'next': 15.0.0",
+                "Detected Next.js App Router conventions"
+              ],
+              "conflicting_signals": []
+            },
+            "styling": null,
+            "component_count": 7
+          },
+          "orchestrate_ui": {
+            "status": "PASS",
+            "workflow": "existing-ui",
+            "intent": null,
+            "ui_state": "EXISTING_UI"
+          },
+          "build_knowledge_plan": {
+            "status": "PASS",
+            "framework_pack": null,
+            "selected_knowledge_count": 5
+          },
+          "plan_modification": {
+            "status": "PASS",
+            "step_count": 0,
+            "execution_chunk_count": 2,
+            "affected_files": []
+          },
+          "build_validation_handoff": {
+            "status": "PASS",
+            "requires_runtime": true,
+            "viewports": [
+              "desktop_1440",
+              "tablet_768",
+              "mobile_375"
+            ]
+          },
+          "detect_runtime": {
+            "status": "PASS",
+            "playwright_state": "NOT_DECLARED",
+            "browser_ready": false
+          },
+          "runtime_critic": {
+            "status": "blocked",
+            "authorized_to_proceed": false,
+            "issues": [
+              {
+                "issue_id": "issue_d0c2442b",
+                "category": "insufficient_evidence",
+                "severity": "CRITICAL",
+                "status": "new_regression",
+                "description": "Runtime evidence is required by the validation plan, but no browser captures or runtime evidence were provided.",
+                "page": "/pricing",
+                "viewport": "desktop_1440",
+                "scenario": "default",
+                "affected_file": null,
+                "affected_component": null,
+                "evidence": "Validation handoff requires runtime execution, but after_evidence contains no captures.",
+                "expected": "Valid runtime evidence captures for all affected routes and viewports.",
+                "actual": "No runtime evidence available.",
+                "likely_cause": "Browser runtime unavailable, execution skipped, or evidence not provided.",
+                "repairable": false,
+                "repair_scope": "execute runtime capture before proceeding",
+                "permission_required": null
+              }
+            ]
+          }
+        },
+        "status": "BLOCKED_BROWSER_RUNTIME",
+        "authorized_to_proceed": false,
+        "runtime_classification": "BLOCKED_NOT_DECLARED"
+      }
+    },
+    {
+      "fixture": "target-c-next-tailwind-elevated",
+      "task": "Improve the pricing page responsive layout while preserving current framework",
+      "result": {
+        "target": "D:\\Onni_UIUX_Design\\development\\fixtures\\targets\\target-c-next-tailwind-elevated",
+        "task": "Improve the pricing page responsive layout while preserving current framework",
+        "stages": {
+          "analyze_repository": {
+            "status": "PASS",
+            "framework": {
+              "name": "unknown",
+              "version": null,
+              "confidence": 0.0,
+              "evidence": [
+                "No known framework dependencies, configuration files, or conventions detected."
+              ],
+              "conflicting_signals": []
+            },
+            "styling": null,
+            "component_count": 7
+          },
+          "orchestrate_ui": {
+            "status": "PASS",
+            "workflow": "existing-ui",
+            "intent": null,
+            "ui_state": "EXISTING_UI"
+          },
+          "build_knowledge_plan": {
+            "status": "PASS",
+            "framework_pack": null,
+            "selected_knowledge_count": 5
+          },
+          "plan_modification": {
+            "status": "PASS",
+            "step_count": 0,
+            "execution_chunk_count": 2,
+            "affected_files": []
+          },
+          "build_validation_handoff": {
+            "status": "PASS",
+            "requires_runtime": true,
+            "viewports": [
+              "desktop_1440",
+              "tablet_768",
+              "mobile_375"
+            ]
+          },
+          "detect_runtime": {
+            "status": "PASS",
+            "playwright_state": "NOT_DECLARED",
+            "browser_ready": false
+          },
+          "runtime_critic": {
+            "status": "blocked",
+            "authorized_to_proceed": false,
+            "issues": [
+              {
+                "issue_id": "issue_f566fde9",
+                "category": "insufficient_evidence",
+                "severity": "CRITICAL",
+                "status": "new_regression",
+                "description": "Runtime evidence is required by the validation plan, but no browser captures or runtime evidence were provided.",
+                "page": "/pricing",
+                "viewport": "desktop_1440",
+                "scenario": "default",
+                "affected_file": null,
+                "affected_component": null,
+                "evidence": "Validation handoff requires runtime execution, but after_evidence contains no captures.",
+                "expected": "Valid runtime evidence captures for all affected routes and viewports.",
+                "actual": "No runtime evidence available.",
+                "likely_cause": "Browser runtime unavailable, execution skipped, or evidence not provided.",
+                "repairable": false,
+                "repair_scope": "execute runtime capture before proceeding",
+                "permission_required": null
+              }
+            ]
+          }
+        },
+        "status": "BLOCKED_BROWSER_RUNTIME",
+        "authorized_to_proceed": false,
+        "runtime_classification": "BLOCKED_NOT_DECLARED"
+      }
+    }
+  ]
+}

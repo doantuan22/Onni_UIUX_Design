@@ -18,19 +18,25 @@ class RequirementProfile(TypedDict):
 
 class ProblemDiagnosisItem(TypedDict):
     id: str
-    category: Literal["VISUAL", "UX", "RESPONSIVE", "ACCESSIBILITY", "CONSISTENCY", "ARCHITECTURAL_UI", "PERFORMANCE_UI"]
-    surface: str
+    category: Literal["VISUAL", "UX", "RESPONSIVE", "ACCESSIBILITY", "CONSISTENCY", "ARCHITECTURAL_UI", "PERFORMANCE_UI", "UNKNOWN"]
+    surface: Any
     description: str
     severity: Literal["low", "medium", "high", "critical"]
     evidence_refs: list[str]
     confidence: float
+    confidence_level: NotRequired[Literal["HIGH", "MEDIUM", "LOW"]]
+    confidence_score: NotRequired[float]
     user_impact: str
     technical_impact: str
     is_inferred: bool
+    finding_state: NotRequired[Literal["CONFIRMED", "UNKNOWN"]]
+    unknown_reason: NotRequired[str]
 
 class ProblemDiagnosis(TypedDict):
     issues: list[ProblemDiagnosisItem]
     confidence_score: float
+    confidence_level: NotRequired[Literal["HIGH", "MEDIUM", "LOW"]]
+    evidence_refs: NotRequired[list[str]]
 
 class PreservationProfile(TypedDict):
     locked: list[str]
@@ -48,6 +54,10 @@ class DesignStrategy(TypedDict):
     interaction_strategy: NotRequired[str]
     accessibility_strategy: NotRequired[str]
     knowledge_used: list[dict[str, str]]  # list of {"knowledge_id": "...", "reason": "..."}
+    decisions: NotRequired[list[dict[str, Any]]]
+    target: NotRequired[list[str]]
+    constraints: NotRequired[list[str]]
+    reasoning_mode: NotRequired[str]
 
 class RecipeSelection(TypedDict):
     recipe_id: str

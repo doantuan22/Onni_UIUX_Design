@@ -22,6 +22,7 @@ from uiux.engine.modification_planner.step_planner import plan_implementation_st
 from uiux.engine.modification_planner.diagnosis import diagnose_ui_issues
 from uiux.engine.modification_planner.strategy import build_design_strategy
 from uiux.engine.modification_planner.planning_gate import evaluate_planning_gate
+from uiux.engine.modification_planner.semantic_requirements import analyze_semantic_requirements
 from uiux.engine.preservation import (
     L1,
     L2,
@@ -50,6 +51,13 @@ class ModificationPlanner:
         user_goal = (user_request or "").strip()
         active_repo = repo_profile or {}
         active_ui = existing_ui_profile or {}
+        semantic_context = {**active_repo, **active_ui}
+        semantic_context.setdefault("routes", active_repo.get("routes", []))
+        semantic_context.setdefault("pages", active_repo.get("pages", []))
+        knowledge_refs = [str(item.get("id")) for item in (knowledge_plan or {}).get("selected_knowledge", [])
+            if isinstance(item, dict) and item.get("id")]
+        semantic_requirement = analyze_semantic_requirements(user_goal, ui_context=semantic_context,
+            knowledge_refs=knowledge_refs, workflow=workflow)
         
         # Enforce preservation profile for existing-ui workflow
         if workflow == "existing-ui" and not preservation_profile:
@@ -82,6 +90,26 @@ class ModificationPlanner:
 
         # Determine effective task intent
         effective_intent = task_intent or (knowledge_plan.get("task_intent") if knowledge_plan else "general_ui")
+        if effective_intent == "general_ui":
+            semantic_intent = {
+                "create": "create_ui", "improve": "improve_ui", "fix": "improve_ui",
+                "audit": "audit_only",
+                "redesign": "full_redesign" if semantic_requirement["scope"]["value"] == "global" else "page_redesign",
+            }.get(semantic_requirement["task_type"]["value"])
+            concerns = semantic_requirement.get("concerns", [])
+            if "responsive" in concerns:
+                semantic_intent = "responsive_fix"
+            elif "accessibility" in concerns:
+                semantic_intent = "accessibility_fix"
+            elif "component_consistency" in concerns:
+                semantic_intent = "consistency_fix"
+            if semantic_intent:
+                effective_intent = semantic_intent
+
+        resolved_request_scope = requested_scope
+        if requested_scope == "global" and semantic_requirement["scope"]["state"] in ("EXPLICIT", "INFERRED"):
+            if semantic_requirement["scope"]["value"] in ("page", "section", "component", "token"):
+                resolved_request_scope = semantic_requirement["scope"]["value"]
 
         status_reasons: list[str] = []
         violations: list[str] = []
@@ -89,7 +117,7 @@ class ModificationPlanner:
         # 1. Scope Resolution
         scope_info = resolve_scope(
             user_goal=user_goal,
-            requested_scope=requested_scope,
+            requested_scope=resolved_request_scope,
             task_intent=effective_intent,
             repo_profile=active_repo,
         )
@@ -112,6 +140,16 @@ class ModificationPlanner:
         # Check for unknown repository structure in existing-ui workflow
         from uiux.engine.modification_planner.surface_resolver import _collect_repo_files, _collect_repo_components
         known_files = _collect_repo_files(active_repo)
+        known_surfaces = active_repo.get("routes", []) or active_repo.get("pages", [])
+        has_selected_p0_surface = bool(active_ui.get("selected_surface") or active_ui.get("selected_page") or active_ui.get("current_route"))
+        if (semantic_requirement.get("ambiguities") and not semantic_requirement.get("target_surfaces", {}).get("value")
+            and isinstance(known_surfaces, list) and len(known_surfaces) > 1 and not has_selected_p0_surface):
+            return self._build_empty_plan(
+                user_goal=user_goal, effective_intent=effective_intent, scope_info=scope_info,
+                workflow=workflow, active_repo=active_repo, active_pres=active_pres,
+                knowledge_plan=knowledge_plan, status="insufficient_context",
+                status_reasons=["Ambiguous request has multiple candidate pages; select one target before planning."],
+            )
         if workflow == "existing-ui" and not known_files and not _collect_repo_components(active_repo) and not active_repo.get("routes"):
             return self._build_empty_plan(
                 user_goal=user_goal,
@@ -277,6 +315,7 @@ class ModificationPlanner:
                 "user_goal": user_goal,
                 "task_intent": effective_intent,
                 "requested_scope": scope_info.get("scope", "component"),
+                "semantic_requirements": semantic_requirement,
             },
             "workflow": workflow,
             "repository": repo_context,
@@ -343,6 +382,11 @@ class ModificationPlanner:
         blast = plan.get("blast_radius", {})
         preservation = plan["preservation"]
         user_goal = request.get("user_goal", "")
+        semantic = request.get("semantic_requirements") or analyze_semantic_requirements(
+            user_goal, ui_context={**plan.get("repository", {}), **active_ui},
+            knowledge_refs=(plan.get("knowledge", {}) or {}).get("routed_catalog_ids", []),
+            workflow=plan.get("workflow"))
+        request["semantic_requirements"] = semantic
 
         plan["p2_schema_version"] = 2
         plan["metadata"] = {"plan_id": plan.get("plan_id", ""), "workflow": plan.get("workflow", "")}
@@ -350,16 +394,21 @@ class ModificationPlanner:
             "user_goal": user_goal,
             "task_intent": request.get("task_intent", "general_ui"),
             "requested_scope": request.get("requested_scope", "global"),
-            "explicit_requirements": [],
-            "explicit_constraints": list((explicit_constraints or {}).keys()),
+            "explicit_requirements": [str(x.get("value")) for x in semantic.get("explicit_requirements", []) if x.get("value")],
+            "explicit_constraints": [str(x.get("value")) for x in semantic.get("explicit_constraints", []) if x.get("value")] + list((explicit_constraints or {}).keys()),
             "brand_constraints": [
                 k for k, v in preservation.get("granular_permissions", {}).items() if v == "locked"
             ],
-            "preservation_requests": [],
-            "expected_outcome": f"Implement {request.get('task_intent', 'general_ui')} within scope.",
+            "preservation_requests": [str(x.get("value")) for x in semantic.get("must_keep", []) + semantic.get("must_not_change", []) if x.get("value")],
+            "expected_outcome": f"Address {', '.join(semantic.get('concerns', [])) or request.get('task_intent', 'general UI')} within the resolved target and authorized change level.",
         }
-        plan["diagnosis"] = diagnose_ui_issues(user_goal, active_ui, knowledge_plan)
-        plan["strategy"] = build_design_strategy(plan["diagnosis"], knowledge_plan, active_ui)
+        plan["reasoning_mode"] = semantic.get("reasoning_mode", "HEURISTIC_FALLBACK")
+        plan["reasoning_metadata"] = {"language": semantic.get("language", "OTHER"),
+            "confidence": semantic.get("confidence", "LOW"), "ambiguities": semantic.get("ambiguities", []),
+            "evidence_refs": semantic.get("evidence_refs", []), "knowledge_refs": semantic.get("knowledge_refs", []),
+            "rationale": semantic.get("rationale", [])}
+        plan["diagnosis"] = diagnose_ui_issues(user_goal, active_ui, knowledge_plan, semantic)
+        plan["strategy"] = build_design_strategy(plan["diagnosis"], knowledge_plan, active_ui, semantic)
 
         granular = preservation.get("granular_permissions", {})
         preservation["locked"] = [k for k, v in granular.items() if v == "locked"]
@@ -383,17 +432,21 @@ class ModificationPlanner:
             {**c, "change_level": c.get("level", L1)} for c in plan.get("change_classification", {}).get("changes", [])
         ]
         plan["recipes"] = []
-        plan["decision_trace"] = []
+        plan["decision_trace"] = [{"decision": "scope_and_constraints", "reason": item,
+            "evidence_refs": ",".join(semantic.get("evidence_refs", [])), "knowledge_refs": ",".join(semantic.get("knowledge_refs", []))}
+            for item in semantic.get("rationale", [])]
         plan["execution_chunks"] = [
             {
                 "id": f"chunk_{i}",
                 "step_id": step.get("id", f"step_{i + 1}"),
                 "target": step.get("target", ""),
-                "description": step.get("description") or f"{step.get('action', 'modify')} {step.get('target', '')}".strip(),
-                "scope": step.get("scope", "local"),
-                "expected_result": step.get("expected_result", ""),
+                "description": (step.get("description") or " ".join(x for x in (
+                    str(step.get("action", "modify")), str(step.get("target") or ", ".join(str(v.get("name", v)) if isinstance(v, dict) else str(v) for v in semantic.get("target_surfaces", {}).get("value", []))),
+                    str(step.get("expected_result", ""))) if x.strip())).strip() or "Apply the approved change within the resolved scope.",
+                "scope": step.get("scope", plan.get("request", {}).get("requested_scope", "local")) or "local",
+                "expected_result": step.get("expected_result") or f"Address the approved {', '.join(semantic.get('concerns', [])) or 'UI'} requirements within scope.",
                 "dependencies": step.get("dependencies", []),
-                "verification_required": [],
+                "verification_required": step.get("validation_required") or list(plan.get("validation", {}).get("required_checks", [])),
             }
             for i, step in enumerate(plan.get("implementation_steps", []))
         ]
@@ -406,7 +459,15 @@ class ModificationPlanner:
             "accessibility_checks": list(validation.get("accessibility", [])) or ["verify wcag contrast"],
             "check_steps": list(validation.get("required_checks", [])) or ["visual_qa"],
         }
+        for page in (semantic.get("target_surfaces", {}).get("value") or []):
+            route = page.get("route") if isinstance(page, dict) else None
+            if route and route not in plan["impact"]["affected_pages"]:
+                plan["impact"]["affected_pages"].append(route)
+            if route and route not in plan["verification"]["pages"]:
+                plan["verification"]["pages"].append(route)
         plan["planning_gate"] = evaluate_planning_gate(plan)
+        from uiux.engine.modification_planner.reasoning_validation import validate_reasoning_completeness
+        plan["reasoning_completeness"] = validate_reasoning_completeness(plan)
         return plan
 
     def _build_empty_plan(

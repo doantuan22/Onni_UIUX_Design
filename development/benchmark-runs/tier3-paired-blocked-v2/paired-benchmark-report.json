@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "benchmark_id": "uiux-tier3-reasoning-2026-09",
+  "created_at_utc": "2026-09-29T17:41:52.329223+00:00",
+  "status": "BLOCKED",
+  "score_status": "NOT_SCORED",
+  "paired_arms_compared": false,
+  "contract": {
+    "same_fixture_copy": true,
+    "same_request": true,
+    "same_environment": true,
+    "same_time_budget_seconds": 1800,
+    "repetitions_per_arm": 3,
+    "baseline_arm": "AI with no UI/UX plugin context",
+    "plugin_arm": "AI with this plugin and its P0-P4 contracts"
+  },
+  "results": [
+    {
+      "case_id": "landing-static",
+      "status": "BLOCKED_INCOMPLETE_ARMS",
+      "fixture": "development/fixtures/targets/target-a-static",
+      "request": "Improve the landing page mobile layout while preserving existing content.",
+      "initial_fixture_sha256": "e386914a80f5587094ecdd7ac41057368cf4b9250b8c4484fec628ec590125d7",
+      "arms": {
+        "baseline": {
+          "status": "BLOCKED_NO_ARM_COMMAND"
+        },
+        "plugin": {
+          "status": "BLOCKED_NO_ARM_COMMAND"
+        }
+      }
+    },
+    {
+      "case_id": "dashboard-react-tailwind",
+      "status": "BLOCKED_INCOMPLETE_ARMS",
+      "fixture": "development/fixtures/targets/target-b-react",
+      "request": "Improve the dashboard mobile navigation and search filter while preserving data and behavior.",
+      "initial_fixture_sha256": "ecd708ff51ebf73e4107116e646f1acefe91d35410ee00379808afab0fb37393",
+      "arms": {
+        "baseline": {
+          "status": "BLOCKED_NO_ARM_COMMAND"
+        },
+        "plugin": {
+          "status": "BLOCKED_NO_ARM_COMMAND"
+        }
+      }
+    },
+    {
+      "case_id": "ecommerce-spring-thymeleaf",
+      "status": "BLOCKED_MISSING_FIXTURE",
+      "archetype": "ecommerce",
+      "framework": "spring_boot_thymeleaf_bootstrap",
+      "detail": "A complete fixture directory for this case is unavailable."
+    },
+    {
+      "case_id": "multistep-form-react-tailwind",
+      "status": "BLOCKED_MISSING_FIXTURE",
+      "archetype": "multistep_form",
+      "framework": "react_tailwind",
+      "detail": "A complete fixture directory for this case is unavailable."
+    }
+  ]
+}

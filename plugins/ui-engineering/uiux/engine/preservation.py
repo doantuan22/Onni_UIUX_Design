@@ -102,6 +102,12 @@ EXPLICIT_REDESIGN_PATTERNS = [
     r"\bfull\s+redesign\b",
     r"\boverhaul\s+(?:the\s+)?(?:ui|branding)\b",
     r"\bcomplete\s+redesign\b",
+    r"\bthiết\s+kế\s+lại\b",
+    r"\bđập\s+đi\s+làm\s+lại\b",
+    r"\bđập\s+đi\s+xây\s+lại\b",
+    r"\b(?:được\s+phép|có\s+thể)\s+redesign\b",
+    r"\b(?:được\s+phép|có\s+thể)\s+thiết\s+kế\s+lại\b",
+    r"\bthiết\s+kế\s+lại\s+(?:toàn\s+bộ\s+)?(?:trang|dashboard|landing)\b",
 ]
 
 # Patterns for explicit palette change permission
@@ -116,6 +122,7 @@ PALETTE_CHANGE_PATTERNS = [
 # Patterns for explicit layout / architecture permission
 LAYOUT_CHANGE_PATTERNS = [
     r"\bđược\s+phép\s+thay\s+đổi\s+layout\b",
+    r"\b(?:được\s+phép|có\s+thể)\s+(?:đổi|thay\s+đổi)\s+bố\s+cục\b",
     r"\bthay\s+đổi\s+bố\s+cục\b",
     r"\bchange\s+(?:the\s+)?layout\b",
     r"\brestructure\s+(?:the\s+)?layout\b",

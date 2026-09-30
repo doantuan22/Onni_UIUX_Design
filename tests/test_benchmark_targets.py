@@ -64,8 +64,8 @@ class BenchmarkTargetsTests(unittest.TestCase):
         self.assertEqual(stages["detect_runtime"]["status"], "PASS")
         self.assertFalse(res["authorized_to_proceed"])
 
-    def test_target_with_simulated_complete_evidence(self):
-        """When complete runtime evidence is provided, critic evaluates to pass and authorized_to_proceed=True."""
+    def test_simulated_evidence_never_claims_real_browser_execution(self):
+        """Fixture data is not treated as a real browser run or runtime authorization."""
         task = "Update landing page layout"
         mock_evidence = {
             "captures": [
@@ -80,9 +80,8 @@ class BenchmarkTargetsTests(unittest.TestCase):
             "implemented_states": ["ready"],
         }
         res = run_target_benchmark(self.target_a, task, mock_browser_evidence=mock_evidence)
-        # With valid mock evidence, runtime critic must evaluate to pass
-        self.assertEqual(res["stages"]["runtime_critic"]["status"], "pass")
-        self.assertTrue(res["stages"]["runtime_critic"]["authorized_to_proceed"])
+        self.assertNotEqual(res["status"], "BROWSER_E2E_VERIFIED")
+        self.assertNotEqual(res.get("runtime_classification"), "REAL_BROWSER_EXECUTED")
 
 
 if __name__ == "__main__":

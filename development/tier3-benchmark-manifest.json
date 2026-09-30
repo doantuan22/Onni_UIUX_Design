@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "benchmark_id": "uiux-tier3-reasoning-2026-09",
+  "pairing_contract": {
+    "same_fixture_copy": true,
+    "same_request": true,
+    "same_environment": true,
+    "same_time_budget_seconds": 1800,
+    "repetitions_per_arm": 3,
+    "baseline_arm": "AI with no UI/UX plugin context",
+    "plugin_arm": "AI with this plugin and its P0-P4 contracts"
+  },
+  "cases": [
+    {"id":"landing-static","archetype":"landing_page","framework":"static_html_css","fixture":"development/fixtures/targets/target-a-static","request":"Improve the landing page mobile layout while preserving existing content."},
+    {"id":"dashboard-react-tailwind","archetype":"dashboard","framework":"react_tailwind","fixture":"development/fixtures/targets/target-b-react","request":"Improve the dashboard mobile navigation and search filter while preserving data and behavior."},
+    {"id":"ecommerce-spring-thymeleaf","archetype":"ecommerce","framework":"spring_boot_thymeleaf_bootstrap","fixture":null,"request":"Improve the product listing and checkout responsiveness while preserving business logic."},
+    {"id":"multistep-form-react-tailwind","archetype":"multistep_form","framework":"react_tailwind","fixture":null,"request":"Improve the multi-step enrollment form accessibility and mobile layout while preserving validation behavior."}
+  ],
+  "fixture_validation": {
+    "landing-static": "available",
+    "dashboard-react-tailwind": "partial_match_react_without_tailwind_manifest",
+    "ecommerce-spring-thymeleaf": "missing",
+    "multistep-form-react-tailwind": "missing"
+  },
+  "arm_commands": {
+    "baseline": null,
+    "plugin": null
+  },
+  "scoring": {
+    "dimensions": ["requirement_coverage", "preservation", "scope_control", "responsive_quality", "accessibility", "interaction_quality", "visual_consistency", "regression_count"],
+    "reviewers_required": 2,
+    "blind_review": true,
+    "report_variance_across_repetitions": true
+  }
+}

@@ -87,13 +87,13 @@ def resolve_scope(
                     reasons.append(f"Ambiguous target: request mentions multiple apps ({', '.join(distinct_apps)}).")
             else:
                 # If requested scope is generic "global" but repo has multiple apps without clear target
-                if requested_scope == "global" and len(app_names) > 1 and not any(k in goal_lower for k in ("toàn bộ", "all apps", "entire monorepo")):
+                if requested_scope not in app_names and len(app_names) > 1 and not any(k in goal_lower for k in ("toàn bộ", "all apps", "entire monorepo")):
                     is_insufficient_context = True
                     reasons.append(f"Repository contains {len(app_names)} applications ({', '.join(app_names)}). Target application must be specified.")
 
     # 2. Scope classification based on user goal and task intent
     # Component-level keywords
-    component_pattern = r'\b(button|card|modal|dialog|navbar|header|footer|sidebar|input|dropdown|select|badge|table|avatar|tabs?|accordion|drawer)\b'
+    component_pattern = r'\b(button|card|modal|dialog|navbar|header|footer|sidebar|input|dropdown|select|badge|table|avatar|tabs?|accordion|drawer|nut|bo\s+loc|filter|danh\s+sach\s+san\s+pham)\b'
     comp_match = re.search(component_pattern, goal_lower)
 
     # Token/Design system keywords
@@ -101,7 +101,7 @@ def resolve_scope(
     token_match = re.search(token_pattern, goal_lower)
 
     # Page-level keywords
-    page_pattern = r'\b(page|checkout|cart|login|register|dashboard|pricing|landing|profile|settings|home)\b'
+    page_pattern = r'\b(page|checkout|cart|login|register|dashboard|pricing|landing|profile|settings|home|trang\s+(?:checkout|dashboard|landing|san\s+pham)|danh\s+sach\s+san\s+pham|product\s+listing)\b'
     page_match = re.search(page_pattern, goal_lower)
 
     # Global-level keywords
@@ -118,7 +118,9 @@ def resolve_scope(
 
     # If requested_scope was passed as generic "global", refine it based on goal
     if requested_scope == "global":
-        if global_match and not comp_match and not redesign_state["prohibited"]:
+        # A full redesign of one named page remains page-scoped; it is not permission
+        # to expand to the whole application.
+        if global_match and not comp_match and not page_match and not redesign_state["prohibited"]:
             resolved_scope = "global"
             reasons.append("Global scope requested for full product redesign.")
         elif page_match and not comp_match:
@@ -156,7 +158,11 @@ def resolve_scope(
         reasons.append("Vague enhancement request ('modernize'/'clean up') suppressed from widening to global scope.")
 
     target_entity: str | None = None
-    if comp_match:
+    if re.search(r"\b(danh\s+sach\s+san\s+pham|product\s+listing|product\s+list)\b", goal_lower):
+        target_entity = "products"
+    elif re.search(r"\b(thanh\s+toan|checkout)\b", goal_lower):
+        target_entity = "checkout"
+    elif comp_match:
         target_entity = comp_match.group(1)
     elif page_match:
         target_entity = page_match.group(1)

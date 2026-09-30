@@ -205,6 +205,7 @@ def resolve_surface(
 
     affected_routes: list[str] = []
     affected_pages: list[str] = []
+    affected_surface_candidates: list[dict[str, str]] = []
 
     for r in repo_routes:
         r_path = r.get("path", "") if isinstance(r, dict) else str(r)
@@ -219,8 +220,9 @@ def resolve_surface(
                 affected_pages.append(p_name)
 
     if not affected_pages and scope == "page" and target_entity:
-        affected_pages.append(f"/{target_entity}")
-        affected_routes.append(f"/{target_entity}")
+        # Do not fabricate a route when P0 did not discover one. Preserve the
+        # requested label as an ungrounded candidate for clarification/matching.
+        affected_surface_candidates.append({"name": target_entity, "kind": "page", "reason": "No matching P0 route/page entry was found."})
 
     # 5. Discover Affected Files (Strictly Grounded)
     affected_files: list[str] = []
@@ -327,6 +329,7 @@ def resolve_surface(
     return {
         "files": _dedupe(affected_files),
         "pages": _dedupe(affected_pages),
+        "affected_surface_candidates": affected_surface_candidates,
         "components": _dedupe(allowed_components),
         "tokens": _dedupe(affected_tokens),
         "routes": _dedupe(affected_routes),
